@@ -4909,7 +4909,7 @@ async function voteValidation(pid) {
   var place = placeRes.data;
   var isImport = place && !place.user_id;
   if (!isImport && place && place.user_id === currentUser.id) { showToast('⛔ Vous ne pouvez pas valider votre propre lieu', 'error'); return; }
-  if (!isImport && (isAdmin || isModerator)) { await validatePlace(pid); return; }
+  if (isAdmin || isModerator) { await validatePlace(pid); return; }
   var existing = await db.from('place_validations').select('id').eq('place_id', pid).eq('user_id', currentUser.id).maybeSingle();
   if (existing.data) { showToast(isImport ? 'Vous avez déjà confirmé ce lieu' : 'Vous avez déjà voté pour ce lieu', 'error'); return; }
   var weight = isTrusted ? 2 : 1;
