@@ -70,7 +70,10 @@ input[type=text] { max-width: 100%; }
 .queue-group-title { color: #6ee7b7; font-size: 12px; font-weight: 700; margin-bottom: 10px; }
 .queue-group label { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #e8eaf0; padding: 4px 0; cursor: pointer; }
 .queue-group label:hover { color: #6ee7b7; }
-.queue-item-status { margin-left: auto; font-size: 11px; }
+.q-status { margin-left: auto; font-size: 11px; min-width: 16px; text-align: right; }
+.q-active label { color: #6ee7b7 !important; font-weight: 700; }
+.q-done   label { color: #4ade80 !important; opacity: 0.75; }
+.q-fail   label { color: #f87171 !important; opacity: 0.75; }
 </style>
 </head>
 <body>
@@ -1458,6 +1461,26 @@ function setQueueProgress(pct) { document.getElementById('queue-progress').style
 function queueSelectAll()  { document.querySelectorAll('.q-type').forEach(function(c){ c.checked=true; }); }
 function queueSelectNone() { document.querySelectorAll('.q-type').forEach(function(c){ c.checked=false; }); }
 
+function _qSetStatus(type, icon, cls) {
+  var cb = document.querySelector('.q-type[value="'+type+'"]');
+  if (!cb) return;
+  var label = cb.closest('label');
+  var span = label.querySelector('.q-status');
+  if (!span) { span = document.createElement('span'); span.className = 'q-status'; label.appendChild(span); }
+  span.textContent = icon;
+  label.parentElement.classList.remove('q-active','q-done','q-fail');
+  if (cls) label.parentElement.classList.add(cls);
+}
+
+function _qResetAllStatus() {
+  document.querySelectorAll('.q-type').forEach(function(cb) {
+    var label = cb.closest('label');
+    var span = label.querySelector('.q-status');
+    if (span) span.textContent = '';
+    label.parentElement.classList.remove('q-active','q-done','q-fail');
+  });
+}
+
 async function runQueueItem(type, zone) {
   var catName = CAT_NAMES[type];
   if (!catName) { qLog('Type inconnu : ' + type, 'err'); return false; }
@@ -1536,22 +1559,36 @@ async function startQueue(returnResult) {
   document.getElementById('btn-queue-abort').style.display = 'inline-block';
   document.getElementById('queue-log').innerHTML = '';
   setQueueProgress(0);
+  _qResetAllStatus();
+  // marquer tous les éléments cochés comme "en attente"
+  checked.forEach(function(t){ _qSetStatus(t, '🕐', ''); });
   qLog('File d\'attente : ' + checked.length + ' type(s) | ' + zone.split('|').length + ' zone(s)', 'info');
   var success = 0, failed = 0;
   for (var i = 0; i < checked.length; i++) {
-    if (queueAborted) break;
-    var label = CAT_NAMES[checked[i]] || checked[i];
-    document.getElementById('queue-status').textContent = (i+1) + '/' + checked.length + ' — ' + label;
+    if (queueAborted) { _qSetStatus(checked[i], '⏹', ''); break; }
+    var catLabel = CAT_NAMES[checked[i]] || checked[i];
+    document.getElementById('queue-status').textContent = (i+1) + '/' + checked.length + ' — ' + catLabel;
     setQueueProgress(Math.round((i / checked.length) * 100));
+    _qSetStatus(checked[i], '▶', 'q-active');
+    // faire défiler l'élément en cours dans la vue
+    var activeCb = document.querySelector('.q-type[value="'+checked[i]+'"]');
+    if (activeCb) activeCb.scrollIntoView({ block:'nearest', behavior:'smooth' });
     var ok = await runQueueItem(checked[i], zone);
-    if (ok) success++; else { failed++; if (!queueAborted) { qLog('Pause 5s avant le suivant...', 'info'); await sleep(5000); } }
+    if (ok) {
+      success++;
+      _qSetStatus(checked[i], '✅', 'q-done');
+    } else {
+      failed++;
+      _qSetStatus(checked[i], '❌', 'q-fail');
+      if (!queueAborted) { qLog('Pause 5s avant le suivant...', 'info'); await sleep(5000); }
+    }
     if (!queueAborted && i < checked.length-1) await sleep(3000);
   }
   setQueueProgress(100);
   document.getElementById('btn-queue-start').disabled = false;
   document.getElementById('btn-queue-abort').style.display = 'none';
   var msg = queueAborted ? '⏹ File arrêtée.' : ('🎉 File terminée ! ' + success + ' réussi · ' + failed + ' échoué');
-  document.getElementById('queue-status').textContent = queueAborted ? '⏹ Arrêtée' : '✅ Terminée';
+  document.getElementById('queue-status').textContent = queueAborted ? '⏹ Arrêtée' : '✅ ' + success + '/' + checked.length + ' réussis';
   qLog(msg, queueAborted ? 'err' : 'ok');
   if (returnResult) return { success: success, failed: failed };
 }
