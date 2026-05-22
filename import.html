@@ -441,7 +441,7 @@ input[type=text] { max-width: 100%; }
 <div class="section">
   <h2>📋 File d'attente OSM</h2>
   <p class="sub">Coche plusieurs types → lance → tout s'importe automatiquement l'un après l'autre.</p>
-  <div class="queue-grid">
+  <div class="queue-grid" style="grid-template-columns:1fr 1fr 1fr">
     <div class="queue-group">
       <div class="queue-group-title">🚐 Van Life & Camping-car</div>
       <label><input type="checkbox" class="q-type" value="camping"> 🅿️ Aire de camping-car officielle</label>
@@ -453,18 +453,52 @@ input[type=text] { max-width: 100%; }
       <label><input type="checkbox" class="q-type" value="rest_area"> 🛣️ Aire de repos (autoroute)</label>
       <label><input type="checkbox" class="q-type" value="dump_service"> 🚿 Aire de service camping-car</label>
       <label><input type="checkbox" class="q-type" value="dump"> 🗑️ Station de vidange</label>
+      <label><input type="checkbox" class="q-type" value="picnic"> 🪑 Aires de pique-nique</label>
     </div>
     <div class="queue-group">
-      <div class="queue-group-title">🏙️ Services urbains</div>
+      <div class="queue-group-title">🏙️ Services & Commerces</div>
       <label><input type="checkbox" class="q-type" value="wc"> 🚻 Toilettes publiques</label>
       <label><input type="checkbox" class="q-type" value="shower"> 🚿 Douches publiques</label>
       <label><input type="checkbox" class="q-type" value="eau"> 💧 Bornes eau potable</label>
       <label><input type="checkbox" class="q-type" value="laundry"> 👕 Lavomatiques</label>
       <label><input type="checkbox" class="q-type" value="electric"> ⚡ Bornes recharge électrique</label>
+      <label><input type="checkbox" class="q-type" value="vae"> 🛴 Bornes recharge VAE</label>
       <label><input type="checkbox" class="q-type" value="fuel"> ⛽ Stations-service</label>
+      <label><input type="checkbox" class="q-type" value="wifi"> 📶 WiFi public gratuit</label>
       <label><input type="checkbox" class="q-type" value="pharmacy"> 💊 Pharmacies</label>
-      <label><input type="checkbox" class="q-type" value="picnic"> 🪑 Aires de pique-nique</label>
+      <label><input type="checkbox" class="q-type" value="hospital"> 🏥 Hôpitaux / Urgences</label>
+      <label><input type="checkbox" class="q-type" value="supermarket_auto"> 🏪 Supérettes autonomes 24/7</label>
+      <label><input type="checkbox" class="q-type" value="bakery"> 🥖 Boulangeries</label>
+      <label><input type="checkbox" class="q-type" value="market"> 🛍️ Marchés locaux</label>
+      <label><input type="checkbox" class="q-type" value="tourist"> ℹ️ Offices de tourisme</label>
+      <label><input type="checkbox" class="q-type" value="sport"> ⚽ Terrains de sport publics</label>
       <label><input type="checkbox" class="q-type" value="bike_repair"> 🔧 Bornes réparation vélo</label>
+      <label><input type="checkbox" class="q-type" value="bike_rental"> 🚲 Vélos en libre-service</label>
+      <label><input type="checkbox" class="q-type" value="car_sharing"> 🚗 Voitures en libre-service</label>
+      <label><input type="checkbox" class="q-type" value="moto_rental"> 🛵 Scooters / motos</label>
+      <label><input type="checkbox" class="q-type" value="boat_rental"> 🚤 Kayak / canoë / barque</label>
+    </div>
+    <div class="queue-group">
+      <div class="queue-group-title">🛎️ Distributeurs 24/7</div>
+      <label><input type="checkbox" class="q-type" value="pizza"> 🍕 Distributeur de pizzas</label>
+      <label><input type="checkbox" class="q-type" value="pain"> 🥐 Pain & viennoiseries</label>
+      <label><input type="checkbox" class="q-type" value="glacon"> 🧊 Glaçons</label>
+      <label><input type="checkbox" class="q-type" value="huitre"> 🦪 Huîtres</label>
+      <label><input type="checkbox" class="q-type" value="mer"> 🦞 Fruits de mer</label>
+      <label><input type="checkbox" class="q-type" value="fermier"> 🧺 Casier fermier</label>
+      <label><input type="checkbox" class="q-type" value="milk"> 🥛 Lait frais</label>
+      <label><input type="checkbox" class="q-type" value="eggs"> 🥚 Œufs</label>
+      <label><input type="checkbox" class="q-type" value="honey"> 🍯 Miel</label>
+      <label><input type="checkbox" class="q-type" value="fishing"> 🎣 Matériel de pêche</label>
+      <label><input type="checkbox" class="q-type" value="flowers"> 💐 Fleurs</label>
+      <label><input type="checkbox" class="q-type" value="books"> 📚 Livres</label>
+      <label><input type="checkbox" class="q-type" value="coffee"> ☕ Café</label>
+      <label><input type="checkbox" class="q-type" value="drinks"> 🥤 Boissons</label>
+      <label><input type="checkbox" class="q-type" value="petfood"> 🐾 Croquettes animaux</label>
+      <label><input type="checkbox" class="q-type" value="gaz"> 🔵 Bouteilles de gaz</label>
+      <label><input type="checkbox" class="q-type" value="hygiene"> 🧴 Hygiène féminine</label>
+      <label><input type="checkbox" class="q-type" value="firstaid"> 🩹 Premiers secours</label>
+      <label><input type="checkbox" class="q-type" value="condoms"> 🛡️ Préservatifs</label>
     </div>
   </div>
   <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
@@ -472,10 +506,15 @@ input[type=text] { max-width: 100%; }
     <button class="btn btn-sec" onclick="queueSelectNone()">Tout décocher</button>
     <span style="color:#8b91a8;font-size:12px">Zone : celle sélectionnée dans l'onglet OSM ci-dessus</span>
   </div>
-  <div style="margin-bottom:8px">
-    <button class="btn" id="btn-queue-start" onclick="startQueue()">▶ Lancer la file d'attente</button>
+  <div style="margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+    <button class="btn" id="btn-queue-start" onclick="startQueue()">▶ Lancer maintenant</button>
     <button class="btn btn-danger" id="btn-queue-abort" onclick="abortQueue()" style="display:none">⏹ Arrêter</button>
-    <span id="queue-status" style="font-size:12px;color:#8b91a8;margin-left:12px"></span>
+    <span style="color:#8b91a8;font-size:12px">ou</span>
+    <input type="time" id="schedule-time" value="05:00" style="width:100px;margin-bottom:0;display:inline-block">
+    <button class="btn btn-sec" id="btn-schedule" onclick="scheduleQueue()">⏰ Programmer</button>
+    <button class="btn btn-danger" id="btn-cancel-schedule" onclick="cancelSchedule()" style="display:none">✕ Annuler</button>
+    <span id="schedule-countdown" style="font-size:12px;color:#6ee7b7;font-weight:700;margin-left:4px"></span>
+    <span id="queue-status" style="font-size:12px;color:#8b91a8;margin-left:4px"></span>
   </div>
   <div class="progress-bar"><div class="progress-fill" id="queue-progress"></div></div>
   <div class="log" id="queue-log"><span class="log-gray">En attente...</span></div>
@@ -1370,6 +1409,48 @@ async function startQueue() {
 }
 
 function abortQueue() { queueAborted = true; aborted = true; }
+
+// ── Programmation horaire
+var _scheduleTimer = null;
+var _scheduleCountdownTimer = null;
+
+function scheduleQueue() {
+  var timeVal = document.getElementById('schedule-time').value;
+  if (!timeVal) return;
+  var now = new Date();
+  var parts = timeVal.split(':');
+  var target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), parseInt(parts[0]), parseInt(parts[1]), 0, 0);
+  if (target <= now) target.setDate(target.getDate() + 1); // demain si l'heure est passée
+  var msDelay = target - now;
+  cancelSchedule();
+  document.getElementById('btn-schedule').disabled = true;
+  document.getElementById('btn-cancel-schedule').style.display = 'inline-block';
+  document.getElementById('schedule-time').disabled = true;
+  qLog('⏰ Démarrage programmé à ' + timeVal + ' (dans ' + Math.round(msDelay/60000) + ' min)', 'info');
+  _scheduleTimer = setTimeout(function() {
+    cancelSchedule();
+    qLog('⏰ Heure atteinte — démarrage automatique !', 'ok');
+    startQueue();
+  }, msDelay);
+  _scheduleCountdownTimer = setInterval(function() {
+    var remaining = target - new Date();
+    if (remaining <= 0) { clearInterval(_scheduleCountdownTimer); document.getElementById('schedule-countdown').textContent = ''; return; }
+    var h = Math.floor(remaining / 3600000);
+    var m = Math.floor((remaining % 3600000) / 60000);
+    var s = Math.floor((remaining % 60000) / 1000);
+    document.getElementById('schedule-countdown').textContent =
+      '⏳ ' + (h ? h + 'h ' : '') + (m ? m + 'min ' : '') + s + 's';
+  }, 1000);
+}
+
+function cancelSchedule() {
+  if (_scheduleTimer) { clearTimeout(_scheduleTimer); _scheduleTimer = null; }
+  if (_scheduleCountdownTimer) { clearInterval(_scheduleCountdownTimer); _scheduleCountdownTimer = null; }
+  document.getElementById('btn-schedule').disabled = false;
+  document.getElementById('btn-cancel-schedule').style.display = 'none';
+  document.getElementById('schedule-time').disabled = false;
+  document.getElementById('schedule-countdown').textContent = '';
+}
 
 // ── Init
 window.addEventListener('DOMContentLoaded', function() {
