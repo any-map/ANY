@@ -600,7 +600,23 @@ function buildQuery(type, b) {
   if (type==='shower')     return t+'node["amenity"="shower"]('+b+');\nnode["amenity"="toilets"]["shower"="yes"]('+b+');'+e;
   if (type==='eau')        return t+'node["amenity"="drinking_water"]('+b+');\nnode["amenity"="water_point"]('+b+');\nnode["amenity"="fountain"]["drinking_water"="yes"]('+b+');'+e;
   if (type==='dump')       return t+'node["amenity"="sanitary_dump_station"]('+b+');\nnode["amenity"="waste_disposal"]["motorhome"="yes"]('+b+');'+e;
-  if (type==='camping')    return t+'node["tourism"="caravan_site"]('+b+');\nway["tourism"="caravan_site"]('+b+');\nnode["amenity"="parking"]["motorhome"="yes"]('+b+');\nnode["amenity"="parking"]["campers"="yes"]('+b+');'+ec;
+  if (type==='camping')    return t
+    +'node["tourism"="caravan_site"]('+b+');\n'
+    +'way["tourism"="caravan_site"]('+b+');\n'
+    +'relation["tourism"="caravan_site"]('+b+');\n'
+    +'node["amenity"="parking"]["motorhome"="yes"]('+b+');\n'
+    +'way["amenity"="parking"]["motorhome"="yes"]('+b+');\n'
+    +'node["amenity"="parking"]["campers"="yes"]('+b+');\n'
+    +'way["amenity"="parking"]["campers"="yes"]('+b+');\n'
+    +'node["amenity"="motorhome_parking"]('+b+');\n'
+    +'way["amenity"="motorhome_parking"]('+b+');\n'
+    +'node["leisure"="motorhome_site"]('+b+');\n'
+    +'way["leisure"="motorhome_site"]('+b+');\n'
+    +'node["amenity"="parking"]["motorhome_parking"="yes"]('+b+');\n'
+    +'way["amenity"="parking"]["motorhome_parking"="yes"]('+b+');\n'
+    +'node["amenity"="parking"]["motorhome_parking"="designated"]('+b+');\n'
+    +'way["amenity"="parking"]["motorhome_parking"="designated"]('+b+');'
+    +ec;
   if (type==='wild')       return t+'node["tourism"="camp_site"]["backcountry"="yes"]('+b+');\nnode["tourism"="camp_site"]["camp_site"="basic"]('+b+');\nnode["tourism"="camp_site"]["informal"="yes"]('+b+');\nnode["tourism"="wilderness_hut"]('+b+');'+ec;
   if (type==='picnic')     return t+'node["tourism"="picnic_site"]('+b+');\nway["tourism"="picnic_site"]('+b+');'+ec;
   if (type==='laundry')    return t+'node["shop"="laundry"]["self_service"="yes"]('+b+');\nnode["shop"="laundry"]["self_service"="only"]('+b+');\nnode["shop"="laundrette"]('+b+');\nnode["amenity"="washing_machine"]('+b+');'+e;
