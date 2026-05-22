@@ -2569,8 +2569,9 @@ async function init() {
   layerLabels = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, opacity: 0.9 });
   layerStreet.addTo(map);
   cluster = L.markerClusterGroup({
-    maxClusterRadius: function(zoom) { return zoom >= 14 ? 5 : zoom >= 12 ? 30 : zoom >= 9 ? 50 : 80; },
+    maxClusterRadius: function(zoom) { return zoom >= 14 ? 40 : zoom >= 12 ? 40 : zoom >= 9 ? 55 : 80; },
     spiderfyOnMaxZoom: true,
+    spiderfyDistanceMultiplier: 1.4,
     iconCreateFunction: function(c) {
       var n = c.getChildCount();
       var size = n < 10 ? 34 : n < 50 ? 40 : 46;
@@ -2583,7 +2584,8 @@ async function init() {
   map.addLayer(cluster);
   map.on('click', onMapClick);
   map.on('moveend', function() { scheduleLoad(); });
-  map.on('zoomend', function() { scheduleLoad(); });
+  map.on('zoomend', function() { _autoSpiderfied = false; scheduleLoad(); if (map.getZoom() >= 14) scheduleAutoSpiderfy(350); });
+  cluster.on('animationend', function() { if (!_autoSpiderfied && map.getZoom() >= 14) scheduleAutoSpiderfy(200); });
   window.addEventListener('resize', function() { map.invalidateSize(); });
   setTimeout(function() { map.invalidateSize(); }, 200);
 
@@ -4561,7 +4563,26 @@ function exitSoloToMap() {
   scheduleLoad();
 }
 
+var _autoSpiderfied = false;
+var _spiderfyTimer = null;
+
+function scheduleAutoSpiderfy(delay) {
+  if (_spiderfyTimer) clearTimeout(_spiderfyTimer);
+  _spiderfyTimer = setTimeout(function() {
+    if (_autoSpiderfied || map.getZoom() < 14) return;
+    _autoSpiderfied = true;
+    try {
+      cluster._featureGroup.eachLayer(function(l) {
+        if (l instanceof L.MarkerCluster && l.getChildCount() > 1 && l.getChildCount() <= 8) {
+          l.spiderfy();
+        }
+      });
+    } catch(e) {}
+  }, delay || 300);
+}
+
 function renderMarkers(places) {
+  _autoSpiderfied = false;
   cluster.clearLayers();
   places.forEach(function(p) {
     var cat = p.categories;
