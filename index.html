@@ -4178,7 +4178,7 @@ async function checkAuth() {
     loadNotifCount();
     loadModReportsCount();
     startRealtimeNotifs();
-    loadUserFavorites();
+    loadUserFavorites(); loadUserValidations();
     if (!currentUser.email_confirmed_at && !sessionStorage.getItem('emailReminderShown')) {
       sessionStorage.setItem('emailReminderShown', '1');
       setTimeout(function() {
@@ -4238,7 +4238,7 @@ async function handleAuth() {
     loadNotifCount();
     loadModReportsCount();
     startRealtimeNotifs();
-    loadUserFavorites();
+    loadUserFavorites(); loadUserValidations();
     showToast(t('toast_connected'), 'success');
     if (document.getElementById('sheet-profile').classList.contains('open')) {
       renderProfile();
@@ -4593,7 +4593,7 @@ function renderMarkers(places) {
     var isValidated = (p.validation_weight || 0) >= 3;
     var iconHtml = isHidden ? '🔒' : isPending ? '⏳' : fluentImg(icon, 22);
     var markerColor = isHidden ? '#555' : isPending ? '#888' : color;
-    var extra = isHidden || isPending ? ';opacity:0.6' : isValidated ? '' : ';filter:grayscale(1)';
+    var extra = isHidden || isPending ? ';opacity:0.6' : (isValidated || userMyValidations[p.id]) ? '' : ';filter:grayscale(1)';
     var markerStyle = 'background:' + markerColor + extra;
     var vw = p.validation_weight || 0;
     var vThreshold = 3;
@@ -4968,6 +4968,7 @@ async function voteValidation(pid) {
   var weight = isTrusted ? 2 : 1;
   var voteRes = await db.from('place_validations').insert({ place_id: pid, user_id: currentUser.id, weight: weight });
   if (voteRes.error) { showToast(t('lbl_err_generic') + voteRes.error.message, 'error'); return; }
+  userMyValidations[pid] = true;
   var voteCount = await getWeightedCount(pid);
   await db.from('places').update({ validation_weight: voteCount }).eq('id', pid);
   var threshold = 3;
@@ -5113,6 +5114,7 @@ async function unvalidatePlace(pid) {
   if (!currentUser) return;
   var res = await db.from('place_validations').delete().eq('place_id', pid).eq('user_id', currentUser.id);
   if (res.error) { showToast(t('lbl_err_generic') + res.error.message, 'error'); return; }
+  delete userMyValidations[pid];
   showToast('Confirmation retirée', 'success');
   loadValidationSection(pid);
 }
@@ -5379,6 +5381,14 @@ function toggleNav(pid, lat, lng, name) {
 
 // ===== FAVORIS =====
 var userFavs = {};
+var userMyValidations = {};
+
+async function loadUserValidations() {
+  if (!currentUser) return;
+  var res = await db.from('place_validations').select('place_id').eq('user_id', currentUser.id);
+  userMyValidations = {};
+  (res.data || []).forEach(function(v) { userMyValidations[v.place_id] = true; });
+}
 
 async function loadUserFavorites() {
   if (!currentUser) return;
