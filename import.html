@@ -507,6 +507,15 @@ input[type=text] { max-width: 100%; }
   <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
     <button class="btn btn-sec" onclick="queueSelectAll()">Tout cocher</button>
     <button class="btn btn-sec" onclick="queueSelectNone()">Tout décocher</button>
+    <span style="margin-left:8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <label style="margin-bottom:0;display:flex;align-items:center;gap:6px;font-size:13px;color:#e8eaf0;cursor:pointer">
+        <input type="checkbox" id="opt-notify" style="width:16px;height:16px"> 🔔 Notification à la fin
+      </label>
+      <button class="btn btn-sec" id="btn-notif-test" onclick="requestNotifPermission()" style="padding:4px 10px;font-size:11px">Autoriser</button>
+      <label style="margin-bottom:0;display:flex;align-items:center;gap:6px;font-size:13px;color:#e8eaf0;cursor:pointer">
+        <input type="checkbox" id="opt-sound"> 🔊 Son
+      </label>
+    </span>
   </div>
   <div style="margin-bottom:12px">
     <label>Zone géographique pour la file d'attente</label>
@@ -1590,10 +1599,62 @@ async function startQueue(returnResult) {
   var msg = queueAborted ? '⏹ File arrêtée.' : ('🎉 File terminée ! ' + success + ' réussi · ' + failed + ' échoué');
   document.getElementById('queue-status').textContent = queueAborted ? '⏹ Arrêtée' : '✅ ' + success + '/' + checked.length + ' réussis';
   qLog(msg, queueAborted ? 'err' : 'ok');
+  sendFinishNotification(success, failed, queueAborted);
+  playBeep();
   if (returnResult) return { success: success, failed: failed };
 }
 
 function abortQueue() { queueAborted = true; aborted = true; }
+
+// ── Notifications
+function requestNotifPermission() {
+  if (!('Notification' in window)) {
+    alert('Notifications non supportées par ce navigateur.'); return;
+  }
+  Notification.requestPermission().then(function(perm) {
+    var btn = document.getElementById('btn-notif-test');
+    if (perm === 'granted') {
+      btn.textContent = '✅ Autorisé';
+      btn.disabled = true;
+      document.getElementById('opt-notify').checked = true;
+      new Notification('ANY Import', { body: 'Notifications activées !' });
+    } else {
+      btn.textContent = '❌ Refusé';
+    }
+  });
+}
+
+function sendFinishNotification(success, failed, aborted) {
+  if (!document.getElementById('opt-notify').checked) return;
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  var title = aborted ? '⏹ Import arrêté' : (failed === 0 ? '✅ Import terminé !' : '⚠️ Import terminé avec erreurs');
+  var body  = aborted
+    ? 'La file d\'attente a été interrompue.'
+    : success + ' réussi · ' + failed + ' échoué';
+  new Notification(title, { body: body, icon: 'https://my-projet-app.github.io/ANY/icon-192.png' });
+}
+
+function playBeep() {
+  if (!document.getElementById('opt-sound').checked) return;
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = 'sine'; osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+    osc.start(); osc.stop(ctx.currentTime + 0.8);
+  } catch(e) {}
+}
+
+// Init notifications : vérifier si déjà autorisé au chargement
+function initNotifButton() {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    var btn = document.getElementById('btn-notif-test');
+    if (btn) { btn.textContent = '✅ Autorisé'; btn.disabled = true; }
+  }
+}
 
 // ── Programmation multi-créneaux
 var _scheduleTimer = null;
@@ -1715,6 +1776,7 @@ function cancelSchedule(keepSlots) {
 window.addEventListener('DOMContentLoaded', function() {
   loadCatIds().catch(function(){ document.getElementById('cat-status').textContent='(erreur)'; });
   setSource('osm');
+  initNotifButton();
 });
 </script>
 </body>
