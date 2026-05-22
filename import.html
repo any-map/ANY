@@ -65,6 +65,12 @@ input[type=text] { max-width: 100%; }
 .preview-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 12px; overflow-x: auto; display: block; max-height: 120px; }
 .preview-table th { color: #6ee7b7; padding: 4px 8px; border-bottom: 1px solid #2e3348; text-align: left; white-space: nowrap; }
 .preview-table td { color: #8b91a8; padding: 3px 8px; white-space: nowrap; }
+.queue-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.queue-group { background: #1a1d27; border: 1px solid #2e3348; border-radius: 8px; padding: 12px; }
+.queue-group-title { color: #6ee7b7; font-size: 12px; font-weight: 700; margin-bottom: 10px; }
+.queue-group label { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #e8eaf0; padding: 4px 0; cursor: pointer; }
+.queue-group label:hover { color: #6ee7b7; }
+.queue-item-status { margin-left: auto; font-size: 11px; }
 </style>
 </head>
 <body>
@@ -429,6 +435,50 @@ input[type=text] { max-width: 100%; }
   </div>
   <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
   <div class="log" id="log"><span class="log-gray">En attente...</span></div>
+</div>
+
+<!-- ── FILE D'ATTENTE ── -->
+<div class="section">
+  <h2>📋 File d'attente OSM</h2>
+  <p class="sub">Coche plusieurs types → lance → tout s'importe automatiquement l'un après l'autre.</p>
+  <div class="queue-grid">
+    <div class="queue-group">
+      <div class="queue-group-title">🚐 Van Life & Camping-car</div>
+      <label><input type="checkbox" class="q-type" value="camping"> 🅿️ Aire de camping-car officielle</label>
+      <label><input type="checkbox" class="q-type" value="camping_trad"> ⛺ Camping traditionnel</label>
+      <label><input type="checkbox" class="q-type" value="camping_nature"> 🌿 Aire naturelle / petit camping</label>
+      <label><input type="checkbox" class="q-type" value="wild"> 🏕️ Bivouac / Spot sauvage</label>
+      <label><input type="checkbox" class="q-type" value="parking_motorhome"> 🚐 Parking autorisé camping-car</label>
+      <label><input type="checkbox" class="q-type" value="parking_night"> 🌙 Parking autorisé la nuit</label>
+      <label><input type="checkbox" class="q-type" value="rest_area"> 🛣️ Aire de repos (autoroute)</label>
+      <label><input type="checkbox" class="q-type" value="dump_service"> 🚿 Aire de service camping-car</label>
+      <label><input type="checkbox" class="q-type" value="dump"> 🗑️ Station de vidange</label>
+    </div>
+    <div class="queue-group">
+      <div class="queue-group-title">🏙️ Services urbains</div>
+      <label><input type="checkbox" class="q-type" value="wc"> 🚻 Toilettes publiques</label>
+      <label><input type="checkbox" class="q-type" value="shower"> 🚿 Douches publiques</label>
+      <label><input type="checkbox" class="q-type" value="eau"> 💧 Bornes eau potable</label>
+      <label><input type="checkbox" class="q-type" value="laundry"> 👕 Lavomatiques</label>
+      <label><input type="checkbox" class="q-type" value="electric"> ⚡ Bornes recharge électrique</label>
+      <label><input type="checkbox" class="q-type" value="fuel"> ⛽ Stations-service</label>
+      <label><input type="checkbox" class="q-type" value="pharmacy"> 💊 Pharmacies</label>
+      <label><input type="checkbox" class="q-type" value="picnic"> 🪑 Aires de pique-nique</label>
+      <label><input type="checkbox" class="q-type" value="bike_repair"> 🔧 Bornes réparation vélo</label>
+    </div>
+  </div>
+  <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+    <button class="btn btn-sec" onclick="queueSelectAll()">Tout cocher</button>
+    <button class="btn btn-sec" onclick="queueSelectNone()">Tout décocher</button>
+    <span style="color:#8b91a8;font-size:12px">Zone : celle sélectionnée dans l'onglet OSM ci-dessus</span>
+  </div>
+  <div style="margin-bottom:8px">
+    <button class="btn" id="btn-queue-start" onclick="startQueue()">▶ Lancer la file d'attente</button>
+    <button class="btn btn-danger" id="btn-queue-abort" onclick="abortQueue()" style="display:none">⏹ Arrêter</button>
+    <span id="queue-status" style="font-size:12px;color:#8b91a8;margin-left:12px"></span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="queue-progress"></div></div>
+  <div class="log" id="queue-log"><span class="log-gray">En attente...</span></div>
 </div>
 
 <script>
@@ -1213,6 +1263,113 @@ async function startImportFuel() {
   document.getElementById('btn-abort').style.display = 'none';
   log('Terminé ! ✅' + imported + ' importées ⏭' + skipped + ' ignorées ❌' + errors + ' erreurs', 'ok');
 }
+
+// ── File d'attente ─────────────────────────────────────────
+var queueAborted = false;
+
+function qLog(msg, type) {
+  var el = document.getElementById('queue-log');
+  var line = document.createElement('div');
+  line.className = 'log-' + (type || 'gray');
+  line.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+  el.appendChild(line); el.scrollTop = el.scrollHeight;
+}
+function setQueueProgress(pct) { document.getElementById('queue-progress').style.width = Math.min(pct,100) + '%'; }
+function queueSelectAll()  { document.querySelectorAll('.q-type').forEach(function(c){ c.checked=true; }); }
+function queueSelectNone() { document.querySelectorAll('.q-type').forEach(function(c){ c.checked=false; }); }
+
+async function runQueueItem(type, zone) {
+  var catName = CAT_NAMES[type];
+  if (!catName) { qLog('Type inconnu : ' + type, 'err'); return false; }
+  qLog('══════ ' + catName + ' ══════', 'ok');
+  var bboxes = zone.split('|');
+  var items = [];
+  resetOverpassMirror();
+  for (var bi = 0; bi < bboxes.length; bi++) {
+    if (queueAborted) return false;
+    var q = buildQuery(type, bboxes[bi]);
+    if (!q) { qLog('Requête non supportée pour ' + type, 'err'); return false; }
+    try {
+      qLog('Zone ' + (bi+1) + '/' + bboxes.length + '...', 'gray');
+      var data = await fetchOverpass(q);
+      items = items.concat(data.elements || []);
+    } catch(e) { qLog('Erreur Overpass : ' + e.message, 'err'); return false; }
+  }
+  qLog('Trouvés : ' + items.length + ' lieux', items.length > 0 ? 'ok' : 'info');
+  if (!items.length) return true;
+  await loadCatIds();
+  var cat = catIds[catName];
+  if (!cat) { qLog('Catégorie introuvable dans Supabase : ' + catName, 'err'); return false; }
+  var antiDbl  = document.getElementById('opt-antidoublons').checked;
+  var pendingOpt = document.getElementById('opt-pending').checked;
+  var dryRun   = document.getElementById('opt-dryrun').checked;
+  var delay    = parseInt(document.getElementById('opt-delay').value) || 150;
+  var existingCoords = new Set();
+  if (antiDbl && !dryRun) existingCoords = await loadExistingCoords(cat.id);
+  var rows = items.map(function(el) {
+    var latlng = getLatLng(el); if (!latlng) return null;
+    var tags = el.tags || {}, desc = [];
+    if (tags.fee === 'yes') desc.push('Payant'); if (tags.fee === 'no') desc.push('Gratuit');
+    if (tags.opening_hours) desc.push('Horaires : ' + tags.opening_hours);
+    if (tags.operator) desc.push('Opérateur : ' + tags.operator);
+    if (tags.capacity) desc.push('Capacité : ' + tags.capacity);
+    return { name: tags.name || catName, description: desc.join(' | ') || null,
+             latitude: latlng.lat, longitude: latlng.lng, h24: tags.opening_hours === '24/7' };
+  }).filter(Boolean);
+  var total = rows.length, imported = 0, skipped = 0, errors = 0, BATCH = 25;
+  for (var i = 0; i < rows.length; i += BATCH) {
+    if (queueAborted) { qLog('File interrompue', 'err'); return false; }
+    var batch = rows.slice(i, i+BATCH), toInsert = [];
+    batch.forEach(function(r) {
+      var k = parseFloat(r.latitude).toFixed(5)+','+parseFloat(r.longitude).toFixed(5);
+      if (antiDbl && existingCoords.has(k)) { skipped++; return; }
+      toInsert.push({ name: r.name, description: r.description,
+        latitude: r.latitude, longitude: r.longitude,
+        main_category_id: cat.main_id, category_id: cat.id,
+        user_name: 'OpenStreetMap', disponible_24h: r.h24 || false,
+        approved: true, status: pendingOpt ? 'pending' : 'active' });
+      if (antiDbl) existingCoords.add(k);
+    });
+    if (toInsert.length > 0 && !dryRun) {
+      var res = await db.from('places').insert(toInsert);
+      if (res.error) { errors += toInsert.length; qLog('Erreur lot : ' + res.error.message, 'err'); }
+      else imported += toInsert.length;
+    } else if (dryRun) imported += toInsert.length;
+    await new Promise(function(r){ setTimeout(r, delay); });
+  }
+  qLog('✅ ' + catName + ' terminé : +' + imported + ' importés · ' + skipped + ' doublons · ' + errors + ' erreurs', 'ok');
+  return true;
+}
+
+async function startQueue() {
+  var checked = Array.from(document.querySelectorAll('.q-type:checked')).map(function(cb){ return cb.value; });
+  if (!checked.length) { qLog('Coche au moins un type !', 'err'); return; }
+  var zone = document.getElementById('region-select').value;
+  queueAborted = false; aborted = false;
+  document.getElementById('btn-queue-start').disabled = true;
+  document.getElementById('btn-queue-abort').style.display = 'inline-block';
+  document.getElementById('queue-log').innerHTML = '';
+  setQueueProgress(0);
+  qLog('File d\'attente : ' + checked.length + ' type(s) | ' + zone.split('|').length + ' zone(s)', 'info');
+  var success = 0, failed = 0;
+  for (var i = 0; i < checked.length; i++) {
+    if (queueAborted) break;
+    var label = CAT_NAMES[checked[i]] || checked[i];
+    document.getElementById('queue-status').textContent = (i+1) + '/' + checked.length + ' — ' + label;
+    setQueueProgress(Math.round((i / checked.length) * 100));
+    var ok = await runQueueItem(checked[i], zone);
+    if (ok) success++; else { failed++; if (!queueAborted) { qLog('Pause 5s avant le suivant...', 'info'); await sleep(5000); } }
+    if (!queueAborted && i < checked.length-1) await sleep(3000);
+  }
+  setQueueProgress(100);
+  document.getElementById('btn-queue-start').disabled = false;
+  document.getElementById('btn-queue-abort').style.display = 'none';
+  var msg = queueAborted ? '⏹ File arrêtée.' : ('🎉 File terminée ! ' + success + ' réussi · ' + failed + ' échoué');
+  document.getElementById('queue-status').textContent = queueAborted ? '⏹ Arrêtée' : '✅ Terminée';
+  qLog(msg, queueAborted ? 'err' : 'ok');
+}
+
+function abortQueue() { queueAborted = true; aborted = true; }
 
 // ── Init
 window.addEventListener('DOMContentLoaded', function() {
