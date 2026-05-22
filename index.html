@@ -5038,27 +5038,38 @@ async function loadValidatorsRow(pid) {
   var safeId = pid.replace(/-/g, '_');
   var el = document.getElementById('validators-row-' + safeId);
   if (!el) return;
-  var [countRes, placeRes] = await Promise.all([
+  var [countRes, placeRes, validatorsRes] = await Promise.all([
     db.from('place_validations').select('id', { count: 'exact', head: true }).eq('place_id', pid),
-    db.from('places').select('user_id, status').eq('id', pid).maybeSingle()
+    db.from('places').select('user_id, status').eq('id', pid).maybeSingle(),
+    db.from('place_validations').select('user_id, profiles(username)').eq('place_id', pid)
   ]);
   var n = countRes.count || 0;
   if (n === 0) { el.innerHTML = ''; return; }
   var place = placeRes.data;
-  var isImport = place && !place.user_id;
   var isPending = place && place.status === 'pending';
   var threshold = 3;
   var isComplete = !isPending;
-  var label, color;
+  var label, color, adminValidator = null;
   if (isComplete) {
-    label = n + ' personne' + (n > 1 ? 's ont' : ' a') + ' validé ce lieu';
+    var validatorIds = (validatorsRes.data || []).map(function(v) { return v.user_id; }).filter(Boolean);
+    if (validatorIds.length > 0) {
+      var trustedRes = await db.from('trusted_users').select('user_id, role').in('user_id', validatorIds).in('role', ['admin', 'moderator']);
+      var trustedMap = {};
+      (trustedRes.data || []).forEach(function(t) { trustedMap[t.user_id] = t.role; });
+      var adminEntry = (validatorsRes.data || []).find(function(v) { return trustedMap[v.user_id]; });
+      if (adminEntry) adminValidator = { username: (adminEntry.profiles && adminEntry.profiles.username) || 'Admin', role: trustedMap[adminEntry.user_id] };
+    }
+    label = adminValidator ? 'Validé par ' + adminValidator.username : 'Validé par la communauté';
     color = '#27ae60';
   } else {
     label = n + '&thinsp;/&thinsp;' + threshold + ' vote' + (n > 1 ? 's' : '') + ' — en cours de validation';
     color = n >= threshold ? '#27ae60' : '#f59e0b';
   }
+  var clickableLabel = adminValidator
+    ? '&#9989; Validé par <span onclick="event.stopPropagation();openPublicProfile(\'' + escHtml(adminValidator.username) + '\')" style="text-decoration:underline;cursor:pointer;">' + escHtml(adminValidator.username) + '</span>'
+    : '&#9989; ' + label;
   el.innerHTML = '<div onclick="toggleValidatorsList(\'' + pid + '\')" style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid var(--border);cursor:pointer;font-size:13px;">'
-    + '<span style="color:' + color + ';">&#9989; ' + label + '</span>'
+    + '<span style="color:' + color + ';">' + clickableLabel + '</span>'
     + '<span id="validators-arrow-' + safeId + '" style="font-size:18px;line-height:1;color:var(--text2);">&#8250;</span>'
     + '</div>'
     + '<div id="validators-list-' + safeId + '" style="display:none;padding:0 16px 8px;"></div>';
@@ -5077,25 +5088,33 @@ async function toggleValidatorsList(pid) {
   if (arrow) arrow.innerHTML = '&#8964;';
   list.style.display = 'block';
   list.innerHTML = '<div style="color:var(--text2);font-size:12px;padding:6px 0;">Chargement...</div>';
-  var [res, placeRes] = await Promise.all([
+  var [res, placeRes, trustedRes] = await Promise.all([
     db.from('place_validations').select('user_id, created_at, profiles(username)').eq('place_id', pid).order('created_at', { ascending: true }),
-    db.from('places').select('user_id, status').eq('id', pid).maybeSingle()
+    db.from('places').select('user_id, status').eq('id', pid).maybeSingle(),
+    db.from('trusted_users').select('user_id, role')
   ]);
   var data = res.data || [];
   if (!data.length) { list.innerHTML = '<div style="color:var(--text2);font-size:12px;padding:6px 0;">' + t('lbl_no_vote') + '</div>'; return; }
   var place = placeRes.data;
-  var isImport = place && !place.user_id;
   var isPending = place && place.status === 'pending';
   var threshold = 3;
+  var trustedMap = {};
+  (trustedRes.data || []).forEach(function(t) { trustedMap[t.user_id] = t.role; });
   var header = isPending
     ? '<div style="font-size:11px;color:#f59e0b;font-weight:600;padding:6px 0 8px;">&#8987; ' + data.length + '&thinsp;/&thinsp;' + threshold + ' votes — encore ' + Math.max(0, threshold - data.length) + ' nécessaire' + (threshold - data.length > 1 ? 's' : '') + '</div>'
-    : '<div style="font-size:11px;color:#27ae60;font-weight:600;padding:6px 0 8px;">&#9989; Lieu validé par ' + data.length + ' personne' + (data.length > 1 ? 's' : '') + '</div>';
+    : '<div style="font-size:11px;color:#27ae60;font-weight:600;padding:6px 0 8px;">&#9989; Validé par ' + data.length + ' personne' + (data.length > 1 ? 's' : '') + '</div>';
   list.innerHTML = header + data.map(function(v) {
     var name = (v.profiles && v.profiles.username) || 'Membre';
+    var role = trustedMap[v.user_id];
+    var roleBadge = role === 'admin'
+      ? '<span style="background:rgba(231,76,60,0.15);color:#e74c3c;font-size:9px;font-weight:800;padding:1px 5px;border-radius:8px;margin-left:5px;">ADMIN</span>'
+      : role === 'moderator'
+        ? '<span style="background:rgba(52,152,219,0.15);color:#3498db;font-size:9px;font-weight:800;padding:1px 5px;border-radius:8px;margin-left:5px;">MOD</span>'
+        : '';
     var d = v.created_at ? new Date(v.created_at) : null;
-    var dateStr = d ? d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'2-digit' }) + ' à ' + d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }) : '';
-    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;">'
-      + '<span style="color:var(--text);font-weight:600;">&#128100; ' + escHtml(name) + '</span>'
+    var dateStr = d ? d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit' }) : '';
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;">'
+      + '<span onclick="openPublicProfile(\'' + escHtml(name) + '\')" style="color:var(--accent);font-weight:600;cursor:pointer;display:flex;align-items:center;">&#128100; ' + escHtml(name) + roleBadge + '</span>'
       + '<span style="color:var(--text2);font-size:11px;">' + dateStr + '</span>'
       + '</div>';
   }).join('');
