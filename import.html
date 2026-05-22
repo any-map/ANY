@@ -436,7 +436,14 @@ input[type=text] { max-width: 100%; }
 var SUPABASE_URL = 'https://xssfehwbmvrxtxmocowc.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_lB89hOOAXUCIheGRbS2wEQ_L7uVajNV';
 var db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-var OVERPASS = 'https://overpass-api.de/api/interpreter';
+var OVERPASS_MIRRORS = [
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.karte.io/api/interpreter',
+  'https://overpass.openstreetmap.ru/api/interpreter',
+  'https://maps.mail.ru/osm/tools/overpass/api/interpreter'
+];
+var OVERPASS = OVERPASS_MIRRORS[0];
+var _overpassMirrorIdx = 0;
 var OCM_API  = 'https://api.openchargemap.io/v3/poi/';
 
 var currentSource = 'osm';
@@ -729,20 +736,35 @@ function getLatLng(el) {
   return null;
 }
 async function fetchOverpass(query, attempt) {
-  attempt = attempt||1;
+  attempt = attempt || 1;
+  var mirror = OVERPASS_MIRRORS[_overpassMirrorIdx];
   try {
-    var resp = await fetch(OVERPASS,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'data='+encodeURIComponent(query)});
-    if (resp.status===429||resp.status===504) {
-      if (attempt<3) { log('Overpass surchargé, retry dans 10s ('+attempt+'/3)','info'); await sleep(10000); return fetchOverpass(query,attempt+1); }
-      throw new Error('Overpass inaccessible (HTTP '+resp.status+')');
+    log('Serveur Overpass : ' + mirror.replace('https://','').split('/')[0], 'gray');
+    var resp = await fetch(mirror, {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:'data='+encodeURIComponent(query)});
+    if (resp.status === 429 || resp.status === 504) {
+      throw new Error('HTTP ' + resp.status);
     }
-    if (!resp.ok) throw new Error('HTTP '+resp.status);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
     return await resp.json();
   } catch(e) {
-    if (attempt<3 && !e.message.startsWith('HTTP')) { log('Erreur réseau, retry '+attempt+'/3...','info'); await sleep(5000); return fetchOverpass(query,attempt+1); }
-    throw e;
+    var isNetwork = !e.message.startsWith('HTTP');
+    var nextMirror = _overpassMirrorIdx + 1 < OVERPASS_MIRRORS.length;
+    if (nextMirror) {
+      _overpassMirrorIdx++;
+      log('⚠ ' + mirror.split('/')[2] + ' inaccessible → bascule sur ' + OVERPASS_MIRRORS[_overpassMirrorIdx].split('/')[2], 'info');
+      await sleep(2000);
+      return fetchOverpass(query, attempt);
+    }
+    if (attempt < 2) {
+      _overpassMirrorIdx = 0;
+      log('Tous les miroirs essayés, retry dans 15s...', 'info');
+      await sleep(15000);
+      return fetchOverpass(query, attempt + 1);
+    }
+    throw new Error('Overpass inaccessible sur tous les serveurs. Réessaie dans quelques minutes.');
   }
 }
+function resetOverpassMirror() { _overpassMirrorIdx = 0; }
 
 async function startCount() {
   if (currentSource === 'gbfs') { await startCountGBFS(); return; }
@@ -750,10 +772,11 @@ async function startCount() {
   var type = document.getElementById('type-select').value;
   var bboxes = document.getElementById('region-select').value.split('|');
   importData = [];
+  resetOverpassMirror();
   document.getElementById('btn-import').disabled = true;
   document.getElementById('log').innerHTML = '';
   setStat('found','…'); setProgress(10);
-  log('Type : '+(CAT_NAMES[type]||type)+' | Zone : '+bboxes.join('+'),'info');
+  log('Type : '+(CAT_NAMES[type]||type)+' | Zone : '+bboxes.length+' zone(s)','info');
   try {
     for (var bi=0; bi<bboxes.length; bi++) {
       var q = buildQuery(type, bboxes[bi]);
