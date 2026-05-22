@@ -504,7 +504,44 @@ input[type=text] { max-width: 100%; }
   <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
     <button class="btn btn-sec" onclick="queueSelectAll()">Tout cocher</button>
     <button class="btn btn-sec" onclick="queueSelectNone()">Tout décocher</button>
-    <span style="color:#8b91a8;font-size:12px">Zone : celle sélectionnée dans l'onglet OSM ci-dessus</span>
+  </div>
+  <div style="margin-bottom:12px">
+    <label>Zone géographique pour la file d'attente</label>
+    <select id="queue-zone-select" style="max-width:420px">
+      <optgroup label="── Multi-pays">
+        <option value="42.0,-5.0,51.5,9.5|36.9,-9.5,42.2,-6.2|35.9,-9.3,43.8,4.3|36.6,6.6,47.1,18.5|45.8,5.9,47.8,10.5|47.3,5.9,55.1,15.0|49.5,2.5,51.5,6.4|50.7,3.3,53.6,7.3" selected>🌍 8 pays (FR · ES · PT · IT · CH · DE · BE · NL)</option>
+        <option value="35.9,-9.5,43.8,4.3">Espagne + Portugal</option>
+      </optgroup>
+      <optgroup label="── France complète">
+        <option value="42.0,-5.0,51.5,9.5">🇫🇷 France entière</option>
+        <option value="42.0,-5.0,51.5,9.5|41.3,8.5,43.1,9.7">France + Corse</option>
+      </optgroup>
+      <optgroup label="── Régions France">
+        <option value="47.0,-5.2,49.0,-0.5">Bretagne</option>
+        <option value="47.0,-2.0,49.0,1.0">Pays de la Loire</option>
+        <option value="48.5,-2.0,50.0,1.8">Normandie</option>
+        <option value="43.0,-1.8,46.0,1.5">Nouvelle-Aquitaine</option>
+        <option value="42.5,-1.8,44.5,1.8">Pyrénées / Pays Basque</option>
+        <option value="43.0,1.4,45.0,5.5">Occitanie</option>
+        <option value="43.0,4.8,44.5,7.7">PACA</option>
+        <option value="41.3,8.5,43.1,9.7">Corse</option>
+        <option value="45.0,2.5,47.5,7.5">Auvergne-Rhône-Alpes</option>
+        <option value="46.5,4.0,48.5,6.8">Bourgogne-Franche-Comté</option>
+        <option value="47.3,5.9,49.5,8.3">Grand Est / Alsace</option>
+        <option value="46.5,0.5,48.5,3.5">Centre-Val de Loire</option>
+        <option value="48.5,1.5,50.5,5.5">Île-de-France</option>
+        <option value="49.8,1.5,51.1,4.2">Hauts-de-France</option>
+      </optgroup>
+      <optgroup label="── Pays">
+        <option value="36.6,6.6,47.1,18.5">Italie</option>
+        <option value="35.9,-9.3,43.8,4.3">Espagne</option>
+        <option value="36.9,-9.5,42.2,-6.2">Portugal</option>
+        <option value="45.8,5.9,47.8,10.5">Suisse</option>
+        <option value="47.3,5.9,55.1,15.0">Allemagne</option>
+        <option value="49.5,2.5,51.5,6.4">Belgique</option>
+        <option value="50.7,3.3,53.6,7.3">Pays-Bas</option>
+      </optgroup>
+    </select>
   </div>
   <div style="margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
     <button class="btn" id="btn-queue-start" onclick="startQueue()">▶ Lancer maintenant</button>
@@ -1493,7 +1530,7 @@ async function runQueueItem(type, zone) {
 async function startQueue(returnResult) {
   var checked = Array.from(document.querySelectorAll('.q-type:checked')).map(function(cb){ return cb.value; });
   if (!checked.length) { qLog('Coche au moins un type !', 'err'); return returnResult ? {success:0,failed:0} : undefined; }
-  var zone = document.getElementById('region-select').value;
+  var zone = document.getElementById('queue-zone-select').value;
   queueAborted = false; aborted = false;
   document.getElementById('btn-queue-start').disabled = true;
   document.getElementById('btn-queue-abort').style.display = 'inline-block';
