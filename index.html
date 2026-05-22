@@ -5110,6 +5110,15 @@ function validatePlace(pid) {
   openModal('modal-approve-place');
 }
 
+async function adminForceValidate(pid) {
+  var ex = await db.from('place_validations').select('id').eq('place_id', pid).eq('user_id', currentUser.id).maybeSingle();
+  if (!ex.data) await db.from('place_validations').insert({ place_id: pid, user_id: currentUser.id, weight: 2 });
+  await db.from('places').update({ validation_weight: 3 }).eq('id', pid);
+  userMyValidations[pid] = true;
+  showToast('✅ Lieu validé', 'success');
+  scheduleLoad();
+}
+
 async function unvalidatePlace(pid) {
   if (!currentUser) return;
   var res = await db.from('place_validations').delete().eq('place_id', pid).eq('user_id', currentUser.id);
@@ -6403,7 +6412,14 @@ async function addCmt(pid) {
 async function vote(pid, pos) {
   if (!currentUser) { showToast(t('toast_login_vote'), 'error'); return; }
   var result = await db.from('votes').insert({ place_id: pid, user_id: currentUser.id, vote: pos });
-  if (result.error) { showToast(t('toast_already_voted'), 'error'); return; }
+  if (result.error) {
+    if ((isAdmin || isModerator) && pos) {
+      showConfirm('🔓 Valider quand même ?', 'Vous avez déjà voté pour ce lieu. En tant qu\'admin, voulez-vous le valider directement ?', '✅ Oui, valider', '#27ae60', function() { adminForceValidate(pid); });
+    } else {
+      showToast(t('toast_already_voted'), 'error');
+    }
+    return;
+  }
   var place = allPlaces.find(function(p) { return p.id === pid; });
   if (place) {
     var newCount = (place.votes_positifs || 0) + 1;
