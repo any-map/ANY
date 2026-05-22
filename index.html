@@ -768,7 +768,7 @@ html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none;font-f
       </div>
     </div>
     <div class="form-group" id="add-photo-group" style="display:none">
-      <label>Photo</label>
+      <label>Photo <span style="font-size:11px;font-weight:400;color:var(--accent);">recommandée · +5 XP</span></label>
       <input type="file" id="add-photo-input" accept="image/*" style="display:none" onchange="previewAddPhoto(this)">
       <label for="add-photo-input" id="add-photo-btn" style="display:flex;align-items:center;gap:8px;justify-content:center;padding:10px;border:2px dashed var(--border);border-radius:var(--radius-sm);cursor:pointer;color:var(--text2);font-size:13px;">&#128247; Ajouter une photo</label>
       <div id="add-photo-preview" style="display:none;position:relative;margin-top:8px;">
@@ -1130,8 +1130,8 @@ var XP_THRESHOLDS = [
   { min:350, key:'role_explorer', next:700 },
   { min:700, key:'role_expert',   next:null }
 ];
-function calcXP(places, validated, comments, votes, merci) {
-  return (places||0)*10 + (validated||0)*3 + (comments||0)*2 + (votes||0)*1 + (merci||0)*5;
+function calcXP(places, validated, comments, votes, merci, photos) {
+  return (places||0)*5 + (validated||0)*3 + (comments||0)*2 + (votes||0)*1 + (merci||0)*5 + (photos||0)*5;
 }
 function getXPLevel(xp) {
   for (var i = XP_THRESHOLDS.length-1; i >= 0; i--) {
@@ -1166,7 +1166,7 @@ fr:{
   form_main_cat:'Grande catégorie *', form_sub_cat:'Sous-catégorie *',
   form_desc:'Description', form_desc_ph:'Infos utiles : horaires, état, prix...',
   form_available_24h:'Disponible 24h/24 ? *', form_yes:'✅ Oui', form_no:'❌ Non',
-  form_photo:'Photo *', form_add_photo:'📷 Ajouter une photo',
+  form_photo:'Photo (recommandée)', form_add_photo:'📷 Ajouter une photo',
   form_upload:'📷 Upload en cours...', form_publish_place:'Publier le lieu',
   form_choose:'-- Choisir --', form_choose_cat_first:'-- Choisir la catégorie d\'abord --',
   info_adding:'📍 Clique sur la carte pour placer le lieu',
@@ -1366,7 +1366,7 @@ en:{
   form_main_cat:'Main category *', form_sub_cat:'Subcategory *',
   form_desc:'Description', form_desc_ph:'Useful info: hours, condition, price...',
   form_available_24h:'Available 24/7? *', form_yes:'✅ Yes', form_no:'❌ No',
-  form_photo:'Photo *', form_add_photo:'📷 Add a photo',
+  form_photo:'Photo (recommended)', form_add_photo:'📷 Add a photo',
   form_upload:'📷 Uploading...', form_publish_place:'Publish place',
   form_choose:'-- Choose --', form_choose_cat_first:'-- Choose category first --',
   info_adding:'📍 Click on the map to place the location',
@@ -1565,7 +1565,7 @@ es:{
   form_main_cat:'Categoría principal *', form_sub_cat:'Subcategoría *',
   form_desc:'Descripción', form_desc_ph:'Info útil: horario, estado, precio...',
   form_available_24h:'¿Disponible 24h? *', form_yes:'✅ Sí', form_no:'❌ No',
-  form_photo:'Foto *', form_add_photo:'📷 Añadir foto',
+  form_photo:'Foto (recomendada)', form_add_photo:'📷 Añadir foto',
   form_upload:'📷 Subiendo...', form_publish_place:'Publicar lugar',
   form_choose:'-- Elegir --', form_choose_cat_first:'-- Elige categoría primero --',
   info_adding:'📍 Haz clic en el mapa para colocar el lugar',
@@ -1754,7 +1754,7 @@ de:{
   form_main_cat:'Hauptkategorie *', form_sub_cat:'Unterkategorie *',
   form_desc:'Beschreibung', form_desc_ph:'Nützliche Infos: Öffnungszeiten, Zustand, Preis...',
   form_available_24h:'24/7 verfügbar? *', form_yes:'✅ Ja', form_no:'❌ Nein',
-  form_photo:'Foto *', form_add_photo:'📷 Foto hinzufügen',
+  form_photo:'Foto (empfohlen)', form_add_photo:'📷 Foto hinzufügen',
   form_upload:'📷 Wird hochgeladen...', form_publish_place:'Ort veröffentlichen',
   form_choose:'-- Auswählen --', form_choose_cat_first:'-- Zuerst Kategorie wählen --',
   info_adding:'📍 Klicke auf die Karte um den Ort zu platzieren',
@@ -1943,7 +1943,7 @@ it:{
   form_main_cat:'Categoria principale *', form_sub_cat:'Sottocategoria *',
   form_desc:'Descrizione', form_desc_ph:'Informazioni utili: orari, stato, prezzo...',
   form_available_24h:'Disponibile 24h? *', form_yes:'✅ Sì', form_no:'❌ No',
-  form_photo:'Foto *', form_add_photo:'📷 Aggiungi foto',
+  form_photo:'Foto (consigliata)', form_add_photo:'📷 Aggiungi foto',
   form_upload:'📷 Caricamento...', form_publish_place:'Pubblica luogo',
   form_choose:'-- Scegli --', form_choose_cat_first:'-- Scegli prima la categoria --',
   info_adding:'📍 Clicca sulla mappa per posizionare il luogo',
@@ -2132,7 +2132,7 @@ pt:{
   form_main_cat:'Categoria principal *', form_sub_cat:'Subcategoria *',
   form_desc:'Descrição', form_desc_ph:'Informações úteis: horários, estado, preço...',
   form_available_24h:'Disponível 24h? *', form_yes:'✅ Sim', form_no:'❌ Não',
-  form_photo:'Foto *', form_add_photo:'📷 Adicionar foto',
+  form_photo:'Foto (recomendada)', form_add_photo:'📷 Adicionar foto',
   form_upload:'📷 A enviar...', form_publish_place:'Publicar local',
   form_choose:'-- Escolher --', form_choose_cat_first:'-- Escolha a categoria primeiro --',
   info_adding:'📍 Clique no mapa para posicionar o local',
@@ -2321,7 +2321,7 @@ nl:{
   form_main_cat:'Hoofdcategorie *', form_sub_cat:'Subcategorie *',
   form_desc:'Beschrijving', form_desc_ph:'Nuttige info: openingstijden, staat, prijs...',
   form_available_24h:'24/7 beschikbaar? *', form_yes:'✅ Ja', form_no:'❌ Nee',
-  form_photo:'Foto *', form_add_photo:'📷 Foto toevoegen',
+  form_photo:'Foto (aanbevolen)', form_add_photo:'📷 Foto toevoegen',
   form_upload:'📷 Uploaden...', form_publish_place:'Locatie publiceren',
   form_choose:'-- Kiezen --', form_choose_cat_first:'-- Kies eerst een categorie --',
   info_adding:'📍 Klik op de kaart om de locatie te plaatsen',
@@ -3196,7 +3196,8 @@ async function loadProfileStats(username) {
       db.from('profiles').select('user_id', { count: 'exact', head: true }).not('username', 'is', null).lte('registered_at', currentUser.created_at),
       db.from('places').select('id', { count: 'exact', head: true }).eq('approved_by_id', uid),
       db.from('places').select('votes_positifs').eq('user_id', uid),
-      db.from('profiles').select('avatar_url,bio,banner_color,avatar_bg').eq('user_id', uid).maybeSingle()
+      db.from('profiles').select('avatar_url,bio,banner_color,avatar_bg').eq('user_id', uid).maybeSingle(),
+      db.from('place_photos').select('*', { count: 'exact', head: true }).eq('uploaded_by', uid)
     ]);
     var BOT_NAMES = ['Import OSM', 'OpenStreetMap', 'Prix-Carburants-gouv'];
     var lbData = (res[0].data || []).filter(function(u) { return BOT_NAMES.indexOf(u.user_name) === -1; });
@@ -3207,6 +3208,7 @@ async function loadProfileStats(username) {
     var memberNum = res[5].count || null;
     var merciCount = (res[7].data || []).reduce(function(s,p){ return s+(p.votes_positifs||0); }, 0);
     var avatarData = res[8] && res[8].data;
+    var photosCount = (res[9] && res[9].count) || 0;
     if (avatarData && avatarData.avatar_url) {
       currentUserAvatar = avatarData.avatar_url;
       localStorage.setItem('vlm_avatar', currentUserAvatar);
@@ -3264,7 +3266,7 @@ async function loadProfileStats(username) {
         rankEl.textContent = t('profile_unranked');
       }
     }
-    var totalXP = calcXP(placesCount, validatedCount, commentsCount, votesCount, merciCount);
+    var totalXP = calcXP(placesCount, validatedCount, commentsCount, votesCount, merciCount, photosCount);
     var xpLvl = getXPLevel(totalXP);
     userXPIdx = xpLvl.idx;
     var roleLabel = isAdmin ? t('role_admin') : isModerator ? t('role_moderator') : isTrusted ? t('role_trusted') : t(xpLvl.data.key);
@@ -3284,7 +3286,8 @@ async function loadProfileStats(username) {
     var xpPct = xpLvl.data.next ? Math.round(((totalXP - xpLvl.data.min) / (xpLvl.data.next - xpLvl.data.min)) * 100) : 100;
     if (xpFillEl) xpFillEl.style.width = Math.min(100, Math.max(2, xpPct)) + '%';
     if (xpBreakEl) xpBreakEl.innerHTML = [
-      ['\ud83d\udccd', t('profile_places_added'), placesCount, 10],
+      ['\ud83d\udccd', t('profile_places_added'), placesCount, 5],
+      ['\ud83d\udcf7', 'Photos ajout\u00e9es', photosCount, 5],
       ['\ud83d\ude4f', t('profile_thanks_received'), merciCount, 5],
       ['\u2705', t('profile_validated'), validatedCount, 3],
       ['\ud83d\udcac', t('profile_comments'), commentsCount, 2],
@@ -3365,13 +3368,15 @@ async function openPublicProfile(username) {
       db.from('banned_users').select('id').eq('user_id', profile.user_id).maybeSingle(),
       db.from('profiles').select('user_id', { count: 'exact', head: true }).not('username', 'is', null).lte('registered_at', profile.registered_at || profile.created_at),
       db.from('places').select('id', { count: 'exact', head: true }).eq('approved_by_id', profile.user_id),
-      db.from('places').select('votes_positifs').eq('user_id', profile.user_id)
+      db.from('places').select('votes_positifs').eq('user_id', profile.user_id),
+      db.from('place_photos').select('*', { count: 'exact', head: true }).eq('uploaded_by', profile.user_id)
     ]);
     placesCount = stats[0].count || 0;
     commentsCount = stats[1].count || 0;
     validatedCount = (stats[2].count || 0) + (stats[8].count || 0);
     votesCount = stats[3].count || 0;
     var merciCount = (stats[9].data || []).reduce(function(s,p){ return s+(p.votes_positifs||0); }, 0);
+    var photosCountPub = (stats[10] && stats[10].count) || 0;
     var lbData = stats[4].data || [];
     var myIdx = lbData.findIndex(function(u) { return u.user_name === username; });
     if (myIdx >= 0) { rankPos = myIdx + 1; rankTotal = lbData.length; }
@@ -3404,7 +3409,8 @@ async function openPublicProfile(username) {
   var pubUserBanned = typeof pubUserBanned !== 'undefined' ? pubUserBanned : false;
   var memberNum = typeof memberNum !== 'undefined' ? memberNum : null;
   var merciCountPub = (typeof merciCount !== 'undefined' ? merciCount : 0);
-  var pubXP = calcXP(placesCount, validatedCount, commentsCount, votesCount, merciCountPub);
+  var photosCountPub = (typeof photosCountPub !== 'undefined' ? photosCountPub : 0);
+  var pubXP = calcXP(placesCount, validatedCount, commentsCount, votesCount, merciCountPub, photosCountPub);
   var pubXPLvl = getXPLevel(pubXP);
   var pubXPPct = pubXPLvl.data.next ? Math.round(((pubXP - pubXPLvl.data.min) / (pubXPLvl.data.next - pubXPLvl.data.min)) * 100) : 100;
   var roleBadge = pubUserRole === 'admin' ? t('role_admin') : pubUserRole === 'moderator' ? t('role_moderator') : pubUserRole === 'trusted' ? t('role_trusted') : null;
@@ -6622,8 +6628,6 @@ async function submitPlace() {
   if (!name || !mainId || !catId) { showToast(t('toast_err_fields'), 'error'); _reEnable(); return; }
   if (!selectedLatLng) { showToast(t('toast_err_click_map'), 'error'); _reEnable(); return; }
   if (add24hValue === null) { showToast(t('toast_err_24h'), 'error'); _reEnable(); return; }
-  var photoInput = document.getElementById('add-photo-input');
-  if (catAllowsPhotos(catId) && (!photoInput || !photoInput.files[0])) { showToast(t('toast_err_photo'), 'error'); _reEnable(); return; }
   var placeStatus = 'active';
   var result = await db.from('places').insert({
     name: name, description: desc,
