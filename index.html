@@ -4694,7 +4694,7 @@ function makePopup(p) {
     + (function() {
         var SOURCE_LABELS = { 'Import OSM':'🗺️ OpenStreetMap', 'OpenStreetMap':'🗺️ OpenStreetMap', 'Prix-Carburants-gouv':'⛽ Prix Carburants (gouv.fr)' };
         if (!p.user_id) {
-          var src = SOURCE_LABELS[p.user_name] || ('🗄️ ' + (p.user_name || 'Import'));
+          var src = SOURCE_LABELS[p.user_name] || (p.user_name ? '🗄️ ' + p.user_name : '🗺️ Données OSM');
           return '<span class="pv2-badge" style="background:rgba(52,152,219,0.12);color:#3498db;border:1px solid rgba(52,152,219,0.25);">📡 Source : ' + src + '</span>';
         }
         return '<span class="pv2-badge pv2-badge-user" style="cursor:pointer;" onclick="openPublicProfile(this.dataset.u)" data-u="' + escHtml(p.user_name || '') + '">&#128100; ' + escHtml(p.user_name || t('lbl_anonymous')) + '</span>';
