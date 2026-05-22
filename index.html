@@ -701,6 +701,19 @@ html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none;font-f
   </div>
 </div>
 
+<div class="sheet-overlay" id="sheet-member-dash" onclick="closeSheet('sheet-member-dash')">
+  <div class="sheet" onclick="event.stopPropagation()" style="max-height:calc(92vh - env(safe-area-inset-top,0px));">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <span class="sheet-title">📊 Mon tableau de bord</span>
+      <button class="sheet-close" onclick="closeSheet('sheet-member-dash')">&#10005;</button>
+    </div>
+    <div class="sheet-content" id="member-dash-content" style="padding:16px;">
+      <div style="color:var(--text2);font-size:13px;">Chargement...</div>
+    </div>
+  </div>
+</div>
+
 <!-- MODALS -->
 <div id="modal-auth" class="modal-overlay" style="display:none">
   <div class="modal">
@@ -2923,6 +2936,7 @@ async function renderProfile() {
     + '<div id="prof-validated-panel" style="display:none;padding:0 16px 4px;"></div>'
     + '<div id="prof-cmts-panel" style="display:none;padding:0 16px 4px;"></div>'
     + '<div id="prof-votes-panel" style="display:none;padding:0 16px 4px;"></div>'
+    + '<button onclick="openMemberDash()" style="width:calc(100% - 32px);margin:4px 16px 0;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:12px;padding:11px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;justify-content:space-between;">📊 Mon tableau de bord<span style="color:var(--accent);font-size:18px;">›</span></button>'
     + '<div class="prof-xp-wrap">'
     + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">'
     + '<span style="font-size:13px;font-weight:700;color:var(--text);">🏅 <span id="prof-xp-total">—</span> XP <span id="prof-xp-level" style="font-weight:600;color:var(--accent);font-size:12px;"></span></span>'
@@ -7850,6 +7864,106 @@ if ('serviceWorker' in navigator) {
       window.location.reload();
     });
   });
+}
+
+async function openMemberDash() {
+  if (!currentUser) return;
+  openSheet('sheet-member-dash');
+  var el = document.getElementById('member-dash-content');
+  el.innerHTML = '<div style="color:var(--text2);font-size:13px;padding:20px 0;text-align:center;">Chargement...</div>';
+  var uid = currentUser.id;
+  var [placesRes, validationsRes, favsRes] = await Promise.all([
+    db.from('places').select('id,name,validation_weight,votes_positifs,created_at').eq('user_id', uid).order('created_at', {ascending: false}),
+    db.from('place_validations').select('place_id,created_at').eq('user_id', uid).order('created_at', {ascending: false}).limit(20),
+    db.from('favorites').select('place_id', {count: 'exact'}).eq('user_id', uid)
+  ]);
+  var places = placesRes.data || [];
+  var validations = validationsRes.data || [];
+  var favsCount = favsRes.count || 0;
+  var placeIds = places.map(function(p) { return p.id; });
+  var valPlaceIds = validations.map(function(v) { return v.place_id; });
+  var [ratingsRes, valNamesRes] = await Promise.all([
+    placeIds.length > 0 ? db.from('ratings').select('score').in('place_id', placeIds) : Promise.resolve({data:[]}),
+    valPlaceIds.length > 0 ? db.from('places').select('id,name').in('id', valPlaceIds) : Promise.resolve({data:[]})
+  ]);
+  var ratings = ratingsRes.data || [];
+  var avgRating = ratings.length > 0 ? (ratings.reduce(function(s,r){return s+r.score;},0)/ratings.length).toFixed(1) : null;
+  var valNames = {};
+  (valNamesRes.data || []).forEach(function(p){ valNames[p.id] = p.name; });
+  var merciCount = places.reduce(function(s,p){return s+(p.votes_positifs||0);},0);
+  var validatedCount = places.filter(function(p){return (p.validation_weight||0)>=3;}).length;
+  function tile(icon, val, label) {
+    return '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;">'
+      +'<div style="font-size:20px;margin-bottom:4px;">'+icon+'</div>'
+      +'<div style="font-size:20px;font-weight:800;color:var(--text);font-family:var(--font-head);">'+val+'</div>'
+      +'<div style="font-size:11px;color:var(--text2);margin-top:2px;">'+label+'</div></div>';
+  }
+  function sec(txt) {
+    return '<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin:20px 0 8px;">'+txt+'</div>';
+  }
+  function empty(msg) {
+    return '<div style="color:var(--text2);font-size:13px;text-align:center;padding:14px 0;">'+msg+'</div>';
+  }
+  var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">'
+    + tile('📍', places.length, 'Lieux ajoutés')
+    + tile('✅', validatedCount+'/'+places.length, 'Lieux validés')
+    + tile('🙏', merciCount, 'Merci reçus')
+    + tile('⭐', avgRating !== null ? avgRating+'/5' : '—', 'Note moyenne')
+    + '</div>';
+  html += sec('📍 Mes lieux ('+places.length+')');
+  if (!places.length) {
+    html += empty('Aucun lieu ajouté');
+  } else {
+    html += '<div style="display:flex;flex-direction:column;gap:6px;">';
+    places.forEach(function(p) {
+      var vw = p.validation_weight||0;
+      var badge = vw>=3
+        ? '<span style="background:rgba(39,174,96,0.15);color:#27ae60;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;white-space:nowrap;">✅ Validé</span>'
+        : '<span style="background:rgba(245,158,11,0.15);color:#f59e0b;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;white-space:nowrap;">'+vw+'/3</span>';
+      html += '<div onclick="openMemberDashPlace(\''+p.id+'\')" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;">'
+        +'<div style="font-size:13px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escHtml(p.name||'—')+'</div>'
+        +badge+'</div>';
+    });
+    html += '</div>';
+  }
+  html += sec('✅ Mes validations ('+validations.length+')');
+  if (!validations.length) {
+    html += empty('Aucune validation effectuée');
+  } else {
+    html += '<div style="display:flex;flex-direction:column;gap:6px;">';
+    validations.forEach(function(v) {
+      var name = valNames[v.place_id]||'Lieu inconnu';
+      var d = v.created_at ? new Date(v.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) : '';
+      html += '<div onclick="openMemberDashPlace(\''+v.place_id+'\')" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px 12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;">'
+        +'<div style="font-size:13px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escHtml(name)+'</div>'
+        +'<div style="font-size:11px;color:var(--text2);white-space:nowrap;">'+d+'</div></div>';
+    });
+    html += '</div>';
+  }
+  html += sec('❤️ Mes favoris ('+favsCount+')');
+  if (!favsCount) {
+    html += empty('Aucun favori ajouté');
+  } else {
+    html += '<div onclick="openMemberDashFavs()" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">'
+      +'<span style="font-size:13px;font-weight:600;color:var(--text);">Voir mes '+favsCount+' favoris</span>'
+      +'<span style="color:var(--accent);font-size:18px;">›</span></div>';
+  }
+  el.innerHTML = html;
+}
+
+async function openMemberDashPlace(pid) {
+  closeSheet('sheet-member-dash');
+  var res = await db.from('places').select('*').eq('id', pid).maybeSingle();
+  if (res.data) openPlaceSheet(res.data);
+}
+
+function openMemberDashFavs() {
+  closeSheet('sheet-member-dash');
+  navTo('profile');
+  setTimeout(function() {
+    var panel = document.getElementById('prof-favs-panel');
+    if (panel && panel.style.display === 'none') toggleProfFavs();
+  }, 400);
 }
 
 </script>
