@@ -582,6 +582,97 @@ var CAT_NAMES = {
   vae:'Borne de recharge VAE / trottinette'
 };
 
+// Icône + couleur + main_category par défaut pour chaque type
+var CAT_META = {
+  wc:            { icon:'🚻', color:'#3498db', main:'Équipements & Services' },
+  shower:        { icon:'🚿', color:'#2980b9', main:'Équipements & Services' },
+  eau:           { icon:'💧', color:'#1a6fa8', main:'Équipements & Services' },
+  dump:          { icon:'🗑️', color:'#117A65', main:'Van Life & Camping-car' },
+  dump_service:  { icon:'🚿', color:'#148F77', main:'Van Life & Camping-car' },
+  camping:       { icon:'🅿️', color:'#27AE60', main:'Van Life & Camping-car' },
+  camping_trad:  { icon:'⛺', color:'#2ecc71', main:'Van Life & Camping-car' },
+  camping_nature:{ icon:'🌿', color:'#1a8a45', main:'Van Life & Camping-car' },
+  wild:          { icon:'🏕️', color:'#1e8449', main:'Van Life & Camping-car' },
+  picnic:        { icon:'🪑', color:'#f39c12', main:'Nature & Outdoor' },
+  parking_motorhome:{ icon:'🚐', color:'#2980b9', main:'Van Life & Camping-car' },
+  parking_night: { icon:'🌙', color:'#1a252f', main:'Van Life & Camping-car' },
+  rest_area:     { icon:'🛣️', color:'#7f8c8d', main:'Van Life & Camping-car' },
+  laundry:       { icon:'👕', color:'#8e44ad', main:'Équipements & Services' },
+  electric:      { icon:'⚡', color:'#f1c40f', main:'Équipements & Services' },
+  vae:           { icon:'🛴', color:'#e67e22', main:'Équipements & Services' },
+  fuel:          { icon:'⛽', color:'#e74c3c', main:'Équipements & Services' },
+  wifi:          { icon:'📶', color:'#3498db', main:'Équipements & Services' },
+  pharmacy:      { icon:'💊', color:'#27ae60', main:'Santé' },
+  hospital:      { icon:'🏥', color:'#e74c3c', main:'Santé' },
+  supermarket_auto:{ icon:'🏪', color:'#2c3e50', main:'Commerces' },
+  bakery:        { icon:'🥖', color:'#e67e22', main:'Commerces' },
+  market:        { icon:'🛍️', color:'#9b59b6', main:'Commerces' },
+  tourist:       { icon:'ℹ️', color:'#2980b9', main:'Tourisme' },
+  sport:         { icon:'⚽', color:'#27ae60', main:'Loisirs' },
+  bike_repair:   { icon:'🔧', color:'#7f8c8d', main:'Mobilité douce' },
+  bike_rental:   { icon:'🚲', color:'#2ecc71', main:'Mobilité douce' },
+  car_sharing:   { icon:'🚗', color:'#3498db', main:'Mobilité douce' },
+  moto_rental:   { icon:'🛵', color:'#e74c3c', main:'Mobilité douce' },
+  boat_rental:   { icon:'🚤', color:'#1a6fa8', main:'Mobilité douce' },
+  pizza:         { icon:'🍕', color:'#e74c3c', main:'Distributeurs 24/7' },
+  pain:          { icon:'🥐', color:'#f39c12', main:'Distributeurs 24/7' },
+  glacon:        { icon:'🧊', color:'#85c1e9', main:'Distributeurs 24/7' },
+  huitre:        { icon:'🦪', color:'#117a65', main:'Distributeurs 24/7' },
+  mer:           { icon:'🦞', color:'#c0392b', main:'Distributeurs 24/7' },
+  fermier:       { icon:'🧺', color:'#a9cce3', main:'Distributeurs 24/7' },
+  milk:          { icon:'🥛', color:'#f0f3f4', main:'Distributeurs 24/7' },
+  eggs:          { icon:'🥚', color:'#f9e79f', main:'Distributeurs 24/7' },
+  honey:         { icon:'🍯', color:'#f39c12', main:'Distributeurs 24/7' },
+  fishing:       { icon:'🎣', color:'#1a5276', main:'Distributeurs 24/7' },
+  flowers:       { icon:'💐', color:'#ec407a', main:'Distributeurs 24/7' },
+  books:         { icon:'📚', color:'#7d6608', main:'Distributeurs 24/7' },
+  coffee:        { icon:'☕', color:'#6e2c00', main:'Distributeurs 24/7' },
+  drinks:        { icon:'🥤', color:'#2e86c1', main:'Distributeurs 24/7' },
+  petfood:       { icon:'🐾', color:'#784212', main:'Distributeurs 24/7' },
+  gaz:           { icon:'🔵', color:'#1f618d', main:'Distributeurs 24/7' },
+  hygiene:       { icon:'🧴', color:'#a569bd', main:'Distributeurs 24/7' },
+  firstaid:      { icon:'🩹', color:'#e74c3c', main:'Distributeurs 24/7' },
+  condoms:       { icon:'🛡️', color:'#2c3e50', main:'Distributeurs 24/7' },
+};
+
+// Crée la catégorie si elle n'existe pas encore, retourne {id, main_id}
+// Accepte une clé type ('wc') ou un nom complet ('Toilettes publiques')
+async function ensureCategory(typeOrName) {
+  // résoudre le type et le catName
+  var type = CAT_NAMES[typeOrName] ? typeOrName : null;
+  var catName = type ? CAT_NAMES[type] : typeOrName;
+  if (!catName) return null;
+  // déjà en base ?
+  if (catIds[catName]) return catIds[catName];
+  // reverse lookup si on n'a que le nom
+  if (!type) {
+    Object.keys(CAT_NAMES).forEach(function(k){ if (CAT_NAMES[k] === catName) type = k; });
+  }
+
+  var meta = (type && CAT_META[type]) || { icon:'📍', color:'#888888', main:null };
+
+  // cherche la main_category
+  var resM = await db.from('main_categories').select('id, name');
+  var mains = resM.data || [];
+  var main = mains.find(function(m){ return m.name === meta.main; });
+  var mainId = main ? main.id : (mains[0] ? mains[0].id : null);
+
+  // insère la sous-catégorie
+  var newId = 'auto-' + type + '-' + Date.now();
+  var res = await db.from('categories').insert([{
+    id: newId,
+    name: catName,
+    icon: meta.icon,
+    color: meta.color,
+    main_category_id: mainId,
+    allow_photos: true
+  }]).select();
+
+  if (res.error) throw new Error('Création catégorie échouée : ' + res.error.message);
+  catIds[catName] = { id: newId, main_id: mainId };
+  return catIds[catName];
+}
+
 // ── UI helpers
 function log(msg, type) {
   var el = document.getElementById('log');
@@ -671,9 +762,11 @@ async function insertBatch(rows, catName, source) {
 
   var cat = catIds[catName];
   if (!cat) {
-    log('ERREUR : catégorie "' + catName + '" introuvable !', 'err');
-    log('Dispo : ' + Object.keys(catIds).slice(0,8).join(', ') + '...', 'info');
-    return;
+    log('Catégorie absente → création automatique : ' + catName, 'info');
+    try { cat = await ensureCategory(catName); }
+    catch(e) { log('Erreur création catégorie : ' + e.message, 'err'); return; }
+    if (!cat) { log('ERREUR : catégorie introuvable et non créable : ' + catName, 'err'); return; }
+    log('Catégorie créée : ' + catName, 'ok');
   }
   log('Catégorie : ' + catName, 'ok');
 
@@ -1349,7 +1442,13 @@ async function runQueueItem(type, zone) {
   if (!items.length) return true;
   await loadCatIds();
   var cat = catIds[catName];
-  if (!cat) { qLog('Catégorie introuvable dans Supabase : ' + catName, 'err'); return false; }
+  if (!cat) {
+    qLog('Catégorie absente → création automatique : ' + catName, 'info');
+    try { cat = await ensureCategory(type); }
+    catch(e) { qLog('Erreur création catégorie : ' + e.message, 'err'); return false; }
+    if (!cat) { qLog('Impossible de créer la catégorie : ' + catName, 'err'); return false; }
+    qLog('Catégorie créée : ' + catName, 'ok');
+  }
   var antiDbl  = document.getElementById('opt-antidoublons').checked;
   var pendingOpt = document.getElementById('opt-pending').checked;
   var dryRun   = document.getElementById('opt-dryrun').checked;
