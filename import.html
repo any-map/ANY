@@ -105,9 +105,18 @@ input[type=text] { max-width: 100%; }
             <option value="eau">💧 Bornes eau potable</option>
             <option value="dump">🗑️ Stations vidange eaux grises/noires</option>
           </optgroup>
-          <optgroup label="── Camping / Spots">
-            <option value="camping">🅿️ Aires camping-car officielles</option>
-            <option value="wild">🌿 Spots sauvages van / tente</option>
+          <optgroup label="── Van Life & Camping-car">
+            <option value="camping">🅿️ Aire de camping-car officielle</option>
+            <option value="camping_trad">⛺ Camping traditionnel</option>
+            <option value="camping_nature">🌿 Aire naturelle / petit camping</option>
+            <option value="wild">🏕️ Bivouac / Spot sauvage</option>
+            <option value="parking_motorhome">🚐 Parking autorisé camping-car</option>
+            <option value="parking_night">🌙 Parking autorisé la nuit</option>
+            <option value="rest_area">🛣️ Aire de repos (autoroute)</option>
+            <option value="dump_service">🚿 Aire de service camping-car (eau + vidange)</option>
+            <option value="dump">🗑️ Station de vidange seule</option>
+          </optgroup>
+          <optgroup label="── Pique-nique">
             <option value="picnic">🪑 Aires de pique-nique</option>
           </optgroup>
           <optgroup label="── Services & Commerces">
@@ -438,8 +447,13 @@ var gouvRawData = [];
 
 var CAT_NAMES = {
   wc:'Toilettes publiques', shower:'Douche publique', eau:'Borne eau potable',
-  dump:'Station de vidange', camping:'Aire de camping-car officielle',
-  wild:'Spot sauvage van / tente', picnic:'Aire de pique-nique',
+  dump:'Station de vidange', dump_service:'Aire de service camping-car',
+  camping:'Aire de camping-car officielle', camping_trad:'Camping traditionnel',
+  camping_nature:'Aire naturelle / petit camping',
+  wild:'Bivouac / Spot sauvage', picnic:'Aire de pique-nique',
+  parking_motorhome:'Parking autorisé camping-car',
+  parking_night:'Parking autorisé la nuit',
+  rest_area:'Aire de repos (autoroute)',
   laundry:'Lavomatique automatique', electric:'Borne de recharge électrique',
   fuel:'Station-service', wifi:'WiFi public', pharmacy:'Pharmacie',
   hospital:'Hôpital / Urgences', supermarket_auto:'Supérette autonome 24/7',
@@ -623,7 +637,53 @@ function buildQuery(type, b) {
     +'node["amenity"="parking"]["motorhome_parking"="designated"]('+b+');\n'
     +'way["amenity"="parking"]["motorhome_parking"="designated"]('+b+');'
     +ec;
-  if (type==='wild')       return t+'node["tourism"="camp_site"]["backcountry"="yes"]('+b+');\nnode["tourism"="camp_site"]["camp_site"="basic"]('+b+');\nnode["tourism"="camp_site"]["informal"="yes"]('+b+');\nnode["tourism"="wilderness_hut"]('+b+');'+ec;
+  if (type==='camping_trad') return t
+    +'node["tourism"="camp_site"]('+b+');\n'
+    +'way["tourism"="camp_site"]('+b+');\n'
+    +'relation["tourism"="camp_site"]('+b+');'
+    +ec;
+  if (type==='camping_nature') return t
+    +'node["tourism"="camp_site"]["camp_site"="basic"]('+b+');\n'
+    +'node["tourism"="camp_site"]["capacity"~"^[1-9]$|^[1-2][0-9]$"]('+b+');\n'
+    +'node["tourism"="camp_site"]["informal"="yes"]('+b+');\n'
+    +'node["tourism"="camp_site"]["access"="yes"]["fee"="no"]('+b+');'
+    +ec;
+  if (type==='wild')       return t
+    +'node["tourism"="camp_site"]["backcountry"="yes"]('+b+');\n'
+    +'node["tourism"="camp_site"]["camp_site"="basic"]["informal"="yes"]('+b+');\n'
+    +'node["tourism"="wilderness_hut"]('+b+');\n'
+    +'node["tourism"="camp_site"]["tents"="yes"]["caravans"!="yes"]["motorhome"!="yes"]["informal"="yes"]('+b+');'
+    +ec;
+  if (type==='parking_motorhome') return t
+    +'node["amenity"="parking"]["motorhome"="yes"]('+b+');\n'
+    +'way["amenity"="parking"]["motorhome"="yes"]('+b+');\n'
+    +'node["amenity"="parking"]["campers"="yes"]('+b+');\n'
+    +'way["amenity"="parking"]["campers"="yes"]('+b+');\n'
+    +'node["amenity"="parking"]["motorhome_parking"="yes"]('+b+');\n'
+    +'way["amenity"="parking"]["motorhome_parking"="yes"]('+b+');'
+    +ec;
+  if (type==='parking_night') return t
+    +'node["overnight_parking"="yes"]('+b+');\n'
+    +'way["overnight_parking"="yes"]('+b+');\n'
+    +'node["amenity"="parking"]["overnight"="yes"]('+b+');\n'
+    +'way["amenity"="parking"]["overnight"="yes"]('+b+');\n'
+    +'node["amenity"="parking"]["overnight_parking"="yes"]('+b+');\n'
+    +'node["parking"="overnight"]('+b+');'
+    +ec;
+  if (type==='rest_area') return t
+    +'node["highway"="rest_area"]('+b+');\n'
+    +'way["highway"="rest_area"]('+b+');\n'
+    +'node["amenity"="rest_area"]('+b+');\n'
+    +'way["amenity"="rest_area"]('+b+');\n'
+    +'node["highway"="services"]('+b+');\n'
+    +'way["highway"="services"]('+b+');'
+    +ec;
+  if (type==='dump_service') return t
+    +'node["amenity"="sanitary_dump_station"]["drinking_water"="yes"]('+b+');\n'
+    +'node["amenity"="sanitary_dump_station"]["water_point"="yes"]('+b+');\n'
+    +'node["tourism"="caravan_site"]["sanitary_dump_station"="yes"]('+b+');\n'
+    +'node["amenity"="motorhome_parking"]["sanitary_dump_station"="yes"]('+b+');'
+    +e;
   if (type==='picnic')     return t+'node["tourism"="picnic_site"]('+b+');\nway["tourism"="picnic_site"]('+b+');'+ec;
   if (type==='laundry')    return t+'node["shop"="laundry"]["self_service"="yes"]('+b+');\nnode["shop"="laundry"]["self_service"="only"]('+b+');\nnode["shop"="laundrette"]('+b+');\nnode["amenity"="washing_machine"]('+b+');'+e;
   if (type==='electric')   return t+'node["amenity"="charging_station"]["bicycle"!="yes"]('+b+');\nway["amenity"="charging_station"]["bicycle"!="yes"]('+b+');'+ec;
