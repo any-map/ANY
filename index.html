@@ -576,6 +576,10 @@ html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none;font-f
       <span class="nav-item-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#5865F2"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.025.015.048.036.063a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.1.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg></span>
       <span>Discord</span>
     </button>
+    <button class="nav-item" id="nav-member-dash" onclick="navTo('member-dash')" style="display:none;">
+      <span class="nav-item-icon">&#128202;</span>
+      <span>Mon espace</span>
+    </button>
     <button class="nav-item" id="nav-profile" onclick="navTo('profile')">
       <span class="nav-item-icon">&#128100;</span>
       <span data-i18n="nav_profile">Profil</span>
@@ -704,12 +708,22 @@ html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none;font-f
 <div class="sheet-overlay" id="sheet-member-dash" onclick="closeSheet('sheet-member-dash')">
   <div class="sheet" onclick="event.stopPropagation()" style="max-height:calc(92vh - env(safe-area-inset-top,0px));">
     <div class="sheet-handle"></div>
-    <div class="sheet-header">
-      <span class="sheet-title">📊 Mon tableau de bord</span>
-      <button class="sheet-close" onclick="closeSheet('sheet-member-dash')">&#10005;</button>
+    <div id="member-dash-main" style="display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;">
+      <div class="sheet-header">
+        <span class="sheet-title">📊 Mon tableau de bord</span>
+        <button class="sheet-close" onclick="closeSheet('sheet-member-dash')">&#10005;</button>
+      </div>
+      <div class="sheet-content" id="member-dash-content" style="padding:16px;">
+        <div style="color:var(--text2);font-size:13px;">Chargement...</div>
+      </div>
     </div>
-    <div class="sheet-content" id="member-dash-content" style="padding:16px;">
-      <div style="color:var(--text2);font-size:13px;">Chargement...</div>
+    <div id="member-dash-detail" style="display:none;flex-direction:column;flex:1;min-height:0;overflow:hidden;">
+      <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0;">
+        <button onclick="showMemberDashMain()" style="background:none;border:none;color:var(--accent);font-size:22px;cursor:pointer;padding:0 4px;line-height:1;">&#8592;</button>
+        <span class="sheet-title" id="member-dash-detail-title"></span>
+        <button class="sheet-close" style="margin-left:auto;" onclick="closeSheet('sheet-member-dash')">&#10005;</button>
+      </div>
+      <div class="sheet-content" id="member-dash-detail-content" style="padding:16px;"></div>
     </div>
   </div>
 </div>
@@ -2774,6 +2788,7 @@ function navTo(tab) {
   else if (tab === 'profile') { renderProfile(); openSheet('sheet-profile'); }
   else if (tab === 'settings') { renderProfile(); openSheet('sheet-profile'); }
   else if (tab === 'dashboard') { openDashboard(); }
+  else if (tab === 'member-dash') { openMemberDash(); }
 }
 
 function openSheet(id) {
@@ -2936,7 +2951,6 @@ async function renderProfile() {
     + '<div id="prof-validated-panel" style="display:none;padding:0 16px 4px;"></div>'
     + '<div id="prof-cmts-panel" style="display:none;padding:0 16px 4px;"></div>'
     + '<div id="prof-votes-panel" style="display:none;padding:0 16px 4px;"></div>'
-    + '<button onclick="openMemberDash()" style="width:calc(100% - 32px);margin:4px 16px 0;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:12px;padding:11px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;justify-content:space-between;">📊 Mon tableau de bord<span style="color:var(--accent);font-size:18px;">›</span></button>'
     + '<div class="prof-xp-wrap">'
     + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">'
     + '<span style="font-size:13px;font-weight:700;color:var(--text);">🏅 <span id="prof-xp-total">—</span> XP <span id="prof-xp-level" style="font-weight:600;color:var(--accent);font-size:12px;"></span></span>'
@@ -3597,6 +3611,8 @@ function signOut() {
   updateSatBtn();
   document.getElementById('auth-info').textContent = t('auth_not_connected');
   document.getElementById('btn-auth').textContent = t('btn_connect');
+  var navMD = document.getElementById('nav-member-dash');
+  if (navMD) navMD.style.display = 'none';
   closeSheet('sheet-profile');
   showToast(t('toast_disconnected'), 'success');
   setTimeout(function() { openModal('modal-auth'); }, 300);
@@ -3622,6 +3638,8 @@ async function loadUserRole() {
   if (isModerator) isTrusted = true;
   var navDash = document.getElementById('nav-dashboard');
   if (navDash) navDash.style.display = (isAdmin || isModerator) ? 'flex' : 'none';
+  var navMemberDash = document.getElementById('nav-member-dash');
+  if (navMemberDash) navMemberDash.style.display = 'flex';
 }
 
 async function loadUserProfile() {
@@ -7866,95 +7884,167 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+var _memberDashData = null;
+
 async function openMemberDash() {
   if (!currentUser) return;
+  showMemberDashMain();
   openSheet('sheet-member-dash');
   var el = document.getElementById('member-dash-content');
   el.innerHTML = '<div style="color:var(--text2);font-size:13px;padding:20px 0;text-align:center;">Chargement...</div>';
   var uid = currentUser.id;
   var [placesRes, validationsRes, favsRes] = await Promise.all([
-    db.from('places').select('id,name,validation_weight,votes_positifs,created_at').eq('user_id', uid).order('created_at', {ascending: false}),
-    db.from('place_validations').select('place_id,created_at').eq('user_id', uid).order('created_at', {ascending: false}).limit(20),
-    db.from('favorites').select('place_id', {count: 'exact'}).eq('user_id', uid)
+    db.from('places').select('id,name,validation_weight,votes_positifs,latitude,longitude,created_at').eq('user_id', uid).order('created_at', {ascending:false}),
+    db.from('place_validations').select('place_id,created_at').eq('user_id', uid).order('created_at', {ascending:false}).limit(50),
+    db.from('favorites').select('place_id', {count:'exact'}).eq('user_id', uid)
   ]);
   var places = placesRes.data || [];
   var validations = validationsRes.data || [];
   var favsCount = favsRes.count || 0;
-  var placeIds = places.map(function(p) { return p.id; });
-  var valPlaceIds = validations.map(function(v) { return v.place_id; });
+  var placeIds = places.map(function(p){return p.id;});
+  var valPlaceIds = validations.map(function(v){return v.place_id;});
   var [ratingsRes, valNamesRes] = await Promise.all([
     placeIds.length > 0 ? db.from('ratings').select('score').in('place_id', placeIds) : Promise.resolve({data:[]}),
-    valPlaceIds.length > 0 ? db.from('places').select('id,name').in('id', valPlaceIds) : Promise.resolve({data:[]})
+    valPlaceIds.length > 0 ? db.from('places').select('id,name,latitude,longitude').in('id', valPlaceIds) : Promise.resolve({data:[]})
   ]);
   var ratings = ratingsRes.data || [];
   var avgRating = ratings.length > 0 ? (ratings.reduce(function(s,r){return s+r.score;},0)/ratings.length).toFixed(1) : null;
-  var valNames = {};
-  (valNamesRes.data || []).forEach(function(p){ valNames[p.id] = p.name; });
+  var valPlaces = {};
+  (valNamesRes.data||[]).forEach(function(p){ valPlaces[p.id]=p; });
   var merciCount = places.reduce(function(s,p){return s+(p.votes_positifs||0);},0);
   var validatedCount = places.filter(function(p){return (p.validation_weight||0)>=3;}).length;
-  function tile(icon, val, label) {
-    return '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;">'
+  _memberDashData = {places:places, validations:validations, valPlaces:valPlaces, favsCount:favsCount};
+  function tile(icon, val, label, fn) {
+    return '<div onclick="'+fn+'" style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;cursor:pointer;">'
       +'<div style="font-size:20px;margin-bottom:4px;">'+icon+'</div>'
       +'<div style="font-size:20px;font-weight:800;color:var(--text);font-family:var(--font-head);">'+val+'</div>'
-      +'<div style="font-size:11px;color:var(--text2);margin-top:2px;">'+label+'</div></div>';
-  }
-  function sec(txt) {
-    return '<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin:20px 0 8px;">'+txt+'</div>';
-  }
-  function empty(msg) {
-    return '<div style="color:var(--text2);font-size:13px;text-align:center;padding:14px 0;">'+msg+'</div>';
+      +'<div style="font-size:11px;color:var(--text2);margin-top:2px;">'+label+'</div>'
+      +'<div style="font-size:10px;color:var(--accent);margin-top:5px;">Voir ›</div>'
+      +'</div>';
   }
   var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">'
-    + tile('📍', places.length, 'Lieux ajoutés')
-    + tile('✅', validatedCount+'/'+places.length, 'Lieux validés')
-    + tile('🙏', merciCount, 'Merci reçus')
-    + tile('⭐', avgRating !== null ? avgRating+'/5' : '—', 'Note moyenne')
-    + '</div>';
-  html += sec('📍 Mes lieux ('+places.length+')');
-  if (!places.length) {
-    html += empty('Aucun lieu ajouté');
-  } else {
-    html += '<div style="display:flex;flex-direction:column;gap:6px;">';
-    places.forEach(function(p) {
-      var vw = p.validation_weight||0;
-      var badge = vw>=3
-        ? '<span style="background:rgba(39,174,96,0.15);color:#27ae60;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;white-space:nowrap;">✅ Validé</span>'
-        : '<span style="background:rgba(245,158,11,0.15);color:#f59e0b;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;white-space:nowrap;">'+vw+'/3</span>';
-      html += '<div onclick="openMemberDashPlace(\''+p.id+'\')" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;">'
-        +'<div style="font-size:13px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escHtml(p.name||'—')+'</div>'
-        +badge+'</div>';
-    });
-    html += '</div>';
-  }
-  html += sec('✅ Mes validations ('+validations.length+')');
-  if (!validations.length) {
-    html += empty('Aucune validation effectuée');
-  } else {
-    html += '<div style="display:flex;flex-direction:column;gap:6px;">';
-    validations.forEach(function(v) {
-      var name = valNames[v.place_id]||'Lieu inconnu';
-      var d = v.created_at ? new Date(v.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) : '';
-      html += '<div onclick="openMemberDashPlace(\''+v.place_id+'\')" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px 12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;">'
-        +'<div style="font-size:13px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escHtml(name)+'</div>'
-        +'<div style="font-size:11px;color:var(--text2);white-space:nowrap;">'+d+'</div></div>';
-    });
-    html += '</div>';
-  }
-  html += sec('❤️ Mes favoris ('+favsCount+')');
+    +tile('📍', places.length, 'Lieux ajoutés', 'showMemberDashDetail(\'places\')')
+    +tile('✅', validatedCount+'/'+places.length, 'Lieux validés', 'showMemberDashDetail(\'validated\')')
+    +tile('🙏', merciCount, 'Merci reçus', 'showMemberDashDetail(\'merci\')')
+    +tile('⭐', avgRating !== null ? avgRating+'/5' : '—', 'Note moyenne', 'showMemberDashDetail(\'ratings\')')
+    +'</div>';
+  html += '<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin:20px 0 8px;">✅ Mes validations ('+validations.length+')</div>';
+  html += '<div onclick="showMemberDashDetail(\'validations\')" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;">'
+    +'<span style="font-size:13px;font-weight:600;color:var(--text);">'+validations.length+' lieu'+(validations.length>1?'x':'')+' validé'+(validations.length>1?'s':'')+'</span>'
+    +'<span style="color:var(--accent);font-size:18px;">›</span></div>';
+  html += '<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin:20px 0 8px;">❤️ Mes favoris ('+favsCount+')</div>';
   if (!favsCount) {
-    html += empty('Aucun favori ajouté');
+    html += '<div style="color:var(--text2);font-size:13px;text-align:center;padding:14px 0;">Aucun favori</div>';
   } else {
-    html += '<div onclick="openMemberDashFavs()" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">'
+    html += '<div onclick="openMemberDashFavs()" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;">'
       +'<span style="font-size:13px;font-weight:600;color:var(--text);">Voir mes '+favsCount+' favoris</span>'
       +'<span style="color:var(--accent);font-size:18px;">›</span></div>';
   }
   el.innerHTML = html;
 }
 
-async function openMemberDashPlace(pid) {
+function showMemberDashMain() {
+  var main = document.getElementById('member-dash-main');
+  var detail = document.getElementById('member-dash-detail');
+  if (main) { main.style.display='flex'; main.style.flexDirection='column'; }
+  if (detail) detail.style.display='none';
+}
+
+function showMemberDashDetail(type) {
+  if (!_memberDashData) return;
+  var main = document.getElementById('member-dash-main');
+  var detail = document.getElementById('member-dash-detail');
+  var titleEl = document.getElementById('member-dash-detail-title');
+  var content = document.getElementById('member-dash-detail-content');
+  if (main) main.style.display='none';
+  if (detail) { detail.style.display='flex'; detail.style.flexDirection='column'; }
+  var d = _memberDashData;
+  var titles = {places:'📍 Mes lieux', validated:'✅ Lieux validés', merci:'🙏 Merci reçus', validations:'✅ Mes validations', ratings:'⭐ Notes reçues'};
+  if (titleEl) titleEl.textContent = titles[type] || '';
+  if (type === 'ratings') {
+    content.innerHTML = '<div style="color:var(--text2);font-size:13px;padding:20px 0;text-align:center;">Chargement...</div>';
+    loadMemberDashRatings(d.places);
+    return;
+  }
+  var html = '';
+  if (type === 'places' || type === 'validated' || type === 'merci') {
+    var list = d.places.slice();
+    if (type === 'validated') list = list.filter(function(p){return (p.validation_weight||0)>=3;});
+    if (type === 'merci') list = list.filter(function(p){return (p.votes_positifs||0)>0;}).sort(function(a,b){return (b.votes_positifs||0)-(a.votes_positifs||0);});
+    if (!list.length) {
+      html = '<div style="color:var(--text2);font-size:13px;text-align:center;padding:20px 0;">Aucun lieu</div>';
+    } else {
+      html = '<div style="display:flex;flex-direction:column;gap:8px;">';
+      list.forEach(function(p) {
+        var vw = p.validation_weight||0;
+        var badge = vw>=3
+          ? '<span style="background:rgba(39,174,96,0.15);color:#27ae60;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;white-space:nowrap;">✅ Validé</span>'
+          : '<span style="background:rgba(245,158,11,0.15);color:#f59e0b;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;white-space:nowrap;">'+vw+'/3</span>';
+        var extra = type==='merci' && p.votes_positifs>0 ? '<span style="font-size:11px;color:#8b5cf6;margin-right:6px;">🙏 '+p.votes_positifs+'</span>' : '';
+        html += '<div onclick="goToPlaceOnMap(\''+p.id+'\','+p.latitude+','+p.longitude+')" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:8px;">'
+          +'<div style="flex:1;min-width:0;font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escHtml(p.name||'—')+'</div>'
+          +extra+badge+'</div>';
+      });
+      html += '</div>';
+    }
+  }
+  if (type === 'validations') {
+    if (!d.validations.length) {
+      html = '<div style="color:var(--text2);font-size:13px;text-align:center;padding:20px 0;">Aucune validation</div>';
+    } else {
+      html = '<div style="display:flex;flex-direction:column;gap:6px;">';
+      d.validations.forEach(function(v) {
+        var pl = d.valPlaces[v.place_id];
+        var name = pl ? pl.name : 'Lieu inconnu';
+        var date = v.created_at ? new Date(v.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) : '';
+        var onclick = pl ? 'goToPlaceOnMap(\''+v.place_id+'\','+pl.latitude+','+pl.longitude+')' : '';
+        html += '<div '+(onclick?'onclick="'+onclick+'"':'')+' style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px 12px;'+(onclick?'cursor:pointer;':'')+' display:flex;align-items:center;justify-content:space-between;gap:8px;">'
+          +'<div style="font-size:13px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escHtml(name)+'</div>'
+          +'<div style="font-size:11px;color:var(--text2);white-space:nowrap;">'+date+'</div></div>';
+      });
+      html += '</div>';
+    }
+  }
+  content.innerHTML = html;
+}
+
+async function loadMemberDashRatings(places) {
+  var content = document.getElementById('member-dash-detail-content');
+  var placeIds = places.map(function(p){return p.id;});
+  if (!placeIds.length) { content.innerHTML = '<div style="color:var(--text2);font-size:13px;text-align:center;padding:20px 0;">Aucun lieu</div>'; return; }
+  var res = await db.from('ratings').select('place_id,score').in('place_id', placeIds);
+  var byPlace = {};
+  (res.data||[]).forEach(function(r){ if(!byPlace[r.place_id])byPlace[r.place_id]=[]; byPlace[r.place_id].push(r.score); });
+  var rated = places.filter(function(p){return byPlace[p.id]&&byPlace[p.id].length>0;})
+    .sort(function(a,b){
+      var aa=byPlace[a.id].reduce(function(s,r){return s+r;},0)/byPlace[a.id].length;
+      var bb=byPlace[b.id].reduce(function(s,r){return s+r;},0)/byPlace[b.id].length;
+      return bb-aa;
+    });
+  if (!rated.length) { content.innerHTML = '<div style="color:var(--text2);font-size:13px;text-align:center;padding:20px 0;">Aucune note reçue</div>'; return; }
+  var html = '<div style="display:flex;flex-direction:column;gap:8px;">';
+  rated.forEach(function(p) {
+    var scores = byPlace[p.id];
+    var avg = (scores.reduce(function(s,r){return s+r;},0)/scores.length).toFixed(1);
+    var filled = Math.round(parseFloat(avg));
+    var stars = '★'.repeat(filled)+'☆'.repeat(5-filled);
+    html += '<div onclick="goToPlaceOnMap(\''+p.id+'\','+p.latitude+','+p.longitude+')" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;">'
+      +'<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escHtml(p.name||'—')+'</div>'
+      +'<div style="font-size:11px;color:var(--text2);">'+scores.length+' avis</div></div>'
+      +'<div style="font-size:13px;font-weight:700;color:#f59e0b;">'+avg+' '+stars+'</div></div>';
+  });
+  html += '</div>';
+  content.innerHTML = html;
+}
+
+async function goToPlaceOnMap(pid, lat, lng) {
   closeSheet('sheet-member-dash');
-  var res = await db.from('places').select('*').eq('id', pid).maybeSingle();
-  if (res.data) openPlaceSheet(res.data);
+  map.flyTo([lat, lng], 16, {duration:0.8});
+  scheduleLoad();
+  setTimeout(async function() {
+    var res = await db.from('places').select('*').eq('id', pid).maybeSingle();
+    if (res.data) openPlaceSheet(res.data);
+  }, 900);
 }
 
 function openMemberDashFavs() {
@@ -7962,7 +8052,7 @@ function openMemberDashFavs() {
   navTo('profile');
   setTimeout(function() {
     var panel = document.getElementById('prof-favs-panel');
-    if (panel && panel.style.display === 'none') toggleProfFavs();
+    if (panel && panel.style.display==='none') toggleProfFavs();
   }, 400);
 }
 
