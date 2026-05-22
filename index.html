@@ -4544,7 +4544,7 @@ function renderMarkers(places) {
     var markerStyle = 'background:' + markerColor + extra;
     var vw = p.validation_weight || 0;
     var vThreshold = 3;
-    var badgeHtml = (!isValidated && !isPending && !isHidden) ? '<div class="marker-unverified-badge">' + (vw > 0 ? vw + '/3' : 'new') + '</div>' : '';
+    var badgeHtml = (!isValidated && !isPending && !isHidden) ? '<div class="marker-unverified-badge">' + (vw > 0 ? vw + '/3' : 'nouveau') + '</div>' : '';
     var mi = L.divIcon({
       html: '<div style="position:relative;">' +
         '<div class="custom-marker" style="' + markerStyle + '"><div class="custom-marker-inner">' + iconHtml + '</div></div>' +
