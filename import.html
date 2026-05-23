@@ -985,7 +985,9 @@ async function fetchOverpass(query, attempt) {
     log('Serveur Overpass : ' + host + ' (tentative ' + attempt + ')', 'gray');
     // GET évite le preflight CORS et est mieux supporté par les miroirs
     var url = mirror + '?data=' + encodeURIComponent(query);
-    var resp = await fetch(url);
+    var controller = new AbortController();
+    var timeoutId = setTimeout(function(){ controller.abort(); }, 30000);
+    var resp = await fetch(url, { signal: controller.signal }).finally(function(){ clearTimeout(timeoutId); });
     if (resp.status === 429) {
       log('⚠ ' + host + ' rate-limit (429), pause 20s...', 'info');
       await sleep(20000);
