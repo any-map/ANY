@@ -4328,9 +4328,10 @@ async function loadCats() {
   mainCats = (resM.data || []).filter(function(mc) { return catVisibleForRole(mc.min_role); });
   allCats  = (resS.data || []).filter(function(c)  { return catVisibleForRole(c.min_role); });
   mainCats.forEach(function(mc) {
-    filters[mc.id] = { on: true, subs: {} };
+    var isDefault = mc.name === 'Libre service 24/7';
+    filters[mc.id] = { on: isDefault, subs: {} };
     allCats.filter(function(c) { return c.main_category_id === mc.id; }).forEach(function(c) {
-      filters[mc.id].subs[c.id] = true;
+      filters[mc.id].subs[c.id] = isDefault;
     });
   });
   catCounts = {};
