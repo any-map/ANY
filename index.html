@@ -4475,7 +4475,7 @@ async function loadPlaces() {
     ne_lat: ne.lat, ne_lng: ne.lng,
     c_lat: center.lat, c_lng: center.lng,
     cat_ids: Array.from(ok),
-    row_limit: 2000
+    row_limit: 1000
   });
 
   allPlaces = (result.data || []).filter(function(p) {
