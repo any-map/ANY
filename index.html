@@ -4591,6 +4591,7 @@ function scheduleAutoSpiderfy(delay) {
 function renderMarkers(places) {
   _autoSpiderfied = false;
   cluster.clearLayers();
+  var markers = [];
   places.forEach(function(p) {
     var cat = p.categories;
     var color = cat ? cat.color : '#0ba6b3';
@@ -4603,7 +4604,6 @@ function renderMarkers(places) {
     var extra = isHidden || isPending ? ';opacity:0.6' : (isValidated || userMyValidations[p.id]) ? '' : ';filter:grayscale(1)';
     var markerStyle = 'background:' + markerColor + extra;
     var vw = p.validation_weight || 0;
-    var vThreshold = 3;
     var badgeHtml = (!isValidated && !isPending && !isHidden) ? '<div class="marker-unverified-badge">' + (vw > 0 ? vw + '/3' : 'à valider') + '</div>' : '';
     var mi = L.divIcon({
       html: '<div style="position:relative;">' +
@@ -4614,8 +4614,9 @@ function renderMarkers(places) {
     });
     var mk = L.marker([p.latitude, p.longitude], { icon: mi });
     mk.on('click', function(e) { L.DomEvent.stopPropagation(e); openPlaceDetail(p, mk); });
-    cluster.addLayer(mk);
+    markers.push(mk);
   });
+  cluster.addLayers(markers);
 }
 
 function parseFuelPrices(desc) {
