@@ -8109,7 +8109,7 @@ function showMemberDashMain() {
   if (detail) detail.style.display='none';
 }
 
-function showMemberDashDetail(type) {
+async function showMemberDashDetail(type) {
   if (!_memberDashData) return;
   var main = document.getElementById('member-dash-main');
   var detail = document.getElementById('member-dash-detail');
