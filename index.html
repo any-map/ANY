@@ -7091,17 +7091,18 @@ async function loadDashboardTiles(gridId) {
       + '</div>';
   }
 
-  var html = tile('&#128101;', t('dash_registered_members'), totalMembers, 'showDashMembers()')
-    + tile('&#127381;', t('dash_new_members'), newMembers, 'showDashNewMembers()', 0, 'week', t('lbl_this_week'))
-    + tile('&#128205;', t('dash_validated_total'), totalPlaces, 'showDashValidatedPlaces()')
-    + tile('&#10024;', t('dash_new_places'), newPlaces, 'showDashNewPlaces()', 0, 'week', t('lbl_this_week'))
-    + tile('&#9888;&#65039;', t('dash_reported_places'), reportedPlaces, 'showDashReportedPlaces()', reportedPlaces, reportedPlaces > 0 ? 'urgent' : '')
-    + tile('&#128172;', t('dash_reported_comments'), reportedCmts, 'showDashReportedComments()', reportedCmts, reportedCmts > 0 ? 'urgent' : '');
-  // Ligne 4 : classement XP + lieux en attente + statistiques globales
-  html += tile('&#127942;', 'Classement XP', '', 'showDashLeaderboard()', 0, '')
-    + tile('&#9203;', t('dash_pending'), pendingCount, 'showDashPending()', pendingCount, pendingCount > 0 ? 'urgent' : '')
-    + tile('&#128202;', t('dash_global_stats'), '', 'showDashStats()', 0, '');
-  // Ligne 5 admin : équipe + sanctions
+  var html = tile('&#128101;', t('dash_registered_members'), totalMembers, (isAdmin || isModerator) ? 'showDashMembers()' : '')
+    + tile('&#127381;', t('dash_new_members'), newMembers, (isAdmin || isModerator) ? 'showDashNewMembers()' : '', 0, 'week', t('lbl_this_week'))
+    + tile('&#128205;', t('dash_validated_total'), totalPlaces, (isAdmin || isModerator) ? 'showDashValidatedPlaces()' : '')
+    + tile('&#10024;', t('dash_new_places'), newPlaces, (isAdmin || isModerator) ? 'showDashNewPlaces()' : '', 0, 'week', t('lbl_this_week'));
+  if (isAdmin || isModerator) {
+    html += tile('&#9888;&#65039;', t('dash_reported_places'), reportedPlaces, 'showDashReportedPlaces()', reportedPlaces, reportedPlaces > 0 ? 'urgent' : '')
+      + tile('&#128172;', t('dash_reported_comments'), reportedCmts, 'showDashReportedComments()', reportedCmts, reportedCmts > 0 ? 'urgent' : '');
+    html += tile('&#127942;', 'Classement XP', '', 'showDashLeaderboard()', 0, '')
+      + tile('&#9203;', t('dash_pending'), pendingCount, 'showDashPending()', pendingCount, pendingCount > 0 ? 'urgent' : '')
+      + tile('&#128202;', t('dash_global_stats'), '', 'showDashStats()', 0, '');
+  }
+  // Ligne admin : équipe + sanctions
   if (isAdmin) {
     html += tile('&#128737;&#65039;', t('dash_team'), '', 'showDashTeam()', 0, 'admin-only')
       + tile('&#128296;', t('dash_bans'), '', 'showDashBan()', 0, 'admin-only')
@@ -8057,12 +8058,11 @@ async function openMemberDash() {
       +'<span style="font-size:13px;font-weight:600;color:var(--text);">Voir mes '+favsCount+' favoris</span>'
       +'<span style="color:var(--accent);font-size:18px;">›</span></div>';
   }
-  if (isAdmin || isModerator) {
-    html += '<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin:24px 0 10px;">🛡️ Administration</div>'
-      + '<div class="dash-grid" id="member-admin-grid"><div style="color:var(--text2);font-size:13px;text-align:center;padding:12px;">Chargement...</div></div>';
-  }
+  var sectionTitle = (isAdmin || isModerator) ? '🛡️ Administration' : '📊 Statistiques';
+  html += '<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin:24px 0 10px;">' + sectionTitle + '</div>'
+    + '<div class="dash-grid" id="member-admin-grid"><div style="color:var(--text2);font-size:13px;text-align:center;padding:12px;">Chargement...</div></div>';
   el.innerHTML = html;
-  if (isAdmin || isModerator) loadDashboardTiles('member-admin-grid');
+  loadDashboardTiles('member-admin-grid');
 }
 
 function showMemberDashMain() {
