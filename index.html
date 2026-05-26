@@ -7515,28 +7515,17 @@ async function adminToggleCatPhotos(catId, current) {
 }
 
 async function adminConfirmDeleteMainCat(mcId, subCount) {
-  var subIds = allCats.filter(function(s) { return s.main_category_id === mcId; }).map(function(s) { return s.id; });
-  var poiCount = 0;
-  if (subIds.length > 0) {
-    var r = await db.from('places').select('id', { count: 'exact', head: true }).in('category_id', subIds);
-    poiCount = r.count || 0;
+  if (subCount > 0) {
+    showToast('Impossible : supprime d\'abord les ' + subCount + ' sous-catégorie(s)', 'error');
+    return;
   }
-  var msg = 'Cette grande catégorie et ses ' + subCount + ' sous-catégorie(s) seront supprimées.'
-    + (poiCount > 0 ? '\n\n⚠️ ' + poiCount + ' POI seront aussi supprimés définitivement.' : '');
-  showConfirm('Supprimer la catégorie ?', msg, '🗑', '#e74c3c', function() { adminDeleteMainCat(mcId); });
+  showConfirm('Supprimer la catégorie ?', 'Cette grande catégorie sera définitivement supprimée.', '🗑', '#e74c3c', function() { adminDeleteMainCat(mcId); });
 }
 
 async function adminDeleteMainCat(mcId) {
   if (!isAdmin) return;
-  var subIds = allCats.filter(function(s) { return s.main_category_id === mcId; }).map(function(s) { return s.id; });
-  if (subIds.length > 0) {
-    var r0 = await db.from('places').delete().in('category_id', subIds);
-    if (r0.error) { showToast('Erreur : ' + r0.error.message, 'error'); return; }
-    var r1 = await db.from('categories').delete().in('id', subIds);
-    if (r1.error) { showToast('Erreur : ' + r1.error.message, 'error'); return; }
-  }
-  var r2 = await db.from('main_categories').delete().eq('id', mcId);
-  if (r2.error) { showToast('Erreur : ' + r2.error.message, 'error'); return; }
+  var r = await db.from('main_categories').delete().eq('id', mcId);
+  if (r.error) { showToast('Erreur : ' + r.error.message, 'error'); return; }
   showToast('Grande catégorie supprimée', 'success');
   await loadCats();
   renderDashCategoriesContent();
