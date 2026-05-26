@@ -679,29 +679,6 @@ path.leaflet-spider-leg{stroke:#fff!important;stroke-width:1.5px!important;strok
 
 
 <!-- DASHBOARD MODERATEUR -->
-<div class="sheet-overlay" id="sheet-dashboard" onclick="closeSheet('sheet-dashboard')">
-  <div class="sheet" onclick="event.stopPropagation()" style="max-height:calc(92vh - env(safe-area-inset-top,0px));">
-    <div class="sheet-handle"></div>
-    <div id="dash-main-view" style="display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;">
-      <div class="sheet-header">
-        <span class="sheet-title">&#128737;&#65039; Tableau de bord</span>
-        <button class="sheet-close" onclick="closeSheet('sheet-dashboard')">&#10005;</button>
-      </div>
-      <div class="sheet-content" style="padding:0;">
-        <div class="dash-grid" id="dash-grid"><div style="color:var(--text2);font-size:13px;padding:16px;">Chargement...</div></div>
-      </div>
-    </div>
-    <div id="dash-detail-view" style="display:none;flex-direction:column;flex:1;min-height:0;overflow:hidden;">
-      <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0;">
-        <button onclick="showDashMain()" style="background:none;border:none;color:var(--accent);font-size:22px;cursor:pointer;padding:0 4px;line-height:1;">&#8592;</button>
-        <span class="sheet-title" id="dash-detail-title"></span>
-        <button class="sheet-close" style="margin-left:auto;" onclick="closeSheet('sheet-dashboard')">&#10005;</button>
-      </div>
-      <div class="sheet-content" id="dash-detail-content" style="padding:16px;"></div>
-    </div>
-  </div>
-</div>
-
 <div class="sheet-overlay" id="sheet-member-dash" onclick="closeSheet('sheet-member-dash')">
   <div class="sheet" onclick="event.stopPropagation()" style="max-height:calc(92vh - env(safe-area-inset-top,0px));">
     <div class="sheet-handle"></div>
@@ -721,6 +698,29 @@ path.leaflet-spider-leg{stroke:#fff!important;stroke-width:1.5px!important;strok
         <button class="sheet-close" style="margin-left:auto;" onclick="closeSheet('sheet-member-dash')">&#10005;</button>
       </div>
       <div class="sheet-content" id="member-dash-detail-content" style="padding:16px;"></div>
+    </div>
+  </div>
+</div>
+
+<div class="sheet-overlay" id="sheet-dashboard" onclick="closeSheet('sheet-dashboard')">
+  <div class="sheet" onclick="event.stopPropagation()" style="max-height:calc(92vh - env(safe-area-inset-top,0px));">
+    <div class="sheet-handle"></div>
+    <div id="dash-main-view" style="display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;">
+      <div class="sheet-header">
+        <span class="sheet-title">&#128737;&#65039; Tableau de bord</span>
+        <button class="sheet-close" onclick="closeSheet('sheet-dashboard')">&#10005;</button>
+      </div>
+      <div class="sheet-content" style="padding:0;">
+        <div class="dash-grid" id="dash-grid"><div style="color:var(--text2);font-size:13px;padding:16px;">Chargement...</div></div>
+      </div>
+    </div>
+    <div id="dash-detail-view" style="display:none;flex-direction:column;flex:1;min-height:0;overflow:hidden;">
+      <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0;">
+        <button onclick="showDashMain()" style="background:none;border:none;color:var(--accent);font-size:22px;cursor:pointer;padding:0 4px;line-height:1;">&#8592;</button>
+        <span class="sheet-title" id="dash-detail-title"></span>
+        <button class="sheet-close" style="margin-left:auto;" onclick="closeSheet('sheet-dashboard')">&#10005;</button>
+      </div>
+      <div class="sheet-content" id="dash-detail-content" style="padding:16px;"></div>
     </div>
   </div>
 </div>
