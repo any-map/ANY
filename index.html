@@ -480,7 +480,7 @@ html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none;font-f
 .map-srch-section{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text2);padding:10px 14px 4px;}
 .map-srch-locate{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);pointer-events:all;}
 .map-srch-locate-btn{display:flex;align-items:center;gap:8px;background:none;border:none;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body);padding:4px 0;}
-path.leaflet-spider-leg{stroke:#bbb!important;}
+path.leaflet-spider-leg{stroke:#fff!important;stroke-width:1.5px!important;stroke-opacity:1!important;}
 </style>
 </head>
 <body>
@@ -2588,25 +2588,6 @@ async function init() {
   map.on('moveend', function() { scheduleLoad(); });
   map.on('zoomend', function() { _autoSpiderfied = false; scheduleLoad(); if (map.getZoom() >= 14) scheduleAutoSpiderfy(350); });
   cluster.on('animationend', function() { if (!_autoSpiderfied && map.getZoom() >= 14) scheduleAutoSpiderfy(200); });
-  cluster.on('spiderfied', function() {
-    setTimeout(function() {
-      var svgEl = document.querySelector('.leaflet-overlay-pane svg');
-      if (!svgEl) return;
-      if (!document.getElementById('spider-arrow')) {
-        var ns = 'http://www.w3.org/2000/svg';
-        var defs = document.createElementNS(ns, 'defs');
-        var mk = document.createElementNS(ns, 'marker');
-        mk.setAttribute('id', 'spider-arrow'); mk.setAttribute('markerWidth', '8'); mk.setAttribute('markerHeight', '8');
-        mk.setAttribute('refX', '6'); mk.setAttribute('refY', '4'); mk.setAttribute('orient', 'auto');
-        var p = document.createElementNS(ns, 'path'); p.setAttribute('d', 'M0,0 L8,4 L0,8 Z'); p.setAttribute('fill', '#bbb');
-        mk.appendChild(p); defs.appendChild(mk); svgEl.insertBefore(defs, svgEl.firstChild);
-      }
-      var url = 'url(' + window.location.href.replace(/#.*$/, '') + '#spider-arrow)';
-      document.querySelectorAll('.leaflet-spider-leg').forEach(function(el) {
-        el.setAttribute('marker-end', url);
-      });
-    }, 50);
-  });
   window.addEventListener('resize', function() { map.invalidateSize(); });
   setTimeout(function() { map.invalidateSize(); }, 200);
 
