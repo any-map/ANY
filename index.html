@@ -8040,11 +8040,10 @@ async function openMemberDash() {
       +'<div style="font-size:10px;color:var(--accent);margin-top:5px;">Voir ›</div>'
       +'</div>';
   }
-  var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">'
+  var html = '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">'
     +tile('📍', places.length, 'Lieux ajoutés', 'showMemberDashDetail(\'places\')')
     +tile('✅', validatedCount+'/'+places.length, 'Lieux validés', 'showMemberDashDetail(\'validated\')')
     +tile('🙏', merciCount, 'Merci reçus', 'showMemberDashDetail(\'merci\')')
-    +tile('⭐', avgRating !== null ? avgRating+'/5' : '—', 'Note moyenne', 'showMemberDashDetail(\'ratings\')')
     +'</div>';
   html += '<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin:20px 0 8px;">✅ Mes validations ('+validations.length+')</div>';
   html += '<div onclick="showMemberDashDetail(\'validations\')" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;">'
