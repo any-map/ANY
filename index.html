@@ -8008,6 +8008,8 @@ if ('serviceWorker' in navigator) {
 }
 
 var _memberDashData = null;
+var _dashStatsCache = null;
+var _dashStatsCacheTime = 0;
 
 async function openMemberDash() {
   if (!currentUser) return;
@@ -8018,38 +8020,20 @@ async function openMemberDash() {
   var uid = currentUser.id;
   var weekStart = getWeekStartISO();
 
-  // Tout en un seul Promise.all
-  var res = await Promise.all([
+  // Phase 1 : données utilisateur seulement (rapide)
+  var [r0, r1, r2] = await Promise.all([
     db.from('places').select('id,name,validation_weight,votes_positifs,latitude,longitude,created_at').eq('user_id', uid).order('created_at',{ascending:false}).limit(200),
     db.from('place_validations').select('place_id',{count:'exact',head:true}).eq('user_id', uid),
-    db.from('favorites').select('place_id',{count:'exact',head:true}).eq('user_id', uid),
-    db.rpc('get_registered_users_count'),
-    db.rpc('get_new_users_count',{since:weekStart}),
-    db.from('places').select('id',{count:'exact',head:true}).eq('status','active').not('user_id','is',null),
-    db.from('places').select('id',{count:'exact',head:true}).gte('created_at',weekStart).not('user_id','is',null),
-    (isAdmin||isModerator) ? db.from('places').select('id',{count:'exact',head:true}).eq('status','pending') : Promise.resolve({count:0}),
-    (isAdmin||isModerator) ? db.from('reports').select('id',{count:'exact',head:true}) : Promise.resolve({count:0}),
-    (isAdmin||isModerator) ? db.from('comment_reports').select('id',{count:'exact',head:true}) : Promise.resolve({count:0})
+    db.from('favorites').select('place_id',{count:'exact',head:true}).eq('user_id', uid)
   ]);
 
-  var places       = res[0].data || [];
-  var valCount     = res[1].count || 0;
-  var favsCount    = res[2].count || 0;
-  var totalMembers = (res[3].data != null ? Number(res[3].data) : res[3].count) || 0;
-  var newMembers   = (res[4].data != null ? Number(res[4].data) : res[4].count) || 0;
-  var totalPlaces  = res[5].count || 0;
-  var newPlaces    = res[6].count || 0;
-  var pendingCount = res[7].count || 0;
-  var reportedPlaces = res[8].count || 0;
-  var reportedCmts   = res[9].count || 0;
+  var places    = r0.data || [];
+  var valCount  = r1.count || 0;
+  var favsCount = r2.count || 0;
+  _memberDashData = {places:places, favsCount:favsCount};
 
   var merciCount = places.reduce(function(s,p){return s+(p.votes_positifs||0);},0);
   var validatedCount = places.filter(function(p){return (p.validation_weight||0)>=3;}).length;
-  _memberDashData = {places:places, favsCount:favsCount};
-
-  var urgent = pendingCount + reportedPlaces + reportedCmts;
-  var nb = document.getElementById('dash-nav-badge');
-  if (nb) { nb.textContent = urgent > 99 ? '99+' : urgent; nb.style.display = urgent > 0 ? 'block' : 'none'; }
 
   function mTile(icon, val, label, fn) {
     return '<div onclick="'+fn+'" style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;cursor:pointer;">'
@@ -8083,6 +8067,42 @@ async function openMemberDash() {
 
   var sectionTitle = (isAdmin||isModerator) ? '🛡️ Administration' : '📊 Statistiques';
   html += '<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin:24px 0 10px;">'+sectionTitle+'</div>';
+  html += '<div id="member-dash-stats-grid" class="dash-grid"><div style="color:var(--text2);font-size:12px;text-align:center;padding:8px 0;">Chargement...</div></div>';
+  el.innerHTML = html;
+
+  // Phase 2 : stats globales avec cache 5 min
+  var now = Date.now();
+  var useCache = _dashStatsCache && (now - _dashStatsCacheTime) < 300000;
+  var totalMembers, newMembers, totalPlaces, newPlaces, pendingCount, reportedPlaces, reportedCmts;
+  if (useCache) {
+    totalMembers = _dashStatsCache.totalMembers; newMembers = _dashStatsCache.newMembers;
+    totalPlaces = _dashStatsCache.totalPlaces; newPlaces = _dashStatsCache.newPlaces;
+    pendingCount = _dashStatsCache.pendingCount; reportedPlaces = _dashStatsCache.reportedPlaces;
+    reportedCmts = _dashStatsCache.reportedCmts;
+  } else {
+    var sr = await Promise.all([
+      db.rpc('get_registered_users_count'),
+      db.rpc('get_new_users_count',{since:weekStart}),
+      db.from('places').select('id',{count:'exact',head:true}).eq('status','active').not('user_id','is',null),
+      db.from('places').select('id',{count:'exact',head:true}).gte('created_at',weekStart).not('user_id','is',null),
+      (isAdmin||isModerator) ? db.from('places').select('id',{count:'exact',head:true}).eq('status','pending') : Promise.resolve({count:0}),
+      (isAdmin||isModerator) ? db.from('reports').select('id',{count:'exact',head:true}) : Promise.resolve({count:0}),
+      (isAdmin||isModerator) ? db.from('comment_reports').select('id',{count:'exact',head:true}) : Promise.resolve({count:0})
+    ]);
+    totalMembers = (sr[0].data != null ? Number(sr[0].data) : sr[0].count) || 0;
+    newMembers   = (sr[1].data != null ? Number(sr[1].data) : sr[1].count) || 0;
+    totalPlaces  = sr[2].count || 0;
+    newPlaces    = sr[3].count || 0;
+    pendingCount = sr[4].count || 0;
+    reportedPlaces = sr[5].count || 0;
+    reportedCmts   = sr[6].count || 0;
+    _dashStatsCache = {totalMembers:totalMembers, newMembers:newMembers, totalPlaces:totalPlaces, newPlaces:newPlaces, pendingCount:pendingCount, reportedPlaces:reportedPlaces, reportedCmts:reportedCmts};
+    _dashStatsCacheTime = now;
+  }
+
+  var urgent = pendingCount + reportedPlaces + reportedCmts;
+  var nb = document.getElementById('dash-nav-badge');
+  if (nb) { nb.textContent = urgent > 99 ? '99+' : urgent; nb.style.display = urgent > 0 ? 'block' : 'none'; }
 
   var dashHtml = dTile('&#128101;', t('dash_registered_members'), totalMembers, (isAdmin||isModerator)?'showDashMembers()':'')
     + dTile('&#127381;', t('dash_new_members'), newMembers, (isAdmin||isModerator)?'showDashNewMembers()':'', 0, 'week', t('lbl_this_week'))
@@ -8102,8 +8122,8 @@ async function openMemberDash() {
       + dTile('&#128193;', t('dash_categories'), '', 'showDashCategories()', 0, 'admin-only')
       + dTile('&#128172;', t('dash_comm_types'), '', 'showDashCommTypes()', 0, 'admin-only');
   }
-  html += '<div class="dash-grid">'+dashHtml+'</div>';
-  el.innerHTML = html;
+  var statsGrid = document.getElementById('member-dash-stats-grid');
+  if (statsGrid) statsGrid.innerHTML = dashHtml;
 }
 
 function showMemberDashMain() {
