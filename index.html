@@ -7055,8 +7055,8 @@ function getWeekStartISO() {
   return monday.toISOString();
 }
 
-async function loadDashboardTiles() {
-  var grid = document.getElementById('dash-grid');
+async function loadDashboardTiles(gridId) {
+  var grid = document.getElementById(gridId || 'dash-grid');
   if (!grid) return;
   var weekStart = getWeekStartISO();
   var results = await Promise.all([
@@ -8059,10 +8059,10 @@ async function openMemberDash() {
   }
   if (isAdmin || isModerator) {
     html += '<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin:24px 0 10px;">🛡️ Administration</div>'
-      + '<div class="dash-grid" id="dash-grid"><div style="color:var(--text2);font-size:13px;text-align:center;padding:12px;">Chargement...</div></div>';
+      + '<div class="dash-grid" id="member-admin-grid"><div style="color:var(--text2);font-size:13px;text-align:center;padding:12px;">Chargement...</div></div>';
   }
   el.innerHTML = html;
-  if (isAdmin || isModerator) loadDashboardTiles();
+  if (isAdmin || isModerator) loadDashboardTiles('member-admin-grid');
 }
 
 function showMemberDashMain() {
