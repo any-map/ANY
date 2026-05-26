@@ -7522,7 +7522,7 @@ async function adminConfirmDeleteMainCat(mcId, subCount) {
     poiCount = r.count || 0;
   }
   var msg = 'Cette grande catégorie et ses ' + subCount + ' sous-catégorie(s) seront supprimées.'
-    + (poiCount > 0 ? '\n\n⚠️ ' + poiCount + ' POI perdront leur catégorie (ils resteront sur la carte).' : '');
+    + (poiCount > 0 ? '\n\n⚠️ ' + poiCount + ' POI seront aussi supprimés définitivement.' : '');
   showConfirm('Supprimer la catégorie ?', msg, '🗑', '#e74c3c', function() { adminDeleteMainCat(mcId); });
 }
 
@@ -7530,7 +7530,7 @@ async function adminDeleteMainCat(mcId) {
   if (!isAdmin) return;
   var subIds = allCats.filter(function(s) { return s.main_category_id === mcId; }).map(function(s) { return s.id; });
   if (subIds.length > 0) {
-    var r0 = await db.from('places').update({ category_id: null }).in('category_id', subIds);
+    var r0 = await db.from('places').delete().in('category_id', subIds);
     if (r0.error) { showToast('Erreur : ' + r0.error.message, 'error'); return; }
     var r1 = await db.from('categories').delete().in('id', subIds);
     if (r1.error) { showToast('Erreur : ' + r1.error.message, 'error'); return; }
@@ -7546,12 +7546,12 @@ async function adminConfirmDeleteSubCat(catId) {
   var r = await db.from('places').select('id', { count: 'exact', head: true }).eq('category_id', catId);
   var poiCount = r.count || 0;
   var msg = 'Cette sous-catégorie sera définitivement supprimée.'
-    + (poiCount > 0 ? '\n\n⚠️ ' + poiCount + ' POI perdront leur catégorie (ils resteront sur la carte).' : '');
+    + (poiCount > 0 ? '\n\n⚠️ ' + poiCount + ' POI seront aussi supprimés définitivement.' : '');
   showConfirm('Supprimer la sous-catégorie ?', msg, '🗑', '#e74c3c', function() { adminDeleteCat(catId); });
 }
 
 async function adminDeleteCat(catId) {
-  var r1 = await db.from('places').update({ category_id: null }).eq('category_id', catId);
+  var r1 = await db.from('places').delete().eq('category_id', catId);
   if (r1.error) { showToast('Erreur : ' + r1.error.message, 'error'); return; }
   var res = await db.from('categories').delete().eq('id', catId);
   if (res.error) { showToast('Erreur : ' + res.error.message, 'error'); return; }
