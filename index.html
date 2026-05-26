@@ -4472,9 +4472,11 @@ async function loadPlaces() {
   showHint(false);
 
   var center = map.getCenter();
+  var latPad = (ne.lat - sw.lat) * 0.15;
+  var lngPad = (ne.lng - sw.lng) * 0.15;
   var result = await db.rpc('load_places_near', {
-    sw_lat: sw.lat, sw_lng: sw.lng,
-    ne_lat: ne.lat, ne_lng: ne.lng,
+    sw_lat: sw.lat - latPad, sw_lng: sw.lng - lngPad,
+    ne_lat: ne.lat + latPad, ne_lng: ne.lng + lngPad,
     c_lat: center.lat, c_lng: center.lng,
     cat_ids: Array.from(ok),
     row_limit: 1000
@@ -4593,6 +4595,8 @@ function scheduleAutoSpiderfy(delay) {
 function renderMarkers(places) {
   _autoSpiderfied = false;
   cluster.clearLayers();
+  var seen = new Set();
+  places = places.filter(function(p) { if (seen.has(p.id)) return false; seen.add(p.id); return true; });
   var markers = [];
   places.forEach(function(p) {
     var cat = p.categories;
