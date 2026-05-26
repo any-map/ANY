@@ -7514,6 +7514,31 @@ async function adminToggleCatPhotos(catId, current) {
   renderDashCategoriesContent();
 }
 
+function adminConfirmDeleteMainCat(mcId, subCount) {
+  var msg = subCount > 0
+    ? 'Cette grande catégorie et ses ' + subCount + ' sous-catégorie(s) seront définitivement supprimées.'
+    : 'Cette grande catégorie sera définitivement supprimée.';
+  showConfirm('Supprimer la catégorie ?', msg, '🗑', '#e74c3c', function() { adminDeleteMainCat(mcId); });
+}
+
+async function adminDeleteMainCat(mcId) {
+  if (!isAdmin) return;
+  var subIds = allCats.filter(function(s) { return s.main_category_id === mcId; }).map(function(s) { return s.id; });
+  if (subIds.length > 0) {
+    var r1 = await db.from('categories').delete().in('id', subIds);
+    if (r1.error) { showToast('Erreur : ' + r1.error.message, 'error'); return; }
+  }
+  var r2 = await db.from('main_categories').delete().eq('id', mcId);
+  if (r2.error) { showToast('Erreur : ' + r2.error.message, 'error'); return; }
+  showToast('Grande catégorie supprimée', 'success');
+  await loadCats();
+  renderDashCategoriesContent();
+}
+
+function adminConfirmDeleteSubCat(catId) {
+  showConfirm('Supprimer la sous-catégorie ?', 'Cette sous-catégorie sera définitivement supprimée.', '🗑', '#e74c3c', function() { adminDeleteCat(catId); });
+}
+
 async function adminDeleteCat(catId) {
   var res = await db.from('categories').delete().eq('id', catId);
   if (res.error) { showToast('Erreur : ' + res.error.message, 'error'); return; }
@@ -7731,6 +7756,7 @@ function renderDashCategoriesContent() {
       + '<span style="font-size:18px;">' + mc.icon + '</span>'
       + '<span style="font-size:14px;font-weight:700;flex:1;color:var(--text);">' + mc.name + adminRoleTag(mc.min_role) + '</span>'
       + '<button ' + stopProp + ' onclick="adminShowEditMainCatForm(\'' + mc.id + '\')" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;cursor:pointer;font-family:var(--font-body);">&#9998;</button>'
+      + '<button ' + stopProp + ' onclick="adminConfirmDeleteMainCat(\'' + mc.id + '\',' + allSubsRaw.length + ')" style="background:rgba(231,76,60,0.12);color:#e74c3c;border:1px solid rgba(231,76,60,0.3);border-radius:6px;padding:4px 8px;font-size:12px;cursor:pointer;font-family:var(--font-body);">🗑</button>'
       + '<button ' + stopProp + ' onclick="adminShowCreateSubCatForm(\'' + mc.id + '\')" style="background:rgba(11,166,179,0.12);color:var(--accent);border:1px solid rgba(11,166,179,0.3);border-radius:6px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);white-space:nowrap;">+ Sous-cat</button>'
       + '</div>'
       // Barre de réordonnement (cachée, révélée sur appui long)
@@ -7758,6 +7784,7 @@ function renderDashCategoriesContent() {
           + '<span style="font-size:12px;flex:1;color:var(--text2);">' + s.name + adminRoleTag(s.min_role) + '</span>'
           + '<span style="font-size:10px;color:' + (s.allow_photos ? '#27ae60' : 'var(--text2)') + ';opacity:0.7;margin-right:2px;">' + (s.allow_photos ? '📷' : '') + '</span>'
           + '<button ' + stopProp + ' onclick="adminShowEditSubCatForm(\'' + s.id + '\',\'' + mc.id + '\')" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:3px 7px;font-size:11px;cursor:pointer;font-family:var(--font-body);">&#9998;</button>'
+          + '<button ' + stopProp + ' onclick="adminConfirmDeleteSubCat(\'' + s.id + '\')" style="background:rgba(231,76,60,0.12);color:#e74c3c;border:1px solid rgba(231,76,60,0.3);border-radius:6px;padding:3px 7px;font-size:11px;cursor:pointer;font-family:var(--font-body);">🗑</button>'
           + '<select ' + stopProp + ' onchange="adminMoveSubCat(\'' + s.id + '\',this.value,this)" '
           + 'style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:3px 6px;font-size:11px;font-family:var(--font-body);max-width:130px;">'
           + opts + '</select>'
