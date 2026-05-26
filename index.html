@@ -8012,28 +8012,42 @@ async function openMemberDash() {
   var el = document.getElementById('member-dash-content');
   el.innerHTML = '<div style="color:var(--text2);font-size:13px;padding:20px 0;text-align:center;">Chargement...</div>';
   var uid = currentUser.id;
-  var [placesRes, validationsRes, favsRes] = await Promise.all([
-    db.from('places').select('id,name,validation_weight,votes_positifs,latitude,longitude,created_at').eq('user_id', uid).order('created_at', {ascending:false}),
-    db.from('place_validations').select('place_id,created_at').eq('user_id', uid).order('created_at', {ascending:false}).limit(50),
-    db.from('favorites').select('place_id', {count:'exact'}).eq('user_id', uid)
+  var weekStart = getWeekStartISO();
+
+  // Tout en un seul Promise.all
+  var res = await Promise.all([
+    db.from('places').select('id,name,validation_weight,votes_positifs,latitude,longitude,created_at').eq('user_id', uid).order('created_at',{ascending:false}).limit(200),
+    db.from('place_validations').select('place_id',{count:'exact',head:true}).eq('user_id', uid),
+    db.from('favorites').select('place_id',{count:'exact',head:true}).eq('user_id', uid),
+    db.rpc('get_registered_users_count'),
+    db.rpc('get_new_users_count',{since:weekStart}),
+    db.from('places').select('id',{count:'exact',head:true}).eq('status','active').not('user_id','is',null),
+    db.from('places').select('id',{count:'exact',head:true}).gte('created_at',weekStart).not('user_id','is',null),
+    (isAdmin||isModerator) ? db.from('places').select('id',{count:'exact',head:true}).eq('status','pending') : Promise.resolve({count:0}),
+    (isAdmin||isModerator) ? db.from('reports').select('id',{count:'exact',head:true}) : Promise.resolve({count:0}),
+    (isAdmin||isModerator) ? db.from('comment_reports').select('id',{count:'exact',head:true}) : Promise.resolve({count:0})
   ]);
-  var places = placesRes.data || [];
-  var validations = validationsRes.data || [];
-  var favsCount = favsRes.count || 0;
-  var placeIds = places.map(function(p){return p.id;});
-  var valPlaceIds = validations.map(function(v){return v.place_id;});
-  var [ratingsRes, valNamesRes] = await Promise.all([
-    placeIds.length > 0 ? db.from('ratings').select('score').in('place_id', placeIds) : Promise.resolve({data:[]}),
-    valPlaceIds.length > 0 ? db.from('places').select('id,name,latitude,longitude').in('id', valPlaceIds) : Promise.resolve({data:[]})
-  ]);
-  var ratings = ratingsRes.data || [];
-  var avgRating = ratings.length > 0 ? (ratings.reduce(function(s,r){return s+r.score;},0)/ratings.length).toFixed(1) : null;
-  var valPlaces = {};
-  (valNamesRes.data||[]).forEach(function(p){ valPlaces[p.id]=p; });
+
+  var places       = res[0].data || [];
+  var valCount     = res[1].count || 0;
+  var favsCount    = res[2].count || 0;
+  var totalMembers = (res[3].data != null ? Number(res[3].data) : res[3].count) || 0;
+  var newMembers   = (res[4].data != null ? Number(res[4].data) : res[4].count) || 0;
+  var totalPlaces  = res[5].count || 0;
+  var newPlaces    = res[6].count || 0;
+  var pendingCount = res[7].count || 0;
+  var reportedPlaces = res[8].count || 0;
+  var reportedCmts   = res[9].count || 0;
+
   var merciCount = places.reduce(function(s,p){return s+(p.votes_positifs||0);},0);
   var validatedCount = places.filter(function(p){return (p.validation_weight||0)>=3;}).length;
-  _memberDashData = {places:places, validations:validations, valPlaces:valPlaces, favsCount:favsCount};
-  function tile(icon, val, label, fn) {
+  _memberDashData = {places:places, favsCount:favsCount};
+
+  var urgent = pendingCount + reportedPlaces + reportedCmts;
+  var nb = document.getElementById('dash-nav-badge');
+  if (nb) { nb.textContent = urgent > 99 ? '99+' : urgent; nb.style.display = urgent > 0 ? 'block' : 'none'; }
+
+  function mTile(icon, val, label, fn) {
     return '<div onclick="'+fn+'" style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;cursor:pointer;">'
       +'<div style="font-size:20px;margin-bottom:4px;">'+icon+'</div>'
       +'<div style="font-size:20px;font-weight:800;color:var(--text);font-family:var(--font-head);">'+val+'</div>'
@@ -8041,28 +8055,51 @@ async function openMemberDash() {
       +'<div style="font-size:10px;color:var(--accent);margin-top:5px;">Voir ›</div>'
       +'</div>';
   }
-  var html = '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">'
-    +tile('📍', places.length, 'Lieux ajoutés', 'showMemberDashDetail(\'places\')')
-    +tile('✅', validatedCount+'/'+places.length, 'Lieux validés', 'showMemberDashDetail(\'validated\')')
-    +tile('🙏', merciCount, 'Merci reçus', 'showMemberDashDetail(\'merci\')')
-    +'</div>';
-  html += '<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin:20px 0 8px;">✅ Mes validations ('+validations.length+')</div>';
-  html += '<div onclick="showMemberDashDetail(\'validations\')" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;">'
-    +'<span style="font-size:13px;font-weight:600;color:var(--text);">'+validations.length+' lieu'+(validations.length>1?'x':'')+' validé'+(validations.length>1?'s':'')+'</span>'
-    +'<span style="color:var(--accent);font-size:18px;">›</span></div>';
-  html += '<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin:20px 0 8px;">❤️ Mes favoris ('+favsCount+')</div>';
-  if (!favsCount) {
-    html += '<div style="color:var(--text2);font-size:13px;text-align:center;padding:14px 0;">Aucun favori</div>';
-  } else {
-    html += '<div onclick="openMemberDashFavs()" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;">'
-      +'<span style="font-size:13px;font-weight:600;color:var(--text);">Voir mes '+favsCount+' favoris</span>'
-      +'<span style="color:var(--accent);font-size:18px;">›</span></div>';
+  function dTile(icon, label, val, onclick, badge, cls, weekLabel) {
+    var badgeHtml = (badge > 0) ? '<div class="dash-tile-badge">'+(badge>99?'99+':badge)+'</div>' : '';
+    var weekHtml = weekLabel ? '<div class="dash-tile-week-label">'+weekLabel+'</div>' : '';
+    return '<div class="dash-tile'+(cls?' '+cls:'')+'"'+(onclick?' onclick="'+onclick+'"':'')+'>'+badgeHtml+'<div class="dash-tile-icon">'+icon+'</div>'+(val!==''?'<div class="dash-tile-val">'+val+'</div>':'')+'<div class="dash-tile-lbl">'+label+'</div>'+weekHtml+'</div>';
   }
-  var sectionTitle = (isAdmin || isModerator) ? '🛡️ Administration' : '📊 Statistiques';
-  html += '<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin:24px 0 10px;">' + sectionTitle + '</div>'
-    + '<div class="dash-grid" id="member-admin-grid"><div style="color:var(--text2);font-size:13px;text-align:center;padding:12px;">Chargement...</div></div>';
+
+  var html = '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">'
+    +mTile('📍', places.length, 'Lieux ajoutés', "showMemberDashDetail('places')")
+    +mTile('✅', validatedCount+'/'+places.length, 'Lieux validés', "showMemberDashDetail('validated')")
+    +mTile('🙏', merciCount, 'Merci reçus', "showMemberDashDetail('merci')")
+    +'</div>';
+
+  html += '<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin:20px 0 8px;">✅ Mes validations ('+valCount+')</div>';
+  html += '<div onclick="showMemberDashDetail(\'validations\')" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;">'
+    +'<span style="font-size:13px;font-weight:600;color:var(--text);">'+valCount+' lieu'+(valCount>1?'x':'')+' validé'+(valCount>1?'s':'')+'</span>'
+    +'<span style="color:var(--accent);font-size:18px;">›</span></div>';
+
+  html += '<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin:20px 0 8px;">❤️ Mes favoris ('+favsCount+')</div>';
+  html += favsCount
+    ? '<div onclick="openMemberDashFavs()" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;font-weight:600;color:var(--text);">Voir mes '+favsCount+' favoris</span><span style="color:var(--accent);font-size:18px;">›</span></div>'
+    : '<div style="color:var(--text2);font-size:13px;text-align:center;padding:14px 0;">Aucun favori</div>';
+
+  var sectionTitle = (isAdmin||isModerator) ? '🛡️ Administration' : '📊 Statistiques';
+  html += '<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin:24px 0 10px;">'+sectionTitle+'</div>';
+
+  var dashHtml = dTile('&#128101;', t('dash_registered_members'), totalMembers, (isAdmin||isModerator)?'showDashMembers()':'')
+    + dTile('&#127381;', t('dash_new_members'), newMembers, (isAdmin||isModerator)?'showDashNewMembers()':'', 0, 'week', t('lbl_this_week'))
+    + dTile('&#128205;', t('dash_validated_total'), totalPlaces, (isAdmin||isModerator)?'showDashValidatedPlaces()':'')
+    + dTile('&#10024;', t('dash_new_places'), newPlaces, (isAdmin||isModerator)?'showDashNewPlaces()':'', 0, 'week', t('lbl_this_week'));
+  if (isAdmin||isModerator) {
+    dashHtml += dTile('&#9888;&#65039;', t('dash_reported_places'), reportedPlaces, 'showDashReportedPlaces()', reportedPlaces, reportedPlaces>0?'urgent':'')
+      + dTile('&#128172;', t('dash_reported_comments'), reportedCmts, 'showDashReportedComments()', reportedCmts, reportedCmts>0?'urgent':'')
+      + dTile('&#127942;', 'Classement XP', '', 'showDashLeaderboard()')
+      + dTile('&#9203;', t('dash_pending'), pendingCount, 'showDashPending()', pendingCount, pendingCount>0?'urgent':'')
+      + dTile('&#128202;', t('dash_global_stats'), '', 'showDashStats()');
+  }
+  if (isAdmin) {
+    dashHtml += dTile('&#128737;&#65039;', t('dash_team'), '', 'showDashTeam()', 0, 'admin-only')
+      + dTile('&#128296;', t('dash_bans'), '', 'showDashBan()', 0, 'admin-only')
+      + dTile('&#128221;', t('dash_history_mod'), '', 'showDashReportHistory()', 0, 'admin-only')
+      + dTile('&#128193;', t('dash_categories'), '', 'showDashCategories()', 0, 'admin-only')
+      + dTile('&#128172;', t('dash_comm_types'), '', 'showDashCommTypes()', 0, 'admin-only');
+  }
+  html += '<div class="dash-grid">'+dashHtml+'</div>';
   el.innerHTML = html;
-  loadDashboardTiles('member-admin-grid');
 }
 
 function showMemberDashMain() {
@@ -8111,21 +8148,33 @@ function showMemberDashDetail(type) {
     }
   }
   if (type === 'validations') {
-    if (!d.validations.length) {
-      html = '<div style="color:var(--text2);font-size:13px;text-align:center;padding:20px 0;">Aucune validation</div>';
+    content.innerHTML = '<div style="color:var(--text2);font-size:13px;padding:20px 0;text-align:center;">Chargement...</div>';
+    var valRes = await db.from('place_validations').select('place_id,created_at').eq('user_id', currentUser.id).order('created_at',{ascending:false}).limit(50);
+    var validations = valRes.data || [];
+    var valPlaces = {};
+    if (validations.length > 0) {
+      var vids = validations.map(function(v){return v.place_id;});
+      var namesRes = await db.from('places').select('id,name,latitude,longitude').in('id', vids);
+      (namesRes.data||[]).forEach(function(p){ valPlaces[p.id]=p; });
+    }
+    var valHtml = '';
+    if (!validations.length) {
+      valHtml = '<div style="color:var(--text2);font-size:13px;text-align:center;padding:20px 0;">Aucune validation</div>';
     } else {
-      html = '<div style="display:flex;flex-direction:column;gap:6px;">';
-      d.validations.forEach(function(v) {
-        var pl = d.valPlaces[v.place_id];
+      valHtml = '<div style="display:flex;flex-direction:column;gap:6px;">';
+      validations.forEach(function(v) {
+        var pl = valPlaces[v.place_id];
         var name = pl ? pl.name : 'Lieu inconnu';
         var date = v.created_at ? new Date(v.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) : '';
-        var onclick = pl ? 'goToPlaceOnMap(\''+v.place_id+'\','+pl.latitude+','+pl.longitude+')' : '';
-        html += '<div '+(onclick?'onclick="'+onclick+'"':'')+' style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px 12px;'+(onclick?'cursor:pointer;':'')+' display:flex;align-items:center;justify-content:space-between;gap:8px;">'
+        var oc = pl ? 'goToPlaceOnMap(\''+v.place_id+'\','+pl.latitude+','+pl.longitude+')' : '';
+        valHtml += '<div '+(oc?'onclick="'+oc+'"':'')+' style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px 12px;'+(oc?'cursor:pointer;':'')+' display:flex;align-items:center;justify-content:space-between;gap:8px;">'
           +'<div style="font-size:13px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escHtml(name)+'</div>'
           +'<div style="font-size:11px;color:var(--text2);white-space:nowrap;">'+date+'</div></div>';
       });
-      html += '</div>';
+      valHtml += '</div>';
     }
+    content.innerHTML = valHtml;
+    return;
   }
   content.innerHTML = html;
 }
