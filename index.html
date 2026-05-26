@@ -7474,6 +7474,7 @@ function showDashBan() {
 // ===== ADMIN — GESTION CATÉGORIES =====
 var _reorderTimer = null;
 var _reorderActiveId = null;
+var _catFoldState = {};
 
 function adminStartLongPress(id) {
   adminCancelLongPress();
@@ -7485,6 +7486,14 @@ function adminStartLongPress(id) {
 
 function adminCancelLongPress() {
   if (_reorderTimer !== null) { clearTimeout(_reorderTimer); _reorderTimer = null; }
+}
+
+function adminToggleCatFold(mcId) {
+  _catFoldState[mcId] = !_catFoldState[mcId];
+  var el = document.getElementById('subs-mc-' + mcId);
+  var btn = document.getElementById('fold-mc-' + mcId);
+  if (el) el.style.display = _catFoldState[mcId] ? 'none' : '';
+  if (btn) btn.textContent = _catFoldState[mcId] ? '▶' : '▼';
 }
 
 function adminToggleReorder(id) {
@@ -7755,6 +7764,7 @@ function renderDashCategoriesContent() {
     html += '<div style="border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:10px;">'
       // Header — appui long pour réordonner
       + '<div onmousedown="adminStartLongPress(\'' + mcLpId + '\')" onmouseup="adminCancelLongPress()" onmouseleave="adminCancelLongPress()" ontouchstart="adminStartLongPress(\'' + mcLpId + '\')" ontouchend="adminCancelLongPress()" ontouchmove="adminCancelLongPress()" oncontextmenu="return false" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;user-select:none;-webkit-user-select:none;">'
+      + '<button ' + stopProp + ' id="fold-mc-' + mc.id + '" onclick="adminToggleCatFold(\'' + mc.id + '\')" style="background:none;border:none;color:var(--text2);font-size:12px;cursor:pointer;padding:2px 4px;line-height:1;">' + (_catFoldState[mc.id] ? '▶' : '▼') + '</button>'
       + '<span style="font-size:18px;">' + mc.icon + '</span>'
       + '<span style="font-size:14px;font-weight:700;flex:1;color:var(--text);">' + mc.name + adminRoleTag(mc.min_role) + '</span>'
       + '<button ' + stopProp + ' onclick="adminShowEditMainCatForm(\'' + mc.id + '\')" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;cursor:pointer;font-family:var(--font-body);">&#9998;</button>'
@@ -7770,6 +7780,7 @@ function renderDashCategoriesContent() {
       + '<div id="admin-edit-maincat-' + mc.id + '"></div>'
       + '<div id="admin-subcat-form-' + mc.id + '"></div>';
 
+    html += '<div id="subs-mc-' + mc.id + '" style="display:' + (_catFoldState[mc.id] ? 'none' : '') + '">';
     if (allSubsRaw.length === 0) {
       html += '<div style="font-size:12px;color:var(--text2);padding-left:4px;">Aucune sous-catégorie</div>';
     } else {
@@ -7802,7 +7813,8 @@ function renderDashCategoriesContent() {
           + '</div>';
       });
     }
-    html += '</div>';
+    html += '</div>'; // ferme subs-mc-{id}
+    html += '</div>'; // ferme la carte de la grande catégorie
   });
 
   c.innerHTML = html;
