@@ -577,18 +577,14 @@ path.leaflet-spider-leg{stroke:#fff!important;stroke-width:1.5px!important;strok
       <span class="nav-item-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#5865F2"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.025.015.048.036.063a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.1.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg></span>
       <span>Discord</span>
     </button>
-    <button class="nav-item" id="nav-member-dash" onclick="navTo('member-dash')" style="display:none;">
+    <button class="nav-item" id="nav-member-dash" onclick="navTo('member-dash')" style="display:none;position:relative;">
       <span class="nav-item-icon">&#128202;</span>
+      <span id="dash-nav-badge" style="display:none;position:absolute;top:8px;right:calc(50% - 18px);background:#e74c3c;color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 5px;min-width:16px;text-align:center;line-height:16px;">0</span>
       <span>Mon espace</span>
     </button>
     <button class="nav-item" id="nav-profile" onclick="navTo('profile')">
       <span class="nav-item-icon">&#128100;</span>
       <span data-i18n="nav_profile">Profil</span>
-    </button>
-    <button class="nav-item" id="nav-dashboard" onclick="navTo('dashboard')" style="display:none;position:relative;">
-      <span class="nav-item-icon">&#128737;&#65039;</span>
-      <span id="dash-nav-badge" style="display:none;position:absolute;top:8px;right:calc(50% - 18px);background:#e74c3c;color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 5px;min-width:16px;text-align:center;line-height:16px;">0</span>
-      <span data-i18n="nav_dashboard">Dashboard</span>
     </button>
   </div>
 </div>
@@ -2791,7 +2787,6 @@ function navTo(tab) {
   else if (tab === 'search') { renderSrchCatList(); updateSrchApplyLabel(); openSheet('sheet-search'); setTimeout(function() { document.getElementById('search-mobile').focus(); }, 300); }
   else if (tab === 'profile') { renderProfile(); openSheet('sheet-profile'); }
   else if (tab === 'settings') { renderProfile(); openSheet('sheet-profile'); }
-  else if (tab === 'dashboard') { openDashboard(); }
   else if (tab === 'member-dash') { openMemberDash(); }
 }
 
@@ -3646,8 +3641,6 @@ async function loadUserRole() {
   }
   if (isAdmin) { isModerator = true; isTrusted = true; }
   if (isModerator) isTrusted = true;
-  var navDash = document.getElementById('nav-dashboard');
-  if (navDash) navDash.style.display = (isAdmin || isModerator) ? 'flex' : 'none';
   var navMemberDash = document.getElementById('nav-member-dash');
   if (navMemberDash) navMemberDash.style.display = 'flex';
 }
@@ -7036,13 +7029,11 @@ function openDashboard() {
 }
 
 function showDashMain() {
-  var main = document.getElementById('dash-main-view');
-  var detail = document.getElementById('dash-detail-view');
-  if (main) { main.style.display = 'flex'; main.style.flexDirection = 'column'; }
-  if (detail) detail.style.display = 'none';
+  closeSheet('sheet-dashboard');
 }
 
 function showDashDetail(title, renderFn) {
+  openSheet('sheet-dashboard');
   var main = document.getElementById('dash-main-view');
   var detail = document.getElementById('dash-detail-view');
   var titleEl = document.getElementById('dash-detail-title');
@@ -8067,7 +8058,12 @@ async function openMemberDash() {
       +'<span style="font-size:13px;font-weight:600;color:var(--text);">Voir mes '+favsCount+' favoris</span>'
       +'<span style="color:var(--accent);font-size:18px;">›</span></div>';
   }
+  if (isAdmin || isModerator) {
+    html += '<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin:24px 0 10px;">🛡️ Administration</div>'
+      + '<div class="dash-grid" id="dash-grid"><div style="color:var(--text2);font-size:13px;text-align:center;padding:12px;">Chargement...</div></div>';
+  }
   el.innerHTML = html;
+  if (isAdmin || isModerator) loadDashboardTiles();
 }
 
 function showMemberDashMain() {
