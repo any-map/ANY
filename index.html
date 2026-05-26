@@ -7757,6 +7757,7 @@ function renderDashCategoriesContent() {
   var stopProp = 'onmousedown="event.stopPropagation();adminCancelLongPress()" ontouchstart="event.stopPropagation();adminCancelLongPress()"';
 
   mainCats.forEach(function(mc, idx) {
+    if (_catFoldState[mc.id] === undefined) _catFoldState[mc.id] = true;
     var allSubsRaw = allCats.filter(function(s) { return s.main_category_id === mc.id; });
     var isFirst = idx === 0, isLast = idx === mainCats.length - 1;
     var mcLpId = 'mc-' + mc.id;
