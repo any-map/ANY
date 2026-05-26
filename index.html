@@ -2569,7 +2569,8 @@ async function init() {
   layerLabels = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, opacity: 0.9 });
   layerStreet.addTo(map);
   cluster = L.markerClusterGroup({
-    maxClusterRadius: function(zoom) { return zoom >= 14 ? 18 : zoom >= 12 ? 35 : zoom >= 9 ? 55 : 80; },
+    maxClusterRadius: function(zoom) { return zoom >= 14 ? 10 : zoom >= 12 ? 20 : zoom >= 9 ? 35 : 60; },
+    disableClusteringAtZoom: 15,
     spiderfyOnMaxZoom: true,
     spiderfyDistanceMultiplier: 1.4,
     iconCreateFunction: function(c) {
