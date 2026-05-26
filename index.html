@@ -5715,10 +5715,12 @@ async function toggleMembersList() {
 async function loadMembersList() {
   var panel = document.getElementById('admin-members-panel');
   if (!panel) return;
-  var res = await db.from('profiles').select('user_id,username,registered_at,created_at').not('username', 'is', null).order('registered_at', { ascending: true });
+  var [res, rolesRes] = await Promise.all([
+    db.from('profiles').select('user_id,username,registered_at,created_at').not('username', 'is', null).order('registered_at', { ascending: true }),
+    db.from('trusted_users').select('user_id,role')
+  ]);
   if (res.error) { panel.innerHTML = '<div style="color:#e74c3c;font-size:13px;">Erreur : ' + res.error.message + '</div>'; return; }
   var members = res.data || [];
-  var rolesRes = await db.from('trusted_users').select('user_id,role');
   var rolesMap = {};
   (rolesRes.data || []).forEach(function(r) { rolesMap[r.user_id] = r.role; });
   if (!members.length) { panel.innerHTML = '<div style="color:var(--text2);font-size:13px;">' + t('lbl_no_member') + '</div>'; return; }
@@ -7335,10 +7337,12 @@ function showDashMembers() {
 async function loadDashMembersList() {
   var el = document.getElementById('dash-members-list');
   if (!el) return;
-  var res = await db.rpc('get_all_members');
+  var [res, rolesRes] = await Promise.all([
+    db.rpc('get_all_members'),
+    db.from('trusted_users').select('user_id,role')
+  ]);
   if (res.error) { el.innerHTML = '<div style="color:#e74c3c;font-size:13px;">Erreur</div>'; return; }
   var members = res.data || [];
-  var rolesRes = await db.from('trusted_users').select('user_id,role');
   var rolesMap = {};
   (rolesRes.data || []).forEach(function(r) { rolesMap[r.user_id] = r.role; });
   if (!members.length) { el.innerHTML = '<div style="color:var(--text2);">' + t('lbl_no_member') + '</div>'; return; }
@@ -8149,14 +8153,10 @@ async function showMemberDashDetail(type) {
   }
   if (type === 'validations') {
     content.innerHTML = '<div style="color:var(--text2);font-size:13px;padding:20px 0;text-align:center;">Chargement...</div>';
-    var valRes = await db.from('place_validations').select('place_id,created_at').eq('user_id', currentUser.id).order('created_at',{ascending:false}).limit(50);
+    var valRes = await db.from('place_validations').select('place_id,created_at,places(id,name,latitude,longitude)').eq('user_id', currentUser.id).order('created_at',{ascending:false}).limit(50);
     var validations = valRes.data || [];
     var valPlaces = {};
-    if (validations.length > 0) {
-      var vids = validations.map(function(v){return v.place_id;});
-      var namesRes = await db.from('places').select('id,name,latitude,longitude').in('id', vids);
-      (namesRes.data||[]).forEach(function(p){ valPlaces[p.id]=p; });
-    }
+    validations.forEach(function(v){ if(v.places) valPlaces[v.place_id]=v.places; });
     var valHtml = '';
     if (!validations.length) {
       valHtml = '<div style="color:var(--text2);font-size:13px;text-align:center;padding:20px 0;">Aucune validation</div>';
