@@ -7550,15 +7550,11 @@ async function adminDeleteCat(catId, poiCount) {
       var deleted = 0;
       showToast('Suppression en cours… 0 / ' + poiCount, 'info');
       while (true) {
-        var rIds = await db.from('places').select('id').eq('category_id', catId).limit(2000);
-        if (rIds.error) { showToast('Erreur : ' + rIds.error.message, 'error'); return; }
-        if (!rIds.data || rIds.data.length === 0) break;
-        var ids = rIds.data.map(function(p) { return p.id; });
-        var rDel = await db.from('places').delete().in('id', ids);
-        if (rDel.error) { showToast('Erreur : ' + rDel.error.message, 'error'); return; }
-        deleted += ids.length;
+        var r = await db.rpc('admin_delete_places_batch', { cat_id: catId, batch_size: 500 });
+        if (r.error) { showToast('Erreur : ' + r.error.message, 'error'); return; }
+        if (!r.data || r.data === 0) break;
+        deleted += r.data;
         showToast('Suppression en cours… ' + deleted + ' / ' + poiCount, 'info');
-        if (ids.length < 2000) break;
       }
     }
     var res = await db.from('categories').delete().eq('id', catId).select('id');
