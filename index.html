@@ -7550,8 +7550,9 @@ async function adminDeleteCat(catId, poiCount) {
       var r1 = await db.from('places').delete().eq('category_id', catId);
       if (r1.error) { showToast('Erreur : ' + r1.error.message, 'error'); return; }
     }
-    var res = await db.from('categories').delete().eq('id', catId);
-    if (res.error) { showToast('Erreur : ' + res.error.message, 'error'); return; }
+    var res = await db.from('categories').delete().eq('id', catId).select('id');
+    if (res.error) { showToast('Erreur DB : ' + res.error.message, 'error'); return; }
+    if (!res.data || res.data.length === 0) { showToast('Erreur : permission refusée (RLS)', 'error'); return; }
     showToast('Sous-catégorie supprimée', 'success');
     await loadCats();
     renderDashCategoriesContent();
