@@ -8022,9 +8022,30 @@ if ('serviceWorker' in navigator) {
 var _memberDashData = null;
 var _dashStatsCache = null;
 var _dashStatsCacheTime = 0;
+var _dashPhase1Cache = null;
+var _DASH_STATS_TTL = 300000;
+var _DASH_P1_TTL = 60000;
+
+function _loadDashCache() {
+  try {
+    var s = localStorage.getItem('dashStatsCache');
+    if (s) { var o = JSON.parse(s); if (Date.now() - o.t < _DASH_STATS_TTL) { _dashStatsCache = o.d; _dashStatsCacheTime = o.t; } }
+    var p = localStorage.getItem('dashP1Cache');
+    if (p) { var o2 = JSON.parse(p); if (Date.now() - o2.t < _DASH_P1_TTL) { _dashPhase1Cache = o2; } }
+  } catch(e) {}
+}
+function _saveDashStatsCache(d) {
+  _dashStatsCache = d; _dashStatsCacheTime = Date.now();
+  try { localStorage.setItem('dashStatsCache', JSON.stringify({t:_dashStatsCacheTime, d:d})); } catch(e) {}
+}
+function _saveDashP1Cache(d) {
+  _dashPhase1Cache = d; _dashPhase1Cache.t = Date.now();
+  try { localStorage.setItem('dashP1Cache', JSON.stringify(_dashPhase1Cache)); } catch(e) {}
+}
 
 async function openMemberDash() {
   if (!currentUser) return;
+  _loadDashCache();
   showMemberDashMain();
   openSheet('sheet-member-dash');
   var el = document.getElementById('member-dash-content');
@@ -8032,16 +8053,20 @@ async function openMemberDash() {
   var uid = currentUser.id;
   var weekStart = getWeekStartISO();
 
-  // Phase 1 : données utilisateur seulement (rapide)
-  var [r0, r1, r2] = await Promise.all([
-    db.from('places').select('id,name,validation_weight,votes_positifs,latitude,longitude,created_at').eq('user_id', uid).order('created_at',{ascending:false}).limit(200),
-    db.from('place_validations').select('place_id',{count:'exact',head:true}).eq('user_id', uid),
-    db.from('favorites').select('place_id',{count:'exact',head:true}).eq('user_id', uid)
-  ]);
+  // Phase 1 : données utilisateur (cache localStorage 60s)
+  var places, valCount, favsCount;
+  if (_dashPhase1Cache && _dashPhase1Cache.uid === uid) {
+    places = _dashPhase1Cache.places; valCount = _dashPhase1Cache.valCount; favsCount = _dashPhase1Cache.favsCount;
+  } else {
+    var [r0, r1, r2] = await Promise.all([
+      db.from('places').select('id,name,validation_weight,votes_positifs,latitude,longitude,created_at').eq('user_id', uid).order('created_at',{ascending:false}).limit(200),
+      db.from('place_validations').select('place_id',{count:'exact',head:true}).eq('user_id', uid),
+      db.from('favorites').select('place_id',{count:'exact',head:true}).eq('user_id', uid)
+    ]);
+    places = r0.data || []; valCount = r1.count || 0; favsCount = r2.count || 0;
+    _saveDashP1Cache({uid:uid, places:places, valCount:valCount, favsCount:favsCount});
+  }
 
-  var places    = r0.data || [];
-  var valCount  = r1.count || 0;
-  var favsCount = r2.count || 0;
   _memberDashData = {places:places, favsCount:favsCount};
 
   var merciCount = places.reduce(function(s,p){return s+(p.votes_positifs||0);},0);
@@ -8082,9 +8107,9 @@ async function openMemberDash() {
   html += '<div id="member-dash-stats-grid" class="dash-grid"><div style="color:var(--text2);font-size:12px;text-align:center;padding:8px 0;">Chargement...</div></div>';
   el.innerHTML = html;
 
-  // Phase 2 : stats globales avec cache 5 min
+  // Phase 2 : stats globales avec cache 5 min (localStorage)
   var now = Date.now();
-  var useCache = _dashStatsCache && (now - _dashStatsCacheTime) < 300000;
+  var useCache = _dashStatsCache && (now - _dashStatsCacheTime) < _DASH_STATS_TTL;
   var totalMembers, newMembers, totalPlaces, newPlaces, pendingCount, reportedPlaces, reportedCmts;
   if (useCache) {
     totalMembers = _dashStatsCache.totalMembers; newMembers = _dashStatsCache.newMembers;
@@ -8108,8 +8133,7 @@ async function openMemberDash() {
     pendingCount = sr[4].count || 0;
     reportedPlaces = sr[5].count || 0;
     reportedCmts   = sr[6].count || 0;
-    _dashStatsCache = {totalMembers:totalMembers, newMembers:newMembers, totalPlaces:totalPlaces, newPlaces:newPlaces, pendingCount:pendingCount, reportedPlaces:reportedPlaces, reportedCmts:reportedCmts};
-    _dashStatsCacheTime = now;
+    _saveDashStatsCache({totalMembers:totalMembers, newMembers:newMembers, totalPlaces:totalPlaces, newPlaces:newPlaces, pendingCount:pendingCount, reportedPlaces:reportedPlaces, reportedCmts:reportedCmts});
   }
 
   var urgent = pendingCount + reportedPlaces + reportedCmts;
