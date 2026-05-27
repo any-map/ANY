@@ -7547,8 +7547,8 @@ async function adminConfirmDeleteSubCat(catId) {
 async function adminDeleteCat(catId, poiCount) {
   try {
     if (poiCount > 0) {
-      var r1 = await db.from('places').delete().eq('category_id', catId);
-      if (r1.error) { showToast('Erreur : ' + r1.error.message, 'error'); return; }
+      var r1 = await db.from('places').delete().eq('category_id', catId).select('id');
+      if (r1.error) { showToast('Erreur suppression POIs : ' + r1.error.message, 'error'); return; }
     }
     var res = await db.from('categories').delete().eq('id', catId).select('id');
     if (res.error) { showToast('Erreur : ' + res.error.message, 'error'); return; }
