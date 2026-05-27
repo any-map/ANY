@@ -356,6 +356,19 @@ html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none;font-f
   #places-count{top:10px;right:10px;font-size:11px;padding:5px 10px;}
   #toast{bottom:calc(var(--nav-h) + 12px);}
 }
+/* LANDSCAPE MOBILE — nav passe à gauche */
+@media (orientation:landscape) and (max-height:500px) {
+  #sidebar{display:none !important;}
+  #bottom-nav{display:block;top:0;bottom:0;right:auto;left:0;width:var(--nav-h);height:100dvh;border-top:none;border-right:1px solid rgba(11,166,179,0.2);}
+  #bottom-nav-inner{flex-direction:column;height:100%;width:100%;}
+  #app{padding-left:var(--nav-h);}
+  #map-wrap{height:100%;}
+  .nav-item span:not(.nav-item-icon),.nav-item-add>span{display:none;}
+  #btn-locate{bottom:14px;}
+  #btn-compass-mode{bottom:68px;}
+  #btn-compass{bottom:122px;}
+  #toast{bottom:12px;}
+}
 /* ── PROFILE CARD ── */
 .prof-banner{height:110px;background:linear-gradient(160deg,#1ab8a0 0%,#1a7ac8 100%);position:relative;}
 .prof-xp-wrap{background:var(--surface);padding:14px 20px;border-bottom:1px solid var(--border);}
