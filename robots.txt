@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://my-projet-app.github.io/ANY/sitemap.xml
