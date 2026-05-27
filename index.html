@@ -7538,20 +7538,24 @@ async function adminDeleteMainCat(mcId) {
 
 async function adminConfirmDeleteSubCat(catId) {
   var r = await db.from('places').select('id', { count: 'exact', head: true }).eq('category_id', catId);
-  var poiCount = r.count || 0;
+  var poiCount = (r && r.count) || 0;
   var msg = 'Cette sous-catégorie sera définitivement supprimée.'
     + (poiCount > 0 ? '\n\n⚠️ ' + poiCount + ' POI seront aussi supprimés définitivement.' : '');
-  showConfirm('Supprimer la sous-catégorie ?', msg, '🗑', '#e74c3c', function() { adminDeleteCat(catId); });
+  showConfirm('Supprimer la sous-catégorie ?', msg, '🗑', '#e74c3c', function() { adminDeleteCat(catId, poiCount); });
 }
 
-async function adminDeleteCat(catId) {
-  var r1 = await db.from('places').delete().eq('category_id', catId);
-  if (r1.error) { showToast('Erreur : ' + r1.error.message, 'error'); return; }
-  var res = await db.from('categories').delete().eq('id', catId);
-  if (res.error) { showToast('Erreur : ' + res.error.message, 'error'); return; }
-  showToast('Sous-catégorie supprimée', 'success');
-  await loadCats();
-  renderDashCategoriesContent();
+async function adminDeleteCat(catId, poiCount) {
+  try {
+    if (poiCount > 0) {
+      var r1 = await db.from('places').delete().eq('category_id', catId);
+      if (r1.error) { showToast('Erreur : ' + r1.error.message, 'error'); return; }
+    }
+    var res = await db.from('categories').delete().eq('id', catId);
+    if (res.error) { showToast('Erreur : ' + res.error.message, 'error'); return; }
+    showToast('Sous-catégorie supprimée', 'success');
+    await loadCats();
+    renderDashCategoriesContent();
+  } catch(e) { showToast('Erreur : ' + e.message, 'error'); }
 }
 
 // ===== ADMIN — TYPES COMMUNAUTÉ =====
