@@ -7519,12 +7519,12 @@ async function adminToggleCatPhotos(catId, current) {
   renderDashCategoriesContent();
 }
 
-async function adminConfirmDeleteMainCat(mcId, subCount) {
+async function adminConfirmDeleteMainCat(mcId, subCount, name) {
   if (subCount > 0) {
     showToast('Impossible : supprime d\'abord les ' + subCount + ' sous-catégorie(s)', 'error');
     return;
   }
-  showConfirm('Supprimer la catégorie ?', 'Cette grande catégorie sera définitivement supprimée.', '🗑', '#e74c3c', function() { adminDeleteMainCat(mcId); });
+  showConfirm('Supprimer la catégorie ?', '« ' + name + ' » sera définitivement supprimée.', '🗑', '#e74c3c', function() { adminDeleteMainCat(mcId); });
 }
 
 async function adminDeleteMainCat(mcId) {
@@ -7536,10 +7536,10 @@ async function adminDeleteMainCat(mcId) {
   renderDashCategoriesContent();
 }
 
-async function adminConfirmDeleteSubCat(catId) {
+async function adminConfirmDeleteSubCat(catId, name) {
   var r = await db.from('places').select('id', { count: 'exact', head: true }).eq('category_id', catId);
   var poiCount = (r && r.count) || 0;
-  var msg = 'Cette sous-catégorie sera définitivement supprimée.'
+  var msg = '« ' + name + ' » sera définitivement supprimée.'
     + (poiCount > 0 ? '\n\n⚠️ ' + poiCount + ' POI seront aussi supprimés définitivement.' : '');
   showConfirm('Supprimer la sous-catégorie ?', msg, '🗑', '#e74c3c', function() { adminDeleteCat(catId, poiCount); });
 }
@@ -7777,7 +7777,7 @@ function renderDashCategoriesContent() {
       + '<span style="font-size:11px;color:var(--text2);flex:1;">Déplacer :</span>'
       + (isFirst ? '' : '<button ' + lpBtn + ' onclick="adminMoveCatOrder(\'' + mc.id + '\',-1)">&#8593; Monter</button>')
       + (isLast  ? '' : '<button ' + lpBtn + ' onclick="adminMoveCatOrder(\'' + mc.id + '\',1)">&#8595; Descendre</button>')
-      + '<button ' + lpBtn + ' onclick="adminConfirmDeleteMainCat(\'' + mc.id + '\',' + allSubsRaw.length + ')" style="background:rgba(231,76,60,0.12);color:#e74c3c;border-color:rgba(231,76,60,0.3);">🗑 Supprimer</button>'
+      + '<button ' + lpBtn + ' onclick="adminConfirmDeleteMainCat(\'' + mc.id + '\',' + allSubsRaw.length + ',\'' + mc.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'") + '\')" style="background:rgba(231,76,60,0.12);color:#e74c3c;border-color:rgba(231,76,60,0.3);">🗑 Supprimer</button>'
       + '</div>'
       + '<div id="admin-edit-maincat-' + mc.id + '"></div>'
       + '<div id="admin-subcat-form-' + mc.id + '"></div>';
@@ -7809,7 +7809,7 @@ function renderDashCategoriesContent() {
           + (isLastS  ? '' : '<button ' + lpBtn + ' onclick="adminMoveSubCatOrder(\'' + s.id + '\',1,\'' + mc.id + '\')">&#8595;</button>')
           + '<span style="flex:1;"></span>'
           + '<button ' + lpBtn + ' onclick="adminToggleCatPhotos(\'' + s.id + '\',' + (!!s.allow_photos) + ')" style="background:' + (s.allow_photos ? 'rgba(39,174,96,0.15)' : 'var(--surface2)') + ';border-color:' + (s.allow_photos ? '#27ae60' : 'var(--border)') + ';color:' + (s.allow_photos ? '#27ae60' : 'var(--text2)') + ';">' + (s.allow_photos ? '📷 Photos ON' : '📷 Photos OFF') + '</button>'
-          + '<button ' + lpBtn + ' onclick="adminConfirmDeleteSubCat(\'' + s.id + '\')" style="background:rgba(231,76,60,0.12);color:#e74c3c;border-color:rgba(231,76,60,0.3);">🗑 Supprimer</button>'
+          + '<button ' + lpBtn + ' onclick="adminConfirmDeleteSubCat(\'' + s.id + '\',\'' + s.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'") + '\')" style="background:rgba(231,76,60,0.12);color:#e74c3c;border-color:rgba(231,76,60,0.3);">🗑 Supprimer</button>'
           + '</div>'
           + '<div id="admin-edit-subcat-' + s.id + '"></div>'
           + '</div>';
