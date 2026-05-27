@@ -6709,6 +6709,18 @@ var liveMarker = null;
 var liveAccCircle = null;
 var liveHeading = null;
 var _orientListenerAdded = false;
+// Pré-requête orientation au premier touch si déjà accordé avant (évite le dialog iOS à chaque session)
+(function() {
+  if (localStorage.getItem('orientPermGranted') !== '1') return;
+  if (typeof DeviceOrientationEvent === 'undefined' || typeof DeviceOrientationEvent.requestPermission !== 'function') return;
+  function _preOrient() {
+    DeviceOrientationEvent.requestPermission().then(function(s) {
+      if (s !== 'granted') { localStorage.removeItem('orientPermGranted'); }
+    }).catch(function() {});
+  }
+  document.addEventListener('touchend', _preOrient, { once: true, passive: true });
+  document.addEventListener('click', _preOrient, { once: true });
+})();
 var compassModeActive = false;
 
 function toggleLiveTracking() {
@@ -6725,7 +6737,10 @@ function startLiveTracking() {
     }
   };
   if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-    DeviceOrientationEvent.requestPermission().then(function(s) { if (s === 'granted') addOrient(); }).catch(function(){});
+    DeviceOrientationEvent.requestPermission().then(function(s) {
+      if (s === 'granted') { localStorage.setItem('orientPermGranted', '1'); addOrient(); }
+      else { localStorage.removeItem('orientPermGranted'); }
+    }).catch(function(){});
   } else { addOrient(); }
   liveTrackActive = true;
   document.getElementById('btn-locate').classList.add('live');
