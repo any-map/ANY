@@ -1,4 +1,4 @@
-var CACHE = 'any-v12';
+﻿var CACHE = 'any-v12';
 var ASSETS = [
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
@@ -47,7 +47,7 @@ self.addEventListener('notificationclick', function(e) {
   e.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(list) {
       for (var i = 0; i < list.length; i++) {
-        if (list[i].url.includes('my-projet-app') || list[i].url.includes('github.io')) {
+        if (list[i].url.includes('any24-7') || list[i].url.includes('github.io')) {
           return list[i].focus();
         }
       }

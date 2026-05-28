@@ -1,4 +1,4 @@
-User-agent: *
+﻿User-agent: *
 Allow: /
 
-Sitemap: https://my-projet-app.github.io/ANY/sitemap.xml
+Sitemap: https://any24-7.github.io/ANY/sitemap.xml

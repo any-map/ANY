@@ -1,4 +1,4 @@
-# ANY — Anything, Anywhere, Anytime
+﻿# ANY — Anything, Anywhere, Anytime
 
 ## Concept
 Carte communautaire interactive des services en libre-service 24h/24.
@@ -17,9 +17,9 @@ Trouvez un lieu utile autour de vous, peu importe où vous êtes et quand — va
 - Projet ID : xssfehwbmvrxtxmocowc
 
 ## URL
-- App : https://my-projet-app.github.io/ANY/
-- Import : https://my-projet-app.github.io/ANY/import.html
-- Admin : https://my-projet-app.github.io/ANY/admin.html
+- App : https://any24-7.github.io/ANY/
+- Import : https://any24-7.github.io/ANY/import.html
+- Admin : https://any24-7.github.io/ANY/admin.html
 
 ## Structure base de données
 
