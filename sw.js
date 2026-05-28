@@ -47,7 +47,7 @@ self.addEventListener('notificationclick', function(e) {
   e.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(list) {
       for (var i = 0; i < list.length; i++) {
-        if (list[i].url.includes('any24-7') || list[i].url.includes('github.io')) {
+        if (list[i].url.includes('any-map') || list[i].url.includes('github.io')) {
           return list[i].focus();
         }
       }

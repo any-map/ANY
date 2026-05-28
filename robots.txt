@@ -1,4 +1,4 @@
 ﻿User-agent: *
 Allow: /
 
-Sitemap: https://any24-7.github.io/ANY/sitemap.xml
+Sitemap: https://any-map.github.io/ANY/sitemap.xml

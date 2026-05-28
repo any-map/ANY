@@ -17,9 +17,9 @@ Trouvez un lieu utile autour de vous, peu importe où vous êtes et quand — va
 - Projet ID : xssfehwbmvrxtxmocowc
 
 ## URL
-- App : https://any24-7.github.io/ANY/
-- Import : https://any24-7.github.io/ANY/import.html
-- Admin : https://any24-7.github.io/ANY/admin.html
+- App : https://any-map.github.io/ANY/
+- Import : https://any-map.github.io/ANY/import.html
+- Admin : https://any-map.github.io/ANY/admin.html
 
 ## Structure base de données
 
