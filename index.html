@@ -8610,26 +8610,32 @@ function _decodePolyline6(str) {
 }
 
 async function _fetchNoHighwayRoute(coordStr, validWps) {
-  // Profil vélo OSRM : même serveur CORS-compatible, ne peut pas emprunter les autoroutes
-  // Durée estimée à 65 km/h (routes nationales/départementales)
-  try {
-    var url = 'https://routing.openstreetmap.de/routed-bike/route/v1/cycling/' + coordStr + '?overview=full&geometries=geojson';
-    var res = await _timedFetch(url, {}, 12000);
-    if (res.ok) {
-      var data = await res.json();
-      if (data.routes && data.routes.length) {
-        var r = data.routes[0];
-        var distKm = Math.round(r.distance / 1000);
-        return {
-          coords: r.geometry.coordinates.map(function(c) { return [c[1], c[0]]; }),
-          distKm: distKm,
-          durationMin: Math.round(distKm * 60 / 65)
-        };
-      }
-    }
-  } catch(e) {}
-  // Fallback : Valhalla (peut fonctionner selon le réseau)
-  return await _fetchValhalla(validWps);
+  var bodyStr = JSON.stringify({
+    locations: validWps.map(function(wp) { return { lon: wp.lng, lat: wp.lat }; }),
+    costing: 'auto',
+    costing_options: { auto: { use_highways: 0.0, use_tolls: 0.0 } },
+    units: 'kilometers'
+  });
+  var enc = encodeURIComponent(bodyStr);
+
+  var attempts = [
+    // Direct GET (fonctionne si CORS OK côté serveur)
+    { url: 'https://valhalla1.openstreetmap.de/route?json=' + enc, opts: {} },
+    { url: 'https://valhalla.openstreetmap.de/route?json=' + enc, opts: {} },
+    // Via proxy CORS (contourne le blocage navigateur)
+    { url: 'https://corsproxy.io/?https://valhalla1.openstreetmap.de/route?json=' + enc, opts: {} },
+    { url: 'https://corsproxy.io/?https://valhalla.openstreetmap.de/route?json=' + enc, opts: {} }
+  ];
+
+  for (var i = 0; i < attempts.length; i++) {
+    try {
+      var res = await _timedFetch(attempts[i].url, attempts[i].opts, 15000);
+      if (!res.ok) continue;
+      var parsed = _parseValhallaData(await res.json());
+      if (parsed) return parsed;
+    } catch(e) {}
+  }
+  return null;
 }
 
 var _VALHALLA_SERVERS = [
