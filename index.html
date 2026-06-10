@@ -8616,25 +8616,35 @@ async function _fetchNoHighwayRoute(coordStr, validWps) {
     costing_options: { auto: { use_highways: 0.0, use_tolls: 0.0 } },
     units: 'kilometers'
   });
-  var enc = encodeURIComponent(bodyStr);
 
-  var attempts = [
-    // Direct GET (fonctionne si CORS OK côté serveur)
-    { url: 'https://valhalla1.openstreetmap.de/route?json=' + enc, opts: {} },
-    { url: 'https://valhalla.openstreetmap.de/route?json=' + enc, opts: {} },
-    // Via proxy CORS (contourne le blocage navigateur)
-    { url: 'https://corsproxy.io/?https://valhalla1.openstreetmap.de/route?json=' + enc, opts: {} },
-    { url: 'https://corsproxy.io/?https://valhalla.openstreetmap.de/route?json=' + enc, opts: {} }
-  ];
+  var postOpts = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: bodyStr };
+  var vServers = ['https://valhalla1.openstreetmap.de/route', 'https://valhalla.openstreetmap.de/route'];
 
-  for (var i = 0; i < attempts.length; i++) {
+  // 1. POST direct (fonctionne si le serveur autorise l'origine)
+  for (var i = 0; i < vServers.length; i++) {
     try {
-      var res = await _timedFetch(attempts[i].url, attempts[i].opts, 15000);
-      if (!res.ok) continue;
-      var parsed = _parseValhallaData(await res.json());
-      if (parsed) return parsed;
+      var res = await _timedFetch(vServers[i], postOpts, 12000);
+      if (res.ok) { var d = _parseValhallaData(await res.json()); if (d) return d; }
     } catch(e) {}
   }
+
+  // 2. POST via corsproxy.io (gère son propre preflight CORS)
+  for (var i = 0; i < vServers.length; i++) {
+    try {
+      var res = await _timedFetch('https://corsproxy.io/?' + encodeURIComponent(vServers[i]), postOpts, 15000);
+      if (res.ok) { var d = _parseValhallaData(await res.json()); if (d) return d; }
+    } catch(e) {}
+  }
+
+  // 3. GET via allorigins.win (autre proxy, URL correctement encodée)
+  for (var i = 0; i < vServers.length; i++) {
+    try {
+      var target = encodeURIComponent(vServers[i] + '?json=' + encodeURIComponent(bodyStr));
+      var res = await _timedFetch('https://api.allorigins.win/raw?url=' + target, {}, 15000);
+      if (res.ok) { var d = _parseValhallaData(await res.json()); if (d) return d; }
+    } catch(e) {}
+  }
+
   return null;
 }
 
