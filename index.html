@@ -8595,13 +8595,26 @@ async function _fetchOSRM(coordStr) {
   return null;
 }
 
+function _decodePolyline6(str) {
+  var coords = [], i = 0, lat = 0, lng = 0;
+  while (i < str.length) {
+    var b, shift = 0, result = 0;
+    do { b = str.charCodeAt(i++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
+    lat += (result & 1) ? ~(result >> 1) : (result >> 1);
+    shift = result = 0;
+    do { b = str.charCodeAt(i++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
+    lng += (result & 1) ? ~(result >> 1) : (result >> 1);
+    coords.push([lat / 1e6, lng / 1e6]);
+  }
+  return coords;
+}
+
 async function _fetchValhalla(validWps) {
   var locations = validWps.map(function(wp) { return { lon: wp.lng, lat: wp.lat }; });
   var body = {
     locations: locations,
     costing: 'auto',
-    costing_options: { auto: { use_highways: 0.05, use_tolls: 0.0 } },
-    shape_format: 'geojson'
+    costing_options: { auto: { use_highways: 0.05, use_tolls: 0.0 } }
   };
   var res = await Promise.race([
     fetch('https://valhalla1.openstreetmap.de/route', {
@@ -8609,15 +8622,17 @@ async function _fetchValhalla(validWps) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     }),
-    new Promise(function(_, rej) { setTimeout(function() { rej(new Error('timeout')); }, 12000); })
+    new Promise(function(_, rej) { setTimeout(function() { rej(new Error('timeout')); }, 15000); })
   ]);
   if (!res.ok) return null;
   var data = await res.json();
   if (!data.trip || !data.trip.legs || !data.trip.legs.length) return null;
   var coords = [];
   data.trip.legs.forEach(function(leg) {
-    leg.shape.coordinates.forEach(function(c) { coords.push([c[1], c[0]]); });
+    var decoded = _decodePolyline6(leg.shape);
+    decoded.forEach(function(c) { coords.push(c); });
   });
+  if (!coords.length) return null;
   return {
     coords: coords,
     distKm: Math.round(data.trip.summary.length),
