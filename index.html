@@ -8506,7 +8506,7 @@ function onRouteWpFocus(idx) {
 }
 
 function _routeBlur(idx) {
-  setTimeout(function() { _closeRouteDd(idx); }, 200);
+  setTimeout(function() { _closeRouteDd(idx); }, 250);
 }
 
 function _closeRouteDd(idx) {
@@ -8540,7 +8540,7 @@ function _fetchRouteWpSugg(idx, q) {
       var city = addr.city || addr.town || addr.village || addr.municipality || addr.county || item.display_name.split(',')[0];
       var region = [addr.state, addr.country].filter(Boolean).join(', ');
       var lat = parseFloat(item.lat), lon = parseFloat(item.lon);
-      return '<div class="route-dd-item" onmousedown="selectRouteWp(' + idx + ',' + lat + ',' + lon + ',' + JSON.stringify(escHtml(city)) + ')">'
+      return '<div class="route-dd-item" onclick="selectRouteWp(' + idx + ',' + lat + ',' + lon + ',this.dataset.n)" data-n="' + escHtml(city) + '">'
         + '<div class="route-dd-city">' + escHtml(city) + '</div>'
         + (region ? '<div class="route-dd-region">' + escHtml(region) + '</div>' : '')
         + '</div>';
