@@ -550,9 +550,7 @@ path.leaflet-spider-leg{stroke:#fff!important;stroke-width:1.5px!important;strok
 .route-add-via-btn:hover{border-color:var(--accent);color:var(--accent);}
 .route-del-via-btn{background:none;border:none;color:var(--text2);font-size:18px;cursor:pointer;padding:0;line-height:1;flex-shrink:0;margin-top:10px;opacity:0.6;}
 .route-del-via-btn:hover{opacity:1;color:var(--danger);}
-.route-radius-row{display:flex;gap:8px;}
-.route-radius-pill{flex:1;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);border-radius:20px;padding:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body);text-align:center;transition:all 0.15s;}
-.route-radius-pill.sel{border-color:var(--accent);background:rgba(11,166,179,0.12);color:var(--accent);}
+.route-radius-slider{width:100%;accent-color:var(--accent);cursor:pointer;height:4px;}
 </style>
 </head>
 <body>
@@ -8468,11 +8466,12 @@ function _renderRouteSheet() {
 
   html += '</div>';
   html += '<div style="margin-top:20px;">';
-  html += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text2);margin-bottom:10px;">Rayon autour du trajet</div>';
-  html += '<div class="route-radius-row">';
-  html += '<button class="route-radius-pill' + (routeState.radius === 5 ? ' sel' : '') + '" onclick="setRouteRadius(5,this)">5 km</button>';
-  html += '<button class="route-radius-pill' + (routeState.radius === 10 ? ' sel' : '') + '" onclick="setRouteRadius(10,this)">10 km</button>';
+  html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">';
+  html += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text2);">Rayon autour du trajet</div>';
+  html += '<div id="route-radius-label" style="font-size:14px;font-weight:700;color:var(--accent);">' + routeState.radius + ' km</div>';
   html += '</div>';
+  html += '<input type="range" class="route-radius-slider" min="1" max="20" value="' + routeState.radius + '" step="1" oninput="setRouteRadius(+this.value)">';
+  html += '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-top:4px;"><span>1 km</span><span>20 km</span></div>';
   html += '</div>';
 
   html += '<div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);">';
@@ -8490,10 +8489,10 @@ function _renderRouteSheet() {
   });
 }
 
-function setRouteRadius(r, btn) {
+function setRouteRadius(r) {
   routeState.radius = r;
-  document.querySelectorAll('.route-radius-pill').forEach(function(b) { b.classList.remove('sel'); });
-  if (btn) btn.classList.add('sel');
+  var lbl = document.getElementById('route-radius-label');
+  if (lbl) lbl.textContent = r + ' km';
 }
 
 function onRouteWpInput(idx, val) {
