@@ -8411,7 +8411,7 @@ var routeState = {
   polyline: null,
   coords: [],
   radius: 5,
-  avoidHighways: false,
+  avoidHighways: true,
   wps: [
     { val: '', lat: null, lng: null },
     { val: '', lat: null, lng: null }
@@ -8476,8 +8476,8 @@ function _renderRouteSheet() {
   html += '</div>';
 
   html += '<div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);">';
-  html += '<div><div style="font-size:13px;font-weight:600;color:var(--text);">&#128739; Éviter les autoroutes</div><div style="font-size:11px;color:var(--text2);margin-top:2px;">Itinéraire sans péages</div></div>';
-  html += '<div class="toggle' + (routeState.avoidHighways ? ' on' : '') + '" onclick="toggleAvoidHighways(this)"></div>';
+  html += '<div><div style="font-size:13px;font-weight:600;color:var(--text);">&#128739; Emprunter les autoroutes</div><div style="font-size:11px;color:var(--text2);margin-top:2px;">Désactivé par défaut — itinéraire sans péages</div></div>';
+  html += '<div class="toggle' + (!routeState.avoidHighways ? ' on' : '') + '" onclick="toggleAvoidHighways(this)"></div>';
   html += '</div>';
 
   body.innerHTML = html;
@@ -8609,6 +8609,11 @@ function _decodePolyline6(str) {
   return coords;
 }
 
+var _VALHALLA_SERVERS = [
+  'https://valhalla1.openstreetmap.de/route',
+  'https://valhalla.openstreetmap.de/route'
+];
+
 async function _fetchValhalla(validWps) {
   var locations = validWps.map(function(wp) { return { lon: wp.lng, lat: wp.lat }; });
   var body = {
@@ -8616,28 +8621,30 @@ async function _fetchValhalla(validWps) {
     costing: 'auto',
     costing_options: { auto: { use_highways: 0.05, use_tolls: 0.0 } }
   };
-  var res = await Promise.race([
-    fetch('https://valhalla1.openstreetmap.de/route', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    }),
-    new Promise(function(_, rej) { setTimeout(function() { rej(new Error('timeout')); }, 15000); })
-  ]);
-  if (!res.ok) return null;
-  var data = await res.json();
-  if (!data.trip || !data.trip.legs || !data.trip.legs.length) return null;
-  var coords = [];
-  data.trip.legs.forEach(function(leg) {
-    var decoded = _decodePolyline6(leg.shape);
-    decoded.forEach(function(c) { coords.push(c); });
-  });
-  if (!coords.length) return null;
-  return {
-    coords: coords,
-    distKm: Math.round(data.trip.summary.length),
-    durationMin: Math.round(data.trip.summary.time / 60)
-  };
+  var jsonParam = encodeURIComponent(JSON.stringify(body));
+
+  for (var i = 0; i < _VALHALLA_SERVERS.length; i++) {
+    try {
+      var res = await Promise.race([
+        fetch(_VALHALLA_SERVERS[i] + '?json=' + jsonParam),
+        new Promise(function(_, rej) { setTimeout(function() { rej(new Error('timeout')); }, 15000); })
+      ]);
+      if (!res.ok) continue;
+      var data = await res.json();
+      if (!data.trip || !data.trip.legs || !data.trip.legs.length) continue;
+      var coords = [];
+      data.trip.legs.forEach(function(leg) {
+        _decodePolyline6(leg.shape).forEach(function(c) { coords.push(c); });
+      });
+      if (!coords.length) continue;
+      return {
+        coords: coords,
+        distKm: Math.round(data.trip.summary.length),
+        durationMin: Math.round(data.trip.summary.time / 60)
+      };
+    } catch(e) { /* next endpoint */ }
+  }
+  return null;
 }
 
 async function calcRoute() {
@@ -8775,7 +8782,7 @@ function _haversineKm(lat1, lng1, lat2, lng2) {
 
 function toggleAvoidHighways(el) {
   routeState.avoidHighways = !routeState.avoidHighways;
-  el.classList.toggle('on', routeState.avoidHighways);
+  el.classList.toggle('on', !routeState.avoidHighways);
 }
 
 function useMyPositionAsStart() {
