@@ -8411,6 +8411,7 @@ var routeState = {
   polyline: null,
   coords: [],
   radius: 5,
+  avoidHighways: false,
   wps: [
     { val: '', lat: null, lng: null },
     { val: '', lat: null, lng: null }
@@ -8453,6 +8454,7 @@ function _renderRouteSheet() {
     html += '<input class="route-wp-input" id="rw-inp-' + i + '" type="text" placeholder="' + ph + '" value="' + escHtml(wps[i].val) + '" autocomplete="off" oninput="onRouteWpInput(' + i + ',this.value)" onfocus="onRouteWpFocus(' + i + ')" onblur="_routeBlur(' + i + ')">';
     html += '<button class="route-wp-clear" id="rw-clr-' + i + '" onclick="clearRouteWp(' + i + ')">&#x2715;</button>';
     html += '<div class="route-dd" id="rw-dd-' + i + '"></div>';
+    if (isStart) html += '<button onclick="useMyPositionAsStart()" style="background:none;border:none;color:var(--accent);font-size:11px;font-weight:600;cursor:pointer;padding:3px 0;font-family:var(--font-body);display:flex;align-items:center;gap:4px;">&#127759; Ma position</button>';
     html += '</div>';
     if (isVia) html += '<button class="route-del-via-btn" onclick="removeRouteVia(' + i + ')" title="Supprimer">&#x2715;</button>';
     html += '</div>';
@@ -8471,6 +8473,11 @@ function _renderRouteSheet() {
   html += '<button class="route-radius-pill' + (routeState.radius === 5 ? ' sel' : '') + '" onclick="setRouteRadius(5,this)">5 km</button>';
   html += '<button class="route-radius-pill' + (routeState.radius === 10 ? ' sel' : '') + '" onclick="setRouteRadius(10,this)">10 km</button>';
   html += '</div>';
+  html += '</div>';
+
+  html += '<div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);">';
+  html += '<div><div style="font-size:13px;font-weight:600;color:var(--text);">&#128739; Éviter les autoroutes</div><div style="font-size:11px;color:var(--text2);margin-top:2px;">Itinéraire sans péages</div></div>';
+  html += '<div class="toggle' + (routeState.avoidHighways ? ' on' : '') + '" onclick="toggleAvoidHighways(this)"></div>';
   html += '</div>';
 
   body.innerHTML = html;
@@ -8572,7 +8579,7 @@ async function calcRoute() {
 
   try {
     var coordStr = validWps.map(function(wp) { return wp.lng.toFixed(6) + ',' + wp.lat.toFixed(6); }).join(';');
-    var url = 'https://router.project-osrm.org/route/v1/driving/' + coordStr + '?overview=full&geometries=geojson';
+    var url = 'https://router.project-osrm.org/route/v1/driving/' + coordStr + '?overview=full&geometries=geojson' + (routeState.avoidHighways ? '&exclude=motorway' : '');
     var res = await fetch(url);
     var data = await res.json();
 
@@ -8688,6 +8695,39 @@ function _haversineKm(lat1, lng1, lat2, lng2) {
     Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
     Math.sin(dLng/2) * Math.sin(dLng/2);
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function toggleAvoidHighways(el) {
+  routeState.avoidHighways = !routeState.avoidHighways;
+  el.classList.toggle('on', routeState.avoidHighways);
+}
+
+function useMyPositionAsStart() {
+  var setPos = function(lat, lng) {
+    var url = 'https://nominatim.openstreetmap.org/reverse?lat=' + lat + '&lon=' + lng + '&format=json&accept-language=fr&zoom=14';
+    fetch(url).then(function(r) { return r.json(); }).then(function(d) {
+      var addr = d.address || {};
+      var name = addr.city || addr.town || addr.village || addr.municipality || addr.county || 'Ma position';
+      routeState.wps[0] = { val: name, lat: lat, lng: lng };
+      _renderRouteSheet();
+    }).catch(function() {
+      routeState.wps[0] = { val: 'Ma position', lat: lat, lng: lng };
+      _renderRouteSheet();
+    });
+  };
+
+  if (liveMarker) {
+    var ll = liveMarker.getLatLng();
+    setPos(ll.lat, ll.lng);
+    return;
+  }
+
+  if (!navigator.geolocation) { showToast('Géolocalisation non disponible', 'error'); return; }
+  navigator.geolocation.getCurrentPosition(
+    function(pos) { setPos(pos.coords.latitude, pos.coords.longitude); },
+    function() { showToast('Position introuvable', 'error'); },
+    { timeout: 8000, maximumAge: 30000 }
+  );
 }
 
 function exitRouteMode() {
