@@ -8571,30 +8571,58 @@ var _OSRM_SERVERS = [
   'https://router.project-osrm.org/route/v1/driving/'
 ];
 
-async function _fetchOSRM(coordStr, avoidHighways) {
+async function _fetchOSRM(coordStr) {
   var suffix = '?overview=full&geometries=geojson';
-  var attempts = [];
-  if (avoidHighways) attempts.push({ s: _OSRM_SERVERS[0], ex: true });
-  _OSRM_SERVERS.forEach(function(s) { attempts.push({ s: s, ex: false }); });
-
-  for (var i = 0; i < attempts.length; i++) {
-    var a = attempts[i];
+  for (var i = 0; i < _OSRM_SERVERS.length; i++) {
     try {
-      var url = a.s + coordStr + suffix + (a.ex ? '&exclude=motorway' : '');
       var res = await Promise.race([
-        fetch(url),
+        fetch(_OSRM_SERVERS[i] + coordStr + suffix),
         new Promise(function(_, rej) { setTimeout(function() { rej(new Error('timeout')); }, 10000); })
       ]);
       if (!res.ok) continue;
       var data = await res.json();
       if (data.routes && data.routes.length) {
-        data._avoidUsed = a.ex;
-        return data;
+        var r = data.routes[0];
+        return {
+          coords: r.geometry.coordinates.map(function(c) { return [c[1], c[0]]; }),
+          distKm: Math.round(r.distance / 1000),
+          durationMin: Math.round(r.duration / 60)
+        };
       }
-      if (data.code === 'NoRoute') return data;
-    } catch (e) { /* try next server */ }
+      if (data.code === 'NoRoute') return null;
+    } catch (e) { /* next server */ }
   }
   return null;
+}
+
+async function _fetchValhalla(validWps) {
+  var locations = validWps.map(function(wp) { return { lon: wp.lng, lat: wp.lat }; });
+  var body = {
+    locations: locations,
+    costing: 'auto',
+    costing_options: { auto: { use_highways: 0.05, use_tolls: 0.0 } },
+    shape_format: 'geojson'
+  };
+  var res = await Promise.race([
+    fetch('https://valhalla1.openstreetmap.de/route', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }),
+    new Promise(function(_, rej) { setTimeout(function() { rej(new Error('timeout')); }, 12000); })
+  ]);
+  if (!res.ok) return null;
+  var data = await res.json();
+  if (!data.trip || !data.trip.legs || !data.trip.legs.length) return null;
+  var coords = [];
+  data.trip.legs.forEach(function(leg) {
+    leg.shape.coordinates.forEach(function(c) { coords.push([c[1], c[0]]); });
+  });
+  return {
+    coords: coords,
+    distKm: Math.round(data.trip.summary.length),
+    durationMin: Math.round(data.trip.summary.time / 60)
+  };
 }
 
 async function calcRoute() {
@@ -8609,26 +8637,27 @@ async function calcRoute() {
   btn.disabled = true;
 
   try {
-    var coordStr = validWps.map(function(wp) { return wp.lng.toFixed(6) + ',' + wp.lat.toFixed(6); }).join(';');
-    var data = await _fetchOSRM(coordStr, routeState.avoidHighways);
+    var result = null;
 
-    if (!data || !data.routes || !data.routes.length) {
+    if (routeState.avoidHighways) {
+      try { result = await _fetchValhalla(validWps); } catch(e) {}
+      if (!result) showToast('Sans autoroutes indisponible — itinéraire standard utilisé', 'error');
+    }
+
+    if (!result) {
+      var coordStr = validWps.map(function(wp) { return wp.lng.toFixed(6) + ',' + wp.lat.toFixed(6); }).join(';');
+      result = await _fetchOSRM(coordStr);
+    }
+
+    if (!result) {
       showToast('Itinéraire introuvable entre ces points', 'error');
       return;
     }
-    if (routeState.avoidHighways && !data._avoidUsed) {
-      showToast('Sans autoroutes indisponible sur ce trajet — itinéraire standard utilisé', 'error');
-    }
 
-    var route = data.routes[0];
-    var distKm = Math.round(route.distance / 1000);
-    var durationMin = Math.round(route.duration / 60);
-
-    routeState.coords = route.geometry.coordinates.map(function(c) { return [c[1], c[0]]; });
+    routeState.coords = result.coords;
     routeState.active = true;
-
     closeRouteSheet();
-    await _activateRouteMode(distKm, durationMin);
+    await _activateRouteMode(result.distKm, result.durationMin);
   } catch (e) {
     showToast('Erreur de calcul de route', 'error');
   } finally {
