@@ -8609,42 +8609,24 @@ function _decodePolyline6(str) {
   return coords;
 }
 
-async function _fetchNoHighwayRoute(coordStr, validWps) {
-  var bodyStr = JSON.stringify({
-    locations: validWps.map(function(wp) { return { lon: wp.lng, lat: wp.lat }; }),
-    costing: 'auto',
-    costing_options: { auto: { use_highways: 0.0, use_tolls: 0.0 } },
-    units: 'kilometers'
-  });
-
-  var postOpts = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: bodyStr };
-  var vServers = ['https://valhalla1.openstreetmap.de/route', 'https://valhalla.openstreetmap.de/route'];
-
-  // 1. POST direct (fonctionne si le serveur autorise l'origine)
-  for (var i = 0; i < vServers.length; i++) {
+async function _fetchNoHighwayRoute(coordStr) {
+  var suffix = '?overview=full&geometries=geojson&exclude=motorway';
+  for (var i = 0; i < _OSRM_SERVERS.length; i++) {
     try {
-      var res = await _timedFetch(vServers[i], postOpts, 12000);
-      if (res.ok) { var d = _parseValhallaData(await res.json()); if (d) return d; }
+      var res = await _timedFetch(_OSRM_SERVERS[i] + coordStr + suffix, {}, 12000);
+      if (!res.ok) continue;
+      var data = await res.json();
+      if (data.routes && data.routes.length) {
+        var r = data.routes[0];
+        return {
+          coords: r.geometry.coordinates.map(function(c) { return [c[1], c[0]]; }),
+          distKm: Math.round(r.distance / 1000),
+          durationMin: Math.round(r.duration / 60)
+        };
+      }
+      if (data.code === 'NoRoute' || data.code === 'InvalidUrl') return null;
     } catch(e) {}
   }
-
-  // 2. POST via corsproxy.io (gère son propre preflight CORS)
-  for (var i = 0; i < vServers.length; i++) {
-    try {
-      var res = await _timedFetch('https://corsproxy.io/?' + encodeURIComponent(vServers[i]), postOpts, 15000);
-      if (res.ok) { var d = _parseValhallaData(await res.json()); if (d) return d; }
-    } catch(e) {}
-  }
-
-  // 3. GET via allorigins.win (autre proxy, URL correctement encodée)
-  for (var i = 0; i < vServers.length; i++) {
-    try {
-      var target = encodeURIComponent(vServers[i] + '?json=' + encodeURIComponent(bodyStr));
-      var res = await _timedFetch('https://api.allorigins.win/raw?url=' + target, {}, 15000);
-      if (res.ok) { var d = _parseValhallaData(await res.json()); if (d) return d; }
-    } catch(e) {}
-  }
-
   return null;
 }
 
@@ -8745,7 +8727,7 @@ async function calcRoute() {
     var coordStr = validWps.map(function(wp) { return wp.lng.toFixed(6) + ',' + wp.lat.toFixed(6); }).join(';');
 
     if (routeState.avoidHighways) {
-      result = await _fetchNoHighwayRoute(coordStr, validWps);
+      result = await _fetchNoHighwayRoute(coordStr);
       if (!result) {
         showToast('Itinéraire sans autoroutes introuvable entre ces points', 'error');
         return;
