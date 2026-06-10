@@ -8609,6 +8609,29 @@ function _decodePolyline6(str) {
   return coords;
 }
 
+async function _fetchNoHighwayRoute(coordStr, validWps) {
+  // Profil vélo OSRM : même serveur CORS-compatible, ne peut pas emprunter les autoroutes
+  // Durée estimée à 65 km/h (routes nationales/départementales)
+  try {
+    var url = 'https://routing.openstreetmap.de/routed-bike/route/v1/cycling/' + coordStr + '?overview=full&geometries=geojson';
+    var res = await _timedFetch(url, {}, 12000);
+    if (res.ok) {
+      var data = await res.json();
+      if (data.routes && data.routes.length) {
+        var r = data.routes[0];
+        var distKm = Math.round(r.distance / 1000);
+        return {
+          coords: r.geometry.coordinates.map(function(c) { return [c[1], c[0]]; }),
+          distKm: distKm,
+          durationMin: Math.round(distKm * 60 / 65)
+        };
+      }
+    }
+  } catch(e) {}
+  // Fallback : Valhalla (peut fonctionner selon le réseau)
+  return await _fetchValhalla(validWps);
+}
+
 var _VALHALLA_SERVERS = [
   'https://valhalla1.openstreetmap.de',
   'https://valhalla.openstreetmap.de'
@@ -8703,14 +8726,15 @@ async function calcRoute() {
   try {
     var result = null;
 
+    var coordStr = validWps.map(function(wp) { return wp.lng.toFixed(6) + ',' + wp.lat.toFixed(6); }).join(';');
+
     if (routeState.avoidHighways) {
-      result = await _fetchValhalla(validWps);
+      result = await _fetchNoHighwayRoute(coordStr, validWps);
       if (!result) {
-        showToast('Service sans autoroutes indisponible. Active le toggle "Autoroutes" ou réessaye.', 'error');
+        showToast('Itinéraire sans autoroutes introuvable entre ces points', 'error');
         return;
       }
     } else {
-      var coordStr = validWps.map(function(wp) { return wp.lng.toFixed(6) + ',' + wp.lat.toFixed(6); }).join(';');
       result = await _fetchOSRM(coordStr);
       if (!result) {
         showToast('Itinéraire introuvable entre ces points', 'error');
