@@ -9087,6 +9087,7 @@ function _renderTutoSlide() {
     return '<div class="tuto-dot'+(i===_tutoSlide?' active':'')+'"></div>';
   }).join('');
   var btn = document.getElementById('tuto-btn-next');
+  var prev = document.getElementById('tuto-btn-prev');
   var skip = document.getElementById('tuto-btn-skip');
   if (_tutoSlide === total - 1) {
     btn.textContent = 'Commencer 🎉';
@@ -9095,6 +9096,11 @@ function _renderTutoSlide() {
     btn.textContent = 'Suivant →';
     if (skip) skip.style.display = '';
   }
+  if (prev) prev.style.display = _tutoSlide > 0 ? '' : 'none';
+}
+
+function prevTutoSlide() {
+  if (_tutoSlide > 0) { _tutoSlide--; _renderTutoSlide(); }
 }
 
 function nextTutoSlide() {
@@ -9168,6 +9174,7 @@ function closeTuto() {
       <div id="tuto-points"></div>
     </div>
     <div id="tuto-footer">
+      <button id="tuto-btn-prev" onclick="prevTutoSlide()" style="background:none;border:1px solid var(--border);color:var(--text2);border-radius:12px;padding:10px 16px;font-size:14px;cursor:pointer;font-family:var(--font-head);transition:opacity 0.15s;display:none;">← Retour</button>
       <div id="tuto-dots"></div>
       <button id="tuto-btn-next" onclick="nextTutoSlide()">Suivant →</button>
     </div>
