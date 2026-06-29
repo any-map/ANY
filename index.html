@@ -551,6 +551,24 @@ path.leaflet-spider-leg{stroke:#fff!important;stroke-width:1.5px!important;strok
 .route-del-via-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text2);font-size:16px;cursor:pointer;padding:0;width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background 0.15s,color 0.15s;align-self:center;}
 .route-del-via-btn:hover,.route-del-via-btn:active{background:rgba(220,53,69,0.12);border-color:var(--danger);color:var(--danger);}
 .route-radius-slider{width:100%;accent-color:var(--accent);cursor:pointer;height:4px;}
+/* TUTO */
+#tuto-overlay{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.78);display:flex;align-items:center;justify-content:center;padding:16px;animation:fadeIn 0.3s ease;}
+#tuto-overlay.hidden{display:none;}
+#tuto-card{background:var(--surface);border-radius:24px;width:100%;max-width:440px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5);position:relative;}
+#tuto-illus{height:190px;display:flex;align-items:center;justify-content:center;font-size:84px;line-height:1;position:relative;overflow:hidden;transition:background 0.35s;}
+#tuto-illus-sub{position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:12px;color:rgba(255,255,255,0.7);font-weight:600;letter-spacing:0.5px;}
+#tuto-body{padding:18px 22px 12px;}
+#tuto-title{font-family:var(--font-head);font-size:20px;font-weight:800;color:var(--text);margin-bottom:6px;}
+#tuto-desc{font-size:13px;color:var(--text2);line-height:1.55;margin-bottom:14px;}
+.tuto-point{display:flex;align-items:flex-start;gap:10px;margin-bottom:9px;font-size:13px;color:var(--text);line-height:1.4;}
+.tuto-point-icon{font-size:17px;flex-shrink:0;margin-top:1px;}
+#tuto-footer{display:flex;align-items:center;justify-content:space-between;padding:10px 22px 20px;}
+#tuto-dots{display:flex;gap:6px;align-items:center;}
+.tuto-dot{width:7px;height:7px;border-radius:50%;background:var(--border);transition:all 0.25s;}
+.tuto-dot.active{background:var(--accent);width:20px;border-radius:4px;}
+#tuto-btn-next{background:var(--accent);color:#fff;border:none;border-radius:12px;padding:10px 22px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font-head);transition:opacity 0.15s;}
+#tuto-btn-next:active{opacity:0.8;}
+#tuto-btn-skip{position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.28);color:#fff;border:none;border-radius:8px;padding:5px 11px;font-size:12px;cursor:pointer;z-index:1;font-weight:600;}
 </style>
 </head>
 <body>
@@ -6928,6 +6946,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   init();
+  setTimeout(initTuto, 900);
 });
 
 var reportPlaceId = null;
@@ -8227,6 +8246,9 @@ async function openMemberDash() {
   var sectionTitle = (isAdmin||isModerator) ? '🛡️ Administration' : '📊 Statistiques';
   html += '<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin:24px 0 10px;">'+sectionTitle+'</div>';
   html += '<div id="member-dash-stats-grid" class="dash-grid"><div style="color:var(--text2);font-size:12px;text-align:center;padding:8px 0;">Chargement...</div></div>';
+  html += '<div style="text-align:center;margin-top:20px;padding-bottom:4px;">'
+    +'<button onclick="reopenTuto()" style="background:none;border:none;color:var(--text2);font-size:12px;cursor:pointer;text-decoration:underline;font-family:var(--font-body);">📖 Revoir le tutoriel</button>'
+    +'</div>';
   el.innerHTML = html;
 
   // Phase 2 : stats globales avec cache 5 min (localStorage)
@@ -8953,6 +8975,142 @@ function exitRouteMode() {
   scheduleLoad();
 }
 
+/* ===== TUTORIEL ===== */
+var _tutoSlide = 0;
+var _tutoSlides = [
+  {
+    bg: 'linear-gradient(135deg,#0ba6b3 0%,#0d7a87 100%)',
+    illus: '🗺️',
+    sub: 'Anything · Anywhere · Anytime',
+    title: 'Bienvenue sur ANY',
+    desc: 'Découvre plus de 900 000 services utiles partout en France — en van, en camping-car ou en balade.',
+    points: [
+      { icon: '⛽', text: 'Bornes de recharge, eau potable, WC, laveries et bien plus' },
+      { icon: '🚐', text: 'Conçu pour le van life, les voyageurs et les nomades' },
+      { icon: '🌍', text: 'Une carte 100 % communautaire, mise à jour par ses membres' }
+    ]
+  },
+  {
+    bg: 'linear-gradient(135deg,#6366f1 0%,#4f46e5 100%)',
+    illus: '📍',
+    sub: 'Filtres · Catégories · Satellite',
+    title: 'Explore la carte',
+    desc: 'La carte regroupe tous les POI par catégorie. Filtre selon tes besoins en un clic.',
+    points: [
+      { icon: '👆', text: 'Clique sur un marqueur pour voir les détails d\'un lieu' },
+      { icon: '☰', text: 'Ouvre le menu pour filtrer par catégorie' },
+      { icon: '🛰️', text: 'Vue satellite disponible une fois connecté' },
+      { icon: '📡', text: 'Bouton de localisation pour centrer la carte sur toi' }
+    ]
+  },
+  {
+    bg: 'linear-gradient(135deg,#10b981 0%,#059669 100%)',
+    illus: '➕',
+    sub: 'Contribue à la communauté',
+    title: 'Ajouter un lieu',
+    desc: 'Tu connais un endroit utile qui manque sur la carte ? Ajoute-le en quelques secondes.',
+    points: [
+      { icon: '🖱️', text: 'Clique sur "Ajouter un lieu" dans le menu ou la barre du bas' },
+      { icon: '📍', text: 'Place le marqueur à l\'endroit exact sur la carte' },
+      { icon: '📝', text: 'Remplis le nom, la catégorie et une description' },
+      { icon: '🚀', text: 'Ton lieu est soumis à la validation communautaire' }
+    ]
+  },
+  {
+    bg: 'linear-gradient(135deg,#f59e0b 0%,#d97706 100%)',
+    illus: '✅',
+    sub: 'Système de confiance communautaire',
+    title: 'La validation',
+    desc: 'Chaque lieu est vérifié par la communauté avant d\'apparaître en couleur sur la carte.',
+    points: [
+      { icon: '🗳️', text: '3 votes "Merci" suffisent pour valider un lieu' },
+      { icon: '🎨', text: 'Lieu validé = icône colorée · En attente = icône grisée' },
+      { icon: '⭐', text: 'Les membres de confiance comptent double' },
+      { icon: '🛡️', text: 'Les modérateurs peuvent valider instantanément' }
+    ]
+  },
+  {
+    bg: 'linear-gradient(135deg,#8b5cf6 0%,#7c3aed 100%)',
+    illus: '🛣️',
+    sub: 'Itinéraire · POI le long du trajet',
+    title: 'Sur ma route',
+    desc: 'Planifie ton trajet et trouve tous les services utiles le long de ta route.',
+    points: [
+      { icon: '🗺️', text: 'Entre un point de départ et une destination' },
+      { icon: '📍', text: 'Affiche les POI dans un rayon de 5 ou 10 km du trajet' },
+      { icon: '🛣️', text: 'Option pour éviter les autoroutes' },
+      { icon: '🔒', text: 'Fonctionnalité réservée aux membres connectés' }
+    ]
+  },
+  {
+    bg: 'linear-gradient(135deg,#e74c3c 0%,#c0392b 100%)',
+    illus: '👤',
+    sub: 'Tes lieux · Favoris · Stats',
+    title: 'Mon espace',
+    desc: 'Retrouve tout ce qui te concerne : tes lieux, tes favoris et les stats de la communauté.',
+    points: [
+      { icon: '📍', text: 'Consulte tous tes lieux ajoutés avec leur ville' },
+      { icon: '❤️', text: 'Gère ta liste de favoris' },
+      { icon: '🙏', text: 'Vois qui a remercié tes contributions' },
+      { icon: '♥', text: 'Soutiens le projet via le bouton "Soutenir" dans le menu' }
+    ]
+  }
+];
+
+function initTuto() {
+  if (localStorage.getItem('any_tuto_done')) return;
+  _tutoSlide = 0;
+  _renderTutoSlide();
+  document.getElementById('tuto-overlay').classList.remove('hidden');
+}
+
+function reopenTuto() {
+  _tutoSlide = 0;
+  _renderTutoSlide();
+  document.getElementById('tuto-overlay').classList.remove('hidden');
+}
+
+function _renderTutoSlide() {
+  var s = _tutoSlides[_tutoSlide];
+  var total = _tutoSlides.length;
+  var illus = document.getElementById('tuto-illus');
+  illus.style.background = s.bg;
+  illus.childNodes[0].nodeValue = s.illus;
+  illus.innerHTML = '<span style="filter:drop-shadow(0 4px 16px rgba(0,0,0,0.25));font-size:84px;line-height:1;">'+s.illus+'</span>'
+    +'<div id="tuto-illus-sub" style="position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:11px;color:rgba(255,255,255,0.75);font-weight:700;letter-spacing:0.6px;text-transform:uppercase;">'+s.sub+'</div>';
+  document.getElementById('tuto-title').textContent = s.title;
+  document.getElementById('tuto-desc').textContent = s.desc;
+  document.getElementById('tuto-points').innerHTML = (s.points||[]).map(function(p) {
+    return '<div class="tuto-point"><span class="tuto-point-icon">'+p.icon+'</span><span>'+p.text+'</span></div>';
+  }).join('');
+  document.getElementById('tuto-dots').innerHTML = _tutoSlides.map(function(_,i) {
+    return '<div class="tuto-dot'+(i===_tutoSlide?' active':'')+'"></div>';
+  }).join('');
+  var btn = document.getElementById('tuto-btn-next');
+  var skip = document.getElementById('tuto-btn-skip');
+  if (_tutoSlide === total - 1) {
+    btn.textContent = 'Commencer 🎉';
+    if (skip) skip.style.display = 'none';
+  } else {
+    btn.textContent = 'Suivant →';
+    if (skip) skip.style.display = '';
+  }
+}
+
+function nextTutoSlide() {
+  if (_tutoSlide < _tutoSlides.length - 1) {
+    _tutoSlide++;
+    _renderTutoSlide();
+  } else {
+    closeTuto();
+  }
+}
+
+function closeTuto() {
+  localStorage.setItem('any_tuto_done', '1');
+  document.getElementById('tuto-overlay').classList.add('hidden');
+}
+
 </script>
 
 <!-- MOVE MODE BANNER -->
@@ -8999,6 +9157,21 @@ function exitRouteMode() {
 <div id="pbs">
   <div id="pbs-handle"></div>
   <div id="pbs-content"></div>
+</div>
+<div id="tuto-overlay" class="hidden">
+  <div id="tuto-card">
+    <button id="tuto-btn-skip" onclick="closeTuto()">Passer</button>
+    <div id="tuto-illus"><div id="tuto-illus-sub"></div></div>
+    <div id="tuto-body">
+      <div id="tuto-title"></div>
+      <div id="tuto-desc"></div>
+      <div id="tuto-points"></div>
+    </div>
+    <div id="tuto-footer">
+      <div id="tuto-dots"></div>
+      <button id="tuto-btn-next" onclick="nextTutoSlide()">Suivant →</button>
+    </div>
+  </div>
 </div>
 <div id="lightbox" onclick="closeLightbox()">
   <button id="lb-close" onclick="closeLightbox()">&#x2715;</button>
