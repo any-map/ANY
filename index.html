@@ -8322,12 +8322,21 @@ async function showMemberDashDetail(type) {
           ? '<span style="background:rgba(39,174,96,0.15);color:#27ae60;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;white-space:nowrap;">✅ Validé</span>'
           : '<span style="background:rgba(245,158,11,0.15);color:#f59e0b;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;white-space:nowrap;">'+vw+'/3</span>';
         var extra = type==='merci' && p.votes_positifs>0 ? '<span style="font-size:11px;color:#8b5cf6;margin-right:6px;">🙏 '+p.votes_positifs+'</span>' : '';
-        html += '<div onclick="goToPlaceOnMap(\''+p.id+'\','+p.latitude+','+p.longitude+')" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:8px;">'
-          +'<div style="flex:1;min-width:0;font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escHtml(p.name||'—')+'</div>'
+        var onclick = type==='merci'
+          ? 'showMerciVoters(this)'
+          : 'goToPlaceOnMap(\''+p.id+'\','+p.latitude+','+p.longitude+')';
+        html += '<div onclick="'+onclick+'" data-pid="'+p.id+'" data-pname="'+escHtml(p.name||'—')+'" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:8px;">'
+          +'<div style="flex:1;min-width:0;">'
+          +'<div style="font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escHtml(p.name||'—')+'</div>'
+          +'<span id="city-'+p.id+'" style="font-size:11px;color:var(--text2);display:block;">…</span>'
+          +'</div>'
           +extra+badge+'</div>';
       });
       html += '</div>';
     }
+    content.innerHTML = html;
+    if (list.length) _loadCitiesForDash(list);
+    return;
   }
   if (type === 'validations') {
     content.innerHTML = '<div style="color:var(--text2);font-size:13px;padding:20px 0;text-align:center;">Chargement...</div>';
@@ -8354,6 +8363,54 @@ async function showMemberDashDetail(type) {
     content.innerHTML = valHtml;
     return;
   }
+  content.innerHTML = html;
+}
+
+async function _loadCitiesForDash(places) {
+  for (var i = 0; i < places.length; i++) {
+    var p = places[i];
+    var el = document.getElementById('city-' + p.id);
+    if (!el) continue;
+    try {
+      var r = await fetch('https://nominatim.openstreetmap.org/reverse?lat=' + p.latitude + '&lon=' + p.longitude + '&format=json&accept-language=fr&zoom=10');
+      var d = await r.json();
+      var addr = d.address || {};
+      var city = addr.city || addr.town || addr.village || addr.municipality || addr.county || '';
+      el.textContent = city;
+    } catch(e) { el.textContent = ''; }
+    if (i < places.length - 1) await new Promise(function(res){setTimeout(res, 350);});
+  }
+}
+
+async function showMerciVoters(el) {
+  var placeId = el.getAttribute('data-pid');
+  var placeName = el.getAttribute('data-pname');
+  var content = document.getElementById('member-dash-detail-content');
+  var titleEl = document.getElementById('member-dash-detail-title');
+  if (titleEl) titleEl.textContent = '🙏 ' + placeName;
+  content.innerHTML = '<div style="color:var(--text2);font-size:13px;padding:20px 0;text-align:center;">Chargement...</div>';
+  var res = await db.from('votes').select('user_id,created_at').eq('place_id', placeId).eq('vote', true).order('created_at',{ascending:false});
+  var votes = res.data || [];
+  var html = '<button onclick="showMemberDashDetail(\'merci\')" style="background:none;border:none;color:var(--accent);font-size:13px;cursor:pointer;padding:0 0 14px 0;display:flex;align-items:center;gap:4px;">‹ Retour</button>';
+  if (!votes.length) {
+    html += '<div style="color:var(--text2);font-size:13px;text-align:center;padding:20px 0;">Aucun merci encore</div>';
+    content.innerHTML = html;
+    return;
+  }
+  var userIds = votes.map(function(v){return v.user_id;});
+  var profRes = await db.from('profiles').select('user_id,username').in('user_id', userIds);
+  var profMap = {};
+  (profRes.data||[]).forEach(function(p){ profMap[p.user_id] = p; });
+  html += '<div style="display:flex;flex-direction:column;gap:6px;">';
+  votes.forEach(function(v) {
+    var prof = profMap[v.user_id] || {};
+    var username = prof.username || 'Anonyme';
+    var date = v.created_at ? new Date(v.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) : '';
+    html += '<div onclick="openPublicProfile(\''+escHtml(username)+'\')" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px 12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;">'
+      +'<div style="font-size:13px;font-weight:600;color:var(--text);">🙏 '+escHtml(username)+'</div>'
+      +'<div style="font-size:11px;color:var(--text2);">'+date+'</div></div>';
+  });
+  html += '</div>';
   content.innerHTML = html;
 }
 
