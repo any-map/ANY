@@ -2722,6 +2722,7 @@ async function init() {
     window.history.replaceState({}, '', window.location.pathname);
     setTimeout(function() { openPublicProfile(decodeURIComponent(sharedProfil)); }, 400);
   }
+  initTuto();
 }
 
 function setupListeners(hasSharedLocation, sharedLat, sharedLon, sharedZoom) {
@@ -6946,7 +6947,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   init();
-  setTimeout(initTuto, 900);
 });
 
 var reportPlaceId = null;
@@ -9058,7 +9058,7 @@ var _tutoSlides = [
 ];
 
 function initTuto() {
-  if (localStorage.getItem('any_tuto_done')) return;
+  if (currentUser) return;
   _tutoSlide = 0;
   _renderTutoSlide();
   document.getElementById('tuto-overlay').classList.remove('hidden');
@@ -9113,7 +9113,6 @@ function nextTutoSlide() {
 }
 
 function closeTuto() {
-  localStorage.setItem('any_tuto_done', '1');
   document.getElementById('tuto-overlay').classList.add('hidden');
 }
 
