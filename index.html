@@ -8480,6 +8480,7 @@ var routeState = {
 var _routeDdTimers = {};
 
 function openRouteSheet() {
+  if (!currentUser) { showToast('Connecte-toi pour utiliser Sur ma route', 'info'); openModal('modal-auth'); return; }
   _renderRouteSheet();
   document.getElementById('sheet-route').classList.add('open');
   document.querySelectorAll('.nav-item').forEach(function(b) { b.classList.remove('active'); });
