@@ -4395,7 +4395,7 @@ function showConfirm(title, msg, confirmLabel, confirmColor, callback) {
   document.getElementById('gc-title').textContent = title;
   document.getElementById('gc-msg').textContent = msg;
   var btn = document.getElementById('gc-confirm-btn');
-  btn.textContent = confirmLabel || 'Confirmer';
+  btn.textContent = confirmLabel || t('btn_confirm');
   btn.style.background = confirmColor || '';
   btn.style.borderColor = confirmColor || '';
   openModal('modal-generic-confirm');
@@ -4407,7 +4407,7 @@ function showConfirm(title, msg, confirmLabel, confirmColor, callback) {
   document.getElementById('gc-title').textContent = title;
   document.getElementById('gc-msg').textContent = msg;
   var btn = document.getElementById('gc-confirm-btn');
-  btn.textContent = confirmLabel || 'Confirmer';
+  btn.textContent = confirmLabel || t('btn_confirm');
   btn.style.background = confirmColor || 'var(--accent)';
   btn.style.borderColor = confirmColor || 'var(--accent)';
   openModal('modal-generic-confirm');
@@ -7348,7 +7348,7 @@ function toggleAllFilters(on) {
 
 function populateForm() {
   var sel = document.getElementById('add-main-cat');
-  sel.innerHTML = '<option value="">-- Choisir --</option>';
+  sel.innerHTML = '<option value="">'+t('form_choose')+'</option>';
   mainCats.forEach(function(mc) {
     var o = document.createElement('option');
     o.value = mc.id; o.textContent = mc.icon + ' ' + mc.name;
@@ -7359,7 +7359,7 @@ function populateForm() {
 function loadSubCats() {
   var mid = document.getElementById('add-main-cat').value;
   var sel = document.getElementById('add-sub-cat');
-  sel.innerHTML = '<option value="">-- Choisir --</option>';
+  sel.innerHTML = '<option value="">'+t('form_choose')+'</option>';
   allCats.filter(function(c) { return c.main_category_id === mid; }).forEach(function(c) {
     var o = document.createElement('option');
     o.value = c.id; o.textContent = c.icon + ' ' + c.name;
@@ -7707,11 +7707,11 @@ async function loadReportInfo(pid) {
   if (!el) return;
   var data = res.data || [];
   if (!data.length) return;
-  var labels = { closed:'Fermé', maintenance:'En maintenance', wrong_location:'Emplacement incorrect', duplicate:'Doublon', wrong_info:'Infos incorrectes', inappropriate:'Inapproprié', bad_photo:'Photo inappropriée', other:'Autre' };
+  var labels = { closed:t('report_reason_closed'), maintenance:t('report_reason_maintenance'), wrong_location:t('report_reason_location'), duplicate:t('report_reason_duplicate'), wrong_info:t('report_reason_info'), inappropriate:t('report_reason_inappropriate'), bad_photo:t('report_reason_bad_photo'), other:t('report_reason_other') };
   var counts = {};
   data.forEach(function(r) { counts[r.reason] = (counts[r.reason] || 0) + 1; });
   var top = Object.keys(counts).sort(function(a,b) { return counts[b]-counts[a]; })[0];
-  el.innerHTML = '&#9888;&#65039; ' + data.length + ' signalement' + (data.length > 1 ? 's' : '') + (top ? ' &middot; ' + (labels[top] || top) : '');
+  el.innerHTML = '&#9888;&#65039; ' + data.length + ' ' + (data.length > 1 ? t('lbl_report_many') : t('lbl_report_one')) + (top ? ' &middot; ' + (labels[top] || top) : '');
   el.style.display = 'block';
 }
 
