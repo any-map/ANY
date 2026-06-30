@@ -850,7 +850,7 @@ path.leaflet-spider-leg{stroke:#fff!important;stroke-width:1.5px!important;strok
   <div class="modal">
     <button class="modal-close" onclick="closeModal('modal-auth')">&#10005;</button>
     <h2 id="auth-title" data-i18n="auth_title_login">Connexion</h2>
-    <div class="form-group"><label data-i18n="auth_email">Email</label><input type="email" id="auth-email" placeholder="votre@email.com"></div>
+    <div class="form-group"><label data-i18n="auth_email">Email</label><input type="email" id="auth-email" data-i18n-ph="ph_email" placeholder="votre@email.com"></div>
     <div class="form-group"><label data-i18n="auth_password">Mot de passe</label><input type="password" id="auth-password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;"></div>
     <div id="forgot-pass-row" style="text-align:right;margin:-6px 0 12px;"><button onclick="forgotPassword()" data-i18n="auth_forgot" style="background:none;border:none;color:var(--text2);font-size:12px;cursor:pointer;text-decoration:underline;padding:0;font-family:var(--font-body);">Mot de passe oubli&#233; ?</button></div>
     <div class="form-group" id="confirm-pass-group" style="display:none"><label data-i18n="auth_confirm_password">Confirmer le mot de passe</label><input type="password" id="auth-password-confirm" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;"></div>
@@ -861,33 +861,33 @@ path.leaflet-spider-leg{stroke:#fff!important;stroke-width:1.5px!important;strok
 
 <div id="modal-reset-pass" class="modal-overlay" style="display:none">
   <div class="modal">
-    <h2>&#128273; Nouveau mot de passe</h2>
-    <div class="form-group"><label>Nouveau mot de passe</label><input type="password" id="reset-pass-new" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" minlength="6"></div>
-    <div class="form-group"><label>Confirmer</label><input type="password" id="reset-pass-confirm" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;"></div>
-    <button class="btn-p" onclick="submitNewPassword()">Enregistrer</button>
+    <h2>&#128273; <span data-i18n="auth_new_password">Nouveau mot de passe</span></h2>
+    <div class="form-group"><label data-i18n="auth_new_password">Nouveau mot de passe</label><input type="password" id="reset-pass-new" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" minlength="6"></div>
+    <div class="form-group"><label data-i18n="auth_confirm_password">Confirmer</label><input type="password" id="reset-pass-confirm" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;"></div>
+    <button class="btn-p" onclick="submitNewPassword()" data-i18n="btn_confirm">Enregistrer</button>
   </div>
 </div>
 
 <div id="modal-add" class="modal-overlay" style="display:none">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('modal-add')">&#10005;</button>
-    <h2>&#128205; Ajouter un lieu</h2>
-    <div class="info-box">Position : <span id="coord-display">Clique sur la carte !</span></div>
-    <div class="form-group"><label>Nom du lieu *</label><input type="text" id="add-name" placeholder="Ex: Distributeur de pain de la mairie"></div>
-    <div class="form-group"><label>Grande cat&#233;gorie *</label><select id="add-main-cat" onchange="loadSubCats()"><option value="">-- Choisir --</option></select></div>
-    <div class="form-group"><label>Sous-cat&#233;gorie *</label><select id="add-sub-cat" onchange="updatePhotoGroupFromSubCat()"><option value="">-- Choisir la cat&#233;gorie d'abord --</option></select></div>
-    <div class="form-group"><label>Description</label><textarea id="add-desc" placeholder="Infos utiles : horaires, &#233;tat, prix..."></textarea></div>
+    <h2 data-i18n="form_add_title">&#128205; Ajouter un lieu</h2>
+    <div class="info-box">Position : <span id="coord-display" data-i18n="form_click_map">Clique sur la carte !</span></div>
+    <div class="form-group"><label data-i18n="form_name">Nom du lieu *</label><input type="text" id="add-name" data-i18n-ph="ph_place_name" placeholder="Ex: Distributeur de pain de la mairie"></div>
+    <div class="form-group"><label data-i18n="form_main_cat">Grande cat&#233;gorie *</label><select id="add-main-cat" onchange="loadSubCats()"><option value="" data-i18n="form_choose">-- Choisir --</option></select></div>
+    <div class="form-group"><label data-i18n="form_sub_cat">Sous-cat&#233;gorie *</label><select id="add-sub-cat" onchange="updatePhotoGroupFromSubCat()"><option value="" data-i18n="form_choose_cat_first">-- Choisir la cat&#233;gorie d'abord --</option></select></div>
+    <div class="form-group"><label data-i18n="form_desc">Description</label><textarea id="add-desc" data-i18n-ph="ph_description" placeholder="Infos utiles : horaires, &#233;tat, prix..."></textarea></div>
     <div class="form-group">
-      <label>Disponible 24h/24 ? *</label>
+      <label data-i18n="form_available_24h">Disponible 24h/24 ? *</label>
       <div style="display:flex;gap:8px;">
         <button type="button" id="add-24h-oui" onclick="set24h(true)" style="flex:1;padding:10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);color:var(--text2);cursor:pointer;font-family:var(--font-body);font-size:13px;font-weight:600;transition:all 0.15s;">&#9989; Oui</button>
         <button type="button" id="add-24h-non" onclick="set24h(false)" style="flex:1;padding:10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);color:var(--text2);cursor:pointer;font-family:var(--font-body);font-size:13px;font-weight:600;transition:all 0.15s;">&#10060; Non</button>
       </div>
     </div>
     <div class="form-group" id="add-photo-group" style="display:none">
-      <label>Photo <span style="font-size:11px;font-weight:400;color:var(--accent);">recommandée · +5 XP</span></label>
+      <label data-i18n="form_photo">Photo <span style="font-size:11px;font-weight:400;color:var(--accent);">recommandée · +5 XP</span></label>
       <input type="file" id="add-photo-input" accept="image/*" style="display:none" onchange="previewAddPhoto(this)">
-      <label for="add-photo-input" id="add-photo-btn" style="display:flex;align-items:center;gap:8px;justify-content:center;padding:10px;border:2px dashed var(--border);border-radius:var(--radius-sm);cursor:pointer;color:var(--text2);font-size:13px;">&#128247; Ajouter une photo</label>
+      <label for="add-photo-input" id="add-photo-btn" style="display:flex;align-items:center;gap:8px;justify-content:center;padding:10px;border:2px dashed var(--border);border-radius:var(--radius-sm);cursor:pointer;color:var(--text2);font-size:13px;" data-i18n="form_add_photo">&#128247; Ajouter une photo</label>
       <div id="add-photo-preview" style="display:none;position:relative;margin-top:8px;">
         <img id="add-photo-img" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;display:block;">
         <button onclick="clearAddPhoto()" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.6);border:none;color:#fff;border-radius:50%;width:26px;height:26px;font-size:14px;cursor:pointer;line-height:1;">&#10005;</button>
@@ -921,23 +921,23 @@ path.leaflet-spider-leg{stroke:#fff!important;stroke-width:1.5px!important;strok
 <div id="modal-confirm-email" class="modal-overlay" style="display:none">
   <div class="modal" style="text-align:center">
     <div style="font-size:48px;margin-bottom:16px">&#128231;</div>
-    <h2 style="text-align:center">Confirmez votre email</h2>
-    <p style="font-size:14px;color:var(--text2);margin-bottom:8px">Un email de confirmation a été envoyé à :</p>
+    <h2 style="text-align:center" data-i18n="modal_confirm_email_title">Confirmez votre email</h2>
+    <p style="font-size:14px;color:var(--text2);margin-bottom:8px" data-i18n="modal_confirm_email_sent">Un email de confirmation a été envoyé à :</p>
     <p style="font-size:15px;font-weight:600;color:var(--accent);margin-bottom:16px" id="confirm-email-addr"></p>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:20px">Cliquez sur le lien dans l'email pour activer votre compte, puis connectez-vous.</p>
-    <button class="btn-p" id="btn-resend-email" onclick="resendConfirmEmail()" style="margin-bottom:10px">📨 Renvoyer le lien</button>
-    <button class="btn-s" onclick="closeModal('modal-confirm-email')">Plus tard</button>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:20px" data-i18n="modal_confirm_email_desc">Cliquez sur le lien dans l'email pour activer votre compte, puis connectez-vous.</p>
+    <button class="btn-p" id="btn-resend-email" onclick="resendConfirmEmail()" style="margin-bottom:10px" data-i18n="btn_resend_email">📨 Renvoyer le lien</button>
+    <button class="btn-s" onclick="closeModal('modal-confirm-email')" data-i18n="btn_later">Plus tard</button>
   </div>
 </div>
 
 <div id="modal-pwa-install" class="modal-overlay" style="display:none">
   <div class="modal" style="text-align:center">
     <div style="font-size:48px;margin-bottom:16px">📲</div>
-    <h2 style="text-align:center;margin-bottom:8px">Installer l'application</h2>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:6px">Accédez à <strong>ANY</strong> depuis votre écran d'accueil, comme une vraie app — rapide, fluide, sans navigateur.</p>
-    <p style="font-size:12px;color:var(--text2);margin-bottom:18px">Sur iPhone : <em>Partager → Sur l'écran d'accueil</em><br>Sur Android : <em>Menu → Installer l'application</em></p>
-    <button class="btn-p" onclick="closeModal('modal-pwa-install')" style="margin-bottom:10px">Plus tard</button>
-    <button class="btn-s" onclick="dismissPwaReminder()">Ne plus afficher</button>
+    <h2 style="text-align:center;margin-bottom:8px" data-i18n="modal_install_app">Installer l'application</h2>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:6px" data-i18n="modal_install_app_desc">Accédez à <strong>ANY</strong> depuis votre écran d'accueil, comme une vraie app — rapide, fluide, sans navigateur.</p>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:18px" data-i18n="modal_install_app_instructions">Sur iPhone : <em>Partager → Sur l'écran d'accueil</em><br>Sur Android : <em>Menu → Installer l'application</em></p>
+    <button class="btn-p" onclick="closeModal('modal-pwa-install')" style="margin-bottom:10px" data-i18n="btn_later">Plus tard</button>
+    <button class="btn-s" onclick="dismissPwaReminder()" data-i18n="btn_dont_show_again">Ne plus afficher</button>
   </div>
 </div>
 
@@ -955,7 +955,7 @@ path.leaflet-spider-leg{stroke:#fff!important;stroke-width:1.5px!important;strok
 
 <div id="modal-pub-profile" class="modal-overlay" style="display:none" onclick="if(event.target===this)this.style.display='none'">
   <div class="modal" style="padding:0;overflow:hidden;">
-    <div id="pub-prof-content"><div style="padding:32px;text-align:center;color:var(--text2);">Chargement...</div></div>
+    <div id="pub-prof-content"><div style="padding:32px;text-align:center;color:var(--text2);" data-i18n="lbl_loading">Chargement...</div></div>
   </div>
 </div>
 
@@ -980,7 +980,7 @@ path.leaflet-spider-leg{stroke:#fff!important;stroke-width:1.5px!important;strok
     </div>
     <div class="form-group">
       <label>Précisions *</label>
-      <textarea id="report-details" placeholder="Décrivez le problème (min. 2 caractères)..." minlength="2"></textarea>
+      <textarea id="report-details" data-i18n-ph="ph_report_details" placeholder="Décrivez le problème (min. 2 caractères)..." minlength="2"></textarea>
     </div>
     <div class="form-group">
       <label>Photo (optionnel)</label>
@@ -1000,10 +1000,10 @@ path.leaflet-spider-leg{stroke:#fff!important;stroke-width:1.5px!important;strok
   <div class="modal">
     <button class="modal-close" onclick="closeModal('modal-delete-place')">&#10005;</button>
     <h2>&#128465;&#65039; Supprimer ce lieu</h2>
-    <div class="info-box" style="color:#e74c3c;">&#9888;&#65039; Cette action est <strong>irréversible</strong>.</div>
-    <p style="font-size:14px;color:var(--text2);margin:12px 0;">Supprimer définitivement <strong id="delete-place-name"></strong> ?</p>
-    <button class="btn-p" style="background:#e74c3c;border-color:#e74c3c;" onclick="confirmDeletePlace()">&#128465;&#65039; Supprimer définitivement</button>
-    <button class="btn-s" onclick="closeModal('modal-delete-place')">Annuler</button>
+    <div class="info-box" style="color:#e74c3c;" data-i18n="warning_irreversible">&#9888;&#65039; Cette action est <strong>irréversible</strong>.</div>
+    <p style="font-size:14px;color:var(--text2);margin:12px 0;" id="delete-place-confirm-text">Supprimer définitivement <strong id="delete-place-name"></strong> ?</p>
+    <button class="btn-p" style="background:#e74c3c;border-color:#e74c3c;" onclick="confirmDeletePlace()" data-i18n="btn_delete_permanently">&#128465;&#65039; Supprimer définitivement</button>
+    <button class="btn-s" onclick="closeModal('modal-delete-place')" data-i18n="btn_cancel">Annuler</button>
   </div>
 </div>
 
@@ -1023,20 +1023,20 @@ path.leaflet-spider-leg{stroke:#fff!important;stroke-width:1.5px!important;strok
     </div>
     <div class="form-group">
       <label>Précisions <span style="color:var(--text2);font-size:11px;">(optionnel)</span></label>
-      <textarea id="closed-hs-details" placeholder="Ex : panneau fermé, porte condamnée, travaux..."></textarea>
+      <textarea id="closed-hs-details" data-i18n-ph="ph_closed_details" placeholder="Ex : panneau fermé, porte condamnée, travaux..."></textarea>
     </div>
-    <button class="btn-p" style="background:#e74c3c;border-color:#e74c3c;" onclick="submitClosedHS()">&#128683; Confirmer le signalement</button>
-    <button class="btn-s" onclick="closeModal('modal-closed-hs')">Annuler</button>
+    <button class="btn-p" style="background:#e74c3c;border-color:#e74c3c;" onclick="submitClosedHS()" data-i18n="btn_confirm_report">&#128683; Confirmer le signalement</button>
+    <button class="btn-s" onclick="closeModal('modal-closed-hs')" data-i18n="btn_cancel">Annuler</button>
   </div>
 </div>
 
 <div id="modal-confirm-report-photo" class="modal-overlay" style="display:none;">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('modal-confirm-report-photo')">&#10005;</button>
-    <h2>🚩 Signaler cette photo</h2>
-    <p style="font-size:14px;color:var(--text2);margin:12px 0;">Cette photo sera marquée comme signalée et examinée par un modérateur.</p>
-    <button class="btn-p" onclick="confirmReportPhoto()">Signaler la photo</button>
-    <button class="btn-s" onclick="closeModal('modal-confirm-report-photo')">Annuler</button>
+    <h2 data-i18n="modal_report_photo">🚩 Signaler cette photo</h2>
+    <p style="font-size:14px;color:var(--text2);margin:12px 0;" data-i18n="modal_report_photo_desc">Cette photo sera marquée comme signalée et examinée par un modérateur.</p>
+    <button class="btn-p" onclick="confirmReportPhoto()" data-i18n="btn_report_photo">Signaler la photo</button>
+    <button class="btn-s" onclick="closeModal('modal-confirm-report-photo')" data-i18n="btn_cancel">Annuler</button>
   </div>
 </div>
 
@@ -1044,9 +1044,9 @@ path.leaflet-spider-leg{stroke:#fff!important;stroke-width:1.5px!important;strok
   <div class="modal">
     <button class="modal-close" onclick="closeModal('modal-hide-place')">&#10005;</button>
     <h2>&#128683; Masquer ce lieu</h2>
-    <p style="font-size:14px;color:var(--text2);margin:12px 0;">Masquer <strong id="hide-place-name"></strong> de la carte publique ?<br><span style="font-size:12px;">Le lieu reste en base et peut être réactivé.</span></p>
-    <button class="btn-p" style="background:#e67e22;border-color:#e67e22;" onclick="confirmHidePlace()">&#128683; Masquer</button>
-    <button class="btn-s" onclick="closeModal('modal-hide-place')">Annuler</button>
+    <p style="font-size:14px;color:var(--text2);margin:12px 0;" id="hide-place-confirm-text">Masquer <strong id="hide-place-name"></strong> de la carte publique ?<br><span style="font-size:12px;">Le lieu reste en base et peut être réactivé.</span></p>
+    <button class="btn-p" style="background:#e67e22;border-color:#e67e22;" onclick="confirmHidePlace()" data-i18n="btn_hide">&#128683; Masquer</button>
+    <button class="btn-s" onclick="closeModal('modal-hide-place')" data-i18n="btn_cancel">Annuler</button>
   </div>
 </div>
 
@@ -1501,7 +1501,64 @@ fr:{
   tuto_s6_p2:'Gère ta liste de favoris',
   tuto_s6_p3:'Vois qui a remercié tes contributions',
   tuto_s6_p4:'Soutiens le projet via le bouton "Soutenir" dans le menu',
-  tuto_btn_next:'Suivant →', tuto_btn_start:'Commencer 🎉', tuto_btn_skip:'Passer'
+  tuto_btn_next:'Suivant →', tuto_btn_start:'Commencer 🎉', tuto_btn_skip:'Passer',
+  auth_new_password:'Nouveau mot de passe',
+  btn_resend_email:'📨 Renvoyer le lien',
+  btn_later:'Plus tard',
+  btn_dont_show_again:'Ne plus afficher',
+  btn_publishing:'⏳ Publication…',
+  btn_sending:'⏳ Envoi…',
+  btn_calculating:'Calcul en cours…',
+  btn_translate:'Traduire',
+  btn_original:'Original',
+  btn_delete_permanently:'🗑️ Supprimer définitivement',
+  btn_hide:'🚫 Masquer',
+  btn_report_photo:'Signaler la photo',
+  btn_confirm_report:'🚫 Confirmer le signalement',
+  btn_back_history:"← Retour à l'historique",
+  modal_install_app:"📍 Installer l'application",
+  modal_install_app_desc:"Accédez à <strong>ANY</strong> depuis votre écran d'accueil, comme une vraie app — rapide, fluide, sans navigateur.",
+  modal_install_app_instructions:"Sur iPhone : <em>Partager → Sur l'écran d'accueil</em><br>Sur Android : <em>Menu → Installer l'application</em>",
+  modal_report_photo:'🚩 Signaler cette photo',
+  modal_report_photo_desc:'Cette photo sera marquée comme signalée et examinée par un modérateur.',
+  modal_delete_place_confirm:'Supprimer définitivement <strong id="delete-place-name"></strong> ?',
+  modal_hide_place_confirm:'Masquer <strong id="hide-place-name"></strong> de la carte publique ?<br><span style="font-size:12px;color:var(--text2)">Le lieu reste en base et peut être réactivé.</span>',
+  form_click_map:'Clique sur la carte !',
+  ph_email:'votre@email.com',
+  ph_place_name:'Ex: Distributeur de pain de la mairie',
+  ph_description:'Infos utiles : horaires, état, prix...',
+  ph_report_details:'Décrivez le problème (min. 2 caractères)...',
+  ph_closed_details:'Ex : panneau fermé, porte condamnée, travaux...',
+  ph_move_details:'Ex : panneau fermé, porte condamnée, travaux...',
+  toast_avatar_updated:'Avatar mis à jour !',
+  toast_profile_updated:'Profil mis à jour !',
+  toast_location_updated:'Localisation mise à jour !',
+  toast_cannot_vote_own:'⛔ Vous ne pouvez pas valider votre propre lieu',
+  toast_place_confirmed:'🎉 Lieu confirmé par la communauté et publié sur la carte !',
+  toast_threshold_reached:'🎉 Seuil atteint — lieu soumis à validation !',
+  toast_confirmation_removed:'Confirmation retirée',
+  toast_place_added:'📍 Lieu ajouté !',
+  toast_photos_enabled:'📷 Photos activées',
+  toast_photos_disabled:'🚫 Photos désactivées',
+  toast_category_deleted:'Grande catégorie supprimée',
+  toast_subcat_deleted:'Sous-catégorie supprimée ✓',
+  toast_login_route:'Connecte-toi pour utiliser Sur ma route',
+  toast_err_route_points:"Renseigne au moins le départ et l'arrivée",
+  toast_err_no_highway_route:'Itinéraire sans autoroutes introuvable entre ces points',
+  toast_err_no_route:'Itinéraire introuvable entre ces points',
+  toast_err_route_calc:'Erreur de calcul de route',
+  toast_geolocation_unavailable:'Géolocalisation non disponible',
+  toast_position_not_found:'Position introuvable',
+  toast_confirmation_sent:'✅ Lien de confirmation renvoyé à ',
+  toast_username_saved:'Pseudo enregistré !',
+  toast_err_delete_subcat_first:"Impossible : supprime d'abord les sous-catégories",
+  toast_deletion_progress:'Suppression en cours…',
+  dash_no_activity_week:'Aucune activité cette semaine.<br>Soyez le premier ! 🚀',
+  dash_validated_total_label:'lieux récemment validés',
+  lbl_no_place:'Aucun lieu',
+  lbl_no_rating_received:'Aucune note reçue',
+  lbl_my_position:'Ma position',
+  warning_irreversible:'⚠️ Cette action est <strong>irréversible</strong>.'
 },
 en:{
   nav_filters:'Filters', nav_search:'Search', nav_add:'Add a place', nav_community:'Community', nav_profile:'Profile', nav_dashboard:'Dashboard',
@@ -1736,7 +1793,64 @@ en:{
   tuto_s6_p2:'Manage your favourites list',
   tuto_s6_p3:'See who thanked your contributions',
   tuto_s6_p4:'Support the project via the "Support" button in the menu',
-  tuto_btn_next:'Next →', tuto_btn_start:'Get started 🎉', tuto_btn_skip:'Skip'
+  tuto_btn_next:'Next →', tuto_btn_start:'Get started 🎉', tuto_btn_skip:'Skip',
+  auth_new_password:'New password',
+  btn_resend_email:'📨 Resend link',
+  btn_later:'Later',
+  btn_dont_show_again:"Don't show again",
+  btn_publishing:'⏳ Publishing…',
+  btn_sending:'⏳ Sending…',
+  btn_calculating:'Calculating…',
+  btn_translate:'Translate',
+  btn_original:'Original',
+  btn_delete_permanently:'🗑️ Delete permanently',
+  btn_hide:'🚫 Hide',
+  btn_report_photo:'Report photo',
+  btn_confirm_report:'🚫 Confirm report',
+  btn_back_history:'← Back to history',
+  modal_install_app:'📍 Install the app',
+  modal_install_app_desc:'Access <strong>ANY</strong> from your home screen, like a real app — fast, smooth, no browser needed.',
+  modal_install_app_instructions:'On iPhone: <em>Share → Add to Home Screen</em><br>On Android: <em>Menu → Install app</em>',
+  modal_report_photo:'🚩 Report this photo',
+  modal_report_photo_desc:'This photo will be flagged and reviewed by a moderator.',
+  modal_delete_place_confirm:'Permanently delete <strong id="delete-place-name"></strong>?',
+  modal_hide_place_confirm:'Hide <strong id="hide-place-name"></strong> from the public map?<br><span style="font-size:12px;color:var(--text2)">The place stays in the database and can be reactivated.</span>',
+  form_click_map:'Click on the map!',
+  ph_email:'your@email.com',
+  ph_place_name:'Ex: Bread vending machine at town hall',
+  ph_description:'Useful info: hours, condition, price...',
+  ph_report_details:'Describe the issue (min. 2 characters)...',
+  ph_closed_details:'Ex: closed sign, blocked door, works...',
+  ph_move_details:'Ex: closed sign, blocked door, works...',
+  toast_avatar_updated:'Avatar updated!',
+  toast_profile_updated:'Profile updated!',
+  toast_location_updated:'Location updated!',
+  toast_cannot_vote_own:'⛔ You cannot validate your own place',
+  toast_place_confirmed:'🎉 Place confirmed by the community and published on the map!',
+  toast_threshold_reached:'🎉 Threshold reached — place submitted for validation!',
+  toast_confirmation_removed:'Confirmation removed',
+  toast_place_added:'📍 Place added!',
+  toast_photos_enabled:'📷 Photos enabled',
+  toast_photos_disabled:'🚫 Photos disabled',
+  toast_category_deleted:'Main category deleted',
+  toast_subcat_deleted:'Subcategory deleted ✓',
+  toast_login_route:'Sign in to use On my route',
+  toast_err_route_points:'Enter at least a start and destination',
+  toast_err_no_highway_route:'No motorway-free route found between these points',
+  toast_err_no_route:'No route found between these points',
+  toast_err_route_calc:'Route calculation error',
+  toast_geolocation_unavailable:'Geolocation unavailable',
+  toast_position_not_found:'Position not found',
+  toast_confirmation_sent:'✅ Confirmation link resent to ',
+  toast_username_saved:'Username saved!',
+  toast_err_delete_subcat_first:'Cannot delete: remove subcategories first',
+  toast_deletion_progress:'Deleting…',
+  dash_no_activity_week:'No activity this week.<br>Be the first! 🚀',
+  dash_validated_total_label:'recently validated places',
+  lbl_no_place:'No places',
+  lbl_no_rating_received:'No ratings received',
+  lbl_my_position:'My position',
+  warning_irreversible:'⚠️ This action is <strong>irreversible</strong>.'
 },
 es:{
   nav_filters:'Filtros', nav_search:'Buscar', nav_add:'Añadir lugar', nav_community:'Comunidad', nav_profile:'Perfil', nav_dashboard:'Panel',
@@ -1968,7 +2082,64 @@ es:{
   tuto_s6_p2:'Gestiona tu lista de favoritos',
   tuto_s6_p3:'Ve quién agradeció tus contribuciones',
   tuto_s6_p4:'Apoya el proyecto con el botón "Apoyar" del menú',
-  tuto_btn_next:'Siguiente →', tuto_btn_start:'Empezar 🎉', tuto_btn_skip:'Saltar'
+  tuto_btn_next:'Siguiente →', tuto_btn_start:'Empezar 🎉', tuto_btn_skip:'Saltar',
+  auth_new_password:'Nueva contraseña',
+  btn_resend_email:'📨 Reenviar enlace',
+  btn_later:'Más tarde',
+  btn_dont_show_again:'No mostrar más',
+  btn_publishing:'⏳ Publicando…',
+  btn_sending:'⏳ Enviando…',
+  btn_calculating:'Calculando…',
+  btn_translate:'Traducir',
+  btn_original:'Original',
+  btn_delete_permanently:'🗑️ Eliminar permanentemente',
+  btn_hide:'🚫 Ocultar',
+  btn_report_photo:'Reportar foto',
+  btn_confirm_report:'🚫 Confirmar reporte',
+  btn_back_history:'← Volver al historial',
+  modal_install_app:'📍 Instalar la aplicación',
+  modal_install_app_desc:'Accede a <strong>ANY</strong> desde tu pantalla de inicio, como una app real — rápida, fluida, sin navegador.',
+  modal_install_app_instructions:'En iPhone: <em>Compartir → En pantalla de inicio</em><br>En Android: <em>Menú → Instalar app</em>',
+  modal_report_photo:'🚩 Reportar esta foto',
+  modal_report_photo_desc:'Esta foto será marcada y revisada por un moderador.',
+  modal_delete_place_confirm:'¿Eliminar permanentemente <strong id="delete-place-name"></strong>?',
+  modal_hide_place_confirm:'¿Ocultar <strong id="hide-place-name"></strong> del mapa público?<br><span style="font-size:12px;color:var(--text2)">El lugar permanece en la base de datos y puede reactivarse.</span>',
+  form_click_map:'¡Haz clic en el mapa!',
+  ph_email:'tu@email.com',
+  ph_place_name:'Ej: Distribuidor de pan del ayuntamiento',
+  ph_description:'Info útil: horarios, estado, precio...',
+  ph_report_details:'Describe el problema (mín. 2 caracteres)...',
+  ph_closed_details:'Ej: cartel cerrado, puerta bloqueada, obras...',
+  ph_move_details:'Ej: cartel cerrado...',
+  toast_avatar_updated:'¡Avatar actualizado!',
+  toast_profile_updated:'¡Perfil actualizado!',
+  toast_location_updated:'¡Localización actualizada!',
+  toast_cannot_vote_own:'⛔ No puedes validar tu propio lugar',
+  toast_place_confirmed:'🎉 ¡Lugar confirmado por la comunidad y publicado en el mapa!',
+  toast_threshold_reached:'🎉 ¡Umbral alcanzado — lugar enviado a validación!',
+  toast_confirmation_removed:'Confirmación retirada',
+  toast_place_added:'📍 ¡Lugar añadido!',
+  toast_photos_enabled:'📷 Fotos activadas',
+  toast_photos_disabled:'🚫 Fotos desactivadas',
+  toast_category_deleted:'Categoría principal eliminada',
+  toast_subcat_deleted:'Subcategoría eliminada ✓',
+  toast_login_route:'Inicia sesión para usar En mi ruta',
+  toast_err_route_points:'Introduce al menos un origen y un destino',
+  toast_err_no_highway_route:'No se encontró ruta sin autopistas entre estos puntos',
+  toast_err_no_route:'No se encontró ruta entre estos puntos',
+  toast_err_route_calc:'Error de cálculo de ruta',
+  toast_geolocation_unavailable:'Geolocalización no disponible',
+  toast_position_not_found:'Posición no encontrada',
+  toast_confirmation_sent:'✅ Enlace de confirmación reenviado a ',
+  toast_username_saved:'¡Nombre de usuario guardado!',
+  toast_err_delete_subcat_first:'Imposible: elimina primero las subcategorías',
+  toast_deletion_progress:'Eliminando…',
+  dash_no_activity_week:'Sin actividad esta semana.<br>¡Sé el primero! 🚀',
+  dash_validated_total_label:'lugares validados recientemente',
+  lbl_no_place:'Ningún lugar',
+  lbl_no_rating_received:'Sin valoraciones recibidas',
+  lbl_my_position:'Mi posición',
+  warning_irreversible:'⚠️ Esta acción es <strong>irreversible</strong>.'
 },
 de:{
   nav_filters:'Filter', nav_search:'Suche', nav_add:'Ort hinzufügen', nav_community:'Community', nav_profile:'Profil', nav_dashboard:'Dashboard',
@@ -2200,7 +2371,64 @@ de:{
   tuto_s6_p2:'Verwalte deine Favoritenliste',
   tuto_s6_p3:'Sieh, wer deine Beiträge gedankt hat',
   tuto_s6_p4:'Unterstütze das Projekt über die Schaltfläche "Unterstützen" im Menü',
-  tuto_btn_next:'Weiter →', tuto_btn_start:'Loslegen 🎉', tuto_btn_skip:'Überspringen'
+  tuto_btn_next:'Weiter →', tuto_btn_start:'Loslegen 🎉', tuto_btn_skip:'Überspringen',
+  auth_new_password:'Neues Passwort',
+  btn_resend_email:'📨 Link erneut senden',
+  btn_later:'Später',
+  btn_dont_show_again:'Nicht mehr anzeigen',
+  btn_publishing:'⏳ Veröffentlichen…',
+  btn_sending:'⏳ Senden…',
+  btn_calculating:'Berechnung…',
+  btn_translate:'Übersetzen',
+  btn_original:'Original',
+  btn_delete_permanently:'🗑️ Endgültig löschen',
+  btn_hide:'🚫 Ausblenden',
+  btn_report_photo:'Foto melden',
+  btn_confirm_report:'🚫 Meldung bestätigen',
+  btn_back_history:'← Zurück zum Verlauf',
+  modal_install_app:'📍 App installieren',
+  modal_install_app_desc:'Greife von deinem Startbildschirm auf <strong>ANY</strong> zu, wie eine echte App — schnell, flüssig, ohne Browser.',
+  modal_install_app_instructions:'Auf iPhone: <em>Teilen → Zum Home-Bildschirm</em><br>Auf Android: <em>Menü → App installieren</em>',
+  modal_report_photo:'🚩 Dieses Foto melden',
+  modal_report_photo_desc:'Dieses Foto wird markiert und von einem Moderator überprüft.',
+  modal_delete_place_confirm:'<strong id="delete-place-name"></strong> endgültig löschen?',
+  modal_hide_place_confirm:'<strong id="hide-place-name"></strong> von der öffentlichen Karte ausblenden?<br><span style="font-size:12px;color:var(--text2)">Der Ort bleibt in der Datenbank und kann reaktiviert werden.</span>',
+  form_click_map:'Klicke auf die Karte!',
+  ph_email:'deine@email.de',
+  ph_place_name:'Bsp: Brotautomat am Rathaus',
+  ph_description:'Nützliche Infos: Öffnungszeiten, Zustand, Preis...',
+  ph_report_details:'Beschreibe das Problem (mind. 2 Zeichen)...',
+  ph_closed_details:'Bsp: Schild geschlossen, Tür blockiert, Baustelle...',
+  ph_move_details:'Bsp: Schild geschlossen...',
+  toast_avatar_updated:'Avatar aktualisiert!',
+  toast_profile_updated:'Profil aktualisiert!',
+  toast_location_updated:'Standort aktualisiert!',
+  toast_cannot_vote_own:'⛔ Du kannst deinen eigenen Ort nicht validieren',
+  toast_place_confirmed:'🎉 Ort von der Community bestätigt und auf der Karte veröffentlicht!',
+  toast_threshold_reached:'🎉 Schwellenwert erreicht — Ort zur Validierung eingereicht!',
+  toast_confirmation_removed:'Bestätigung entfernt',
+  toast_place_added:'📍 Ort hinzugefügt!',
+  toast_photos_enabled:'📷 Fotos aktiviert',
+  toast_photos_disabled:'🚫 Fotos deaktiviert',
+  toast_category_deleted:'Hauptkategorie gelöscht',
+  toast_subcat_deleted:'Unterkategorie gelöscht ✓',
+  toast_login_route:'Melde dich an, um Auf meiner Route zu nutzen',
+  toast_err_route_points:'Gib mindestens Start und Ziel ein',
+  toast_err_no_highway_route:'Keine autobahnfreie Route zwischen diesen Punkten gefunden',
+  toast_err_no_route:'Keine Route zwischen diesen Punkten gefunden',
+  toast_err_route_calc:'Fehler bei der Routenberechnung',
+  toast_geolocation_unavailable:'Geolokalisierung nicht verfügbar',
+  toast_position_not_found:'Position nicht gefunden',
+  toast_confirmation_sent:'✅ Bestätigungslink erneut gesendet an ',
+  toast_username_saved:'Benutzername gespeichert!',
+  toast_err_delete_subcat_first:'Nicht möglich: entferne zuerst die Unterkategorien',
+  toast_deletion_progress:'Löschen…',
+  dash_no_activity_week:'Keine Aktivität diese Woche.<br>Sei der Erste! 🚀',
+  dash_validated_total_label:'kürzlich validierte Orte',
+  lbl_no_place:'Keine Orte',
+  lbl_no_rating_received:'Keine Bewertungen erhalten',
+  lbl_my_position:'Mein Standort',
+  warning_irreversible:'⚠️ Diese Aktion ist <strong>unwiderruflich</strong>.'
 },
 it:{
   nav_filters:'Filtri', nav_search:'Cerca', nav_add:'Aggiungi luogo', nav_community:'Comunità', nav_profile:'Profilo', nav_dashboard:'Dashboard',
@@ -2432,7 +2660,64 @@ it:{
   tuto_s6_p2:'Gestisci la tua lista preferiti',
   tuto_s6_p3:'Vedi chi ha ringraziato i tuoi contributi',
   tuto_s6_p4:'Sostieni il progetto con il pulsante "Sostieni" nel menu',
-  tuto_btn_next:'Avanti →', tuto_btn_start:'Inizia 🎉', tuto_btn_skip:'Salta'
+  tuto_btn_next:'Avanti →', tuto_btn_start:'Inizia 🎉', tuto_btn_skip:'Salta',
+  auth_new_password:'Nuova password',
+  btn_resend_email:'📨 Reinvia link',
+  btn_later:'Più tardi',
+  btn_dont_show_again:'Non mostrare più',
+  btn_publishing:'⏳ Pubblicazione…',
+  btn_sending:'⏳ Invio…',
+  btn_calculating:'Calcolo…',
+  btn_translate:'Tradurre',
+  btn_original:'Originale',
+  btn_delete_permanently:'🗑️ Elimina definitivamente',
+  btn_hide:'🚫 Nascondi',
+  btn_report_photo:'Segnala foto',
+  btn_confirm_report:'🚫 Conferma segnalazione',
+  btn_back_history:'← Torna allo storico',
+  modal_install_app:"📍 Installa l'app",
+  modal_install_app_desc:"Accedi a <strong>ANY</strong> dalla schermata principale, come una vera app — veloce, fluida, senza browser.",
+  modal_install_app_instructions:'Su iPhone: <em>Condividi → Aggiungi alla schermata Home</em><br>Su Android: <em>Menu → Installa app</em>',
+  modal_report_photo:'🚩 Segnala questa foto',
+  modal_report_photo_desc:'Questa foto verrà segnalata e esaminata da un moderatore.',
+  modal_delete_place_confirm:'Eliminare definitivamente <strong id="delete-place-name"></strong>?',
+  modal_hide_place_confirm:'Nascondere <strong id="hide-place-name"></strong> dalla mappa pubblica?<br><span style="font-size:12px;color:var(--text2)">Il luogo rimane nel database e può essere riattivato.</span>',
+  form_click_map:'Clicca sulla mappa!',
+  ph_email:'tua@email.com',
+  ph_place_name:'Es: Distributore di pane del municipio',
+  ph_description:'Info utili: orari, stato, prezzo...',
+  ph_report_details:'Descrivi il problema (min. 2 caratteri)...',
+  ph_closed_details:'Es: cartello chiuso, porta sbarrata, lavori...',
+  ph_move_details:'Es: cartello chiuso...',
+  toast_avatar_updated:'Avatar aggiornato!',
+  toast_profile_updated:'Profilo aggiornato!',
+  toast_location_updated:'Posizione aggiornata!',
+  toast_cannot_vote_own:'⛔ Non puoi validare il tuo luogo',
+  toast_place_confirmed:'🎉 Luogo confermato dalla comunità e pubblicato sulla mappa!',
+  toast_threshold_reached:'🎉 Soglia raggiunta — luogo inviato per la validazione!',
+  toast_confirmation_removed:'Conferma rimossa',
+  toast_place_added:'📍 Luogo aggiunto!',
+  toast_photos_enabled:'📷 Foto attivate',
+  toast_photos_disabled:'🚫 Foto disattivate',
+  toast_category_deleted:'Categoria principale eliminata',
+  toast_subcat_deleted:'Sottocategoria eliminata ✓',
+  toast_login_route:'Accedi per usare Sul mio percorso',
+  toast_err_route_points:'Inserisci almeno partenza e destinazione',
+  toast_err_no_highway_route:'Nessun percorso senza autostrade trovato tra questi punti',
+  toast_err_no_route:'Nessun percorso trovato tra questi punti',
+  toast_err_route_calc:'Errore nel calcolo del percorso',
+  toast_geolocation_unavailable:'Geolocalizzazione non disponibile',
+  toast_position_not_found:'Posizione non trovata',
+  toast_confirmation_sent:'✅ Link di conferma inviato nuovamente a ',
+  toast_username_saved:'Nome utente salvato!',
+  toast_err_delete_subcat_first:'Impossibile: rimuovi prima le sottocategorie',
+  toast_deletion_progress:'Eliminazione…',
+  dash_no_activity_week:'Nessuna attività questa settimana.<br>Sii il primo! 🚀',
+  dash_validated_total_label:'luoghi recentemente validati',
+  lbl_no_place:'Nessun luogo',
+  lbl_no_rating_received:'Nessuna valutazione ricevuta',
+  lbl_my_position:'La mia posizione',
+  warning_irreversible:'⚠️ Questa azione è <strong>irreversibile</strong>.'
 },
 pt:{
   nav_filters:'Filtros', nav_search:'Pesquisar', nav_add:'Adicionar local', nav_community:'Comunidade', nav_profile:'Perfil', nav_dashboard:'Painel',
@@ -2664,7 +2949,64 @@ pt:{
   tuto_s6_p2:'Gere a tua lista de favoritos',
   tuto_s6_p3:'Vê quem agradeceu as tuas contribuições',
   tuto_s6_p4:'Apoia o projeto com o botão "Apoiar" no menu',
-  tuto_btn_next:'Seguinte →', tuto_btn_start:'Começar 🎉', tuto_btn_skip:'Ignorar'
+  tuto_btn_next:'Seguinte →', tuto_btn_start:'Começar 🎉', tuto_btn_skip:'Ignorar',
+  auth_new_password:'Nova palavra-passe',
+  btn_resend_email:'📨 Reenviar link',
+  btn_later:'Mais tarde',
+  btn_dont_show_again:'Não mostrar mais',
+  btn_publishing:'⏳ Publicando…',
+  btn_sending:'⏳ Enviando…',
+  btn_calculating:'Calculando…',
+  btn_translate:'Traduzir',
+  btn_original:'Original',
+  btn_delete_permanently:'🗑️ Eliminar definitivamente',
+  btn_hide:'🚫 Ocultar',
+  btn_report_photo:'Reportar foto',
+  btn_confirm_report:'🚫 Confirmar denúncia',
+  btn_back_history:'← Voltar ao histórico',
+  modal_install_app:'📍 Instalar a aplicação',
+  modal_install_app_desc:'Acede a <strong>ANY</strong> a partir do ecrã inicial, como uma app real — rápida, fluida, sem browser.',
+  modal_install_app_instructions:'No iPhone: <em>Partilhar → Adicionar ao ecrã inicial</em><br>No Android: <em>Menu → Instalar app</em>',
+  modal_report_photo:'🚩 Reportar esta foto',
+  modal_report_photo_desc:'Esta foto será sinalizada e analisada por um moderador.',
+  modal_delete_place_confirm:'Eliminar definitivamente <strong id="delete-place-name"></strong>?',
+  modal_hide_place_confirm:'Ocultar <strong id="hide-place-name"></strong> do mapa público?<br><span style="font-size:12px;color:var(--text2)">O local permanece na base de dados e pode ser reativado.</span>',
+  form_click_map:'Clica no mapa!',
+  ph_email:'o-teu@email.com',
+  ph_place_name:'Ex: Distribuidor de pão da câmara',
+  ph_description:'Info útil: horários, estado, preço...',
+  ph_report_details:'Descreve o problema (mín. 2 caracteres)...',
+  ph_closed_details:'Ex: placa fechado, porta bloqueada, obras...',
+  ph_move_details:'Ex: placa fechado...',
+  toast_avatar_updated:'Avatar atualizado!',
+  toast_profile_updated:'Perfil atualizado!',
+  toast_location_updated:'Localização atualizada!',
+  toast_cannot_vote_own:'⛔ Não podes validar o teu próprio lugar',
+  toast_place_confirmed:'🎉 Local confirmado pela comunidade e publicado no mapa!',
+  toast_threshold_reached:'🎉 Limiar atingido — lugar submetido a validação!',
+  toast_confirmation_removed:'Confirmação removida',
+  toast_place_added:'📍 Local adicionado!',
+  toast_photos_enabled:'📷 Fotos ativadas',
+  toast_photos_disabled:'🚫 Fotos desativadas',
+  toast_category_deleted:'Categoria principal eliminada',
+  toast_subcat_deleted:'Subcategoria eliminada ✓',
+  toast_login_route:'Inicia sessão para usar No meu percurso',
+  toast_err_route_points:'Introduz pelo menos a partida e o destino',
+  toast_err_no_highway_route:'Nenhuma rota sem autoestradas encontrada entre estes pontos',
+  toast_err_no_route:'Nenhuma rota encontrada entre estes pontos',
+  toast_err_route_calc:'Erro no cálculo da rota',
+  toast_geolocation_unavailable:'Geolocalização não disponível',
+  toast_position_not_found:'Posição não encontrada',
+  toast_confirmation_sent:'✅ Link de confirmação reenviado para ',
+  toast_username_saved:'Nome de utilizador guardado!',
+  toast_err_delete_subcat_first:'Impossível: remove primeiro as subcategorias',
+  toast_deletion_progress:'Eliminando…',
+  dash_no_activity_week:'Nenhuma atividade esta semana.<br>Sê o primeiro! 🚀',
+  dash_validated_total_label:'locais recentemente validados',
+  lbl_no_place:'Nenhum local',
+  lbl_no_rating_received:'Nenhuma avaliação recebida',
+  lbl_my_position:'A minha posição',
+  warning_irreversible:'⚠️ Esta ação é <strong>irreversível</strong>.'
 },
 nl:{
   nav_filters:'Filters', nav_search:'Zoeken', nav_add:'Locatie toevoegen', nav_community:'Community', nav_profile:'Profiel', nav_dashboard:'Dashboard',
@@ -2896,7 +3238,64 @@ nl:{
   tuto_s6_p2:'Beheer je favorietenlijst',
   tuto_s6_p3:'Zie wie je bijdragen heeft bedankt',
   tuto_s6_p4:'Steun het project via de knop "Steunen" in het menu',
-  tuto_btn_next:'Volgende →', tuto_btn_start:'Beginnen 🎉', tuto_btn_skip:'Overslaan'
+  tuto_btn_next:'Volgende →', tuto_btn_start:'Beginnen 🎉', tuto_btn_skip:'Overslaan',
+  auth_new_password:'Nieuw wachtwoord',
+  btn_resend_email:'📨 Link opnieuw sturen',
+  btn_later:'Later',
+  btn_dont_show_again:'Niet meer tonen',
+  btn_publishing:'⏳ Publiceren…',
+  btn_sending:'⏳ Verzenden…',
+  btn_calculating:'Berekenen…',
+  btn_translate:'Vertalen',
+  btn_original:'Origineel',
+  btn_delete_permanently:'🗑️ Definitief verwijderen',
+  btn_hide:'🚫 Verbergen',
+  btn_report_photo:'Foto melden',
+  btn_confirm_report:'🚫 Melding bevestigen',
+  btn_back_history:'← Terug naar geschiedenis',
+  modal_install_app:'📍 App installeren',
+  modal_install_app_desc:'Open <strong>ANY</strong> vanaf je startscherm, als een echte app — snel, vloeiend, zonder browser.',
+  modal_install_app_instructions:'Op iPhone: <em>Delen → Zet op beginscherm</em><br>Op Android: <em>Menu → App installeren</em>',
+  modal_report_photo:'🚩 Foto melden',
+  modal_report_photo_desc:'Deze foto wordt gemarkeerd en beoordeeld door een moderator.',
+  modal_delete_place_confirm:'<strong id="delete-place-name"></strong> definitief verwijderen?',
+  modal_hide_place_confirm:'<strong id="hide-place-name"></strong> verbergen op de publieke kaart?<br><span style="font-size:12px;color:var(--text2)">De locatie blijft in de database en kan worden gereactiveerd.</span>',
+  form_click_map:'Klik op de kaart!',
+  ph_email:'jouw@email.com',
+  ph_place_name:'Bijv: Broodautomaat bij het gemeentehuis',
+  ph_description:'Nuttige info: openingstijden, staat, prijs...',
+  ph_report_details:'Beschrijf het probleem (min. 2 tekens)...',
+  ph_closed_details:'Bijv: gesloten bord, geblokkeerde deur, werkzaamheden...',
+  ph_move_details:'Bijv: gesloten bord...',
+  toast_avatar_updated:'Avatar bijgewerkt!',
+  toast_profile_updated:'Profiel bijgewerkt!',
+  toast_location_updated:'Locatie bijgewerkt!',
+  toast_cannot_vote_own:'⛔ Je kunt je eigen locatie niet valideren',
+  toast_place_confirmed:'🎉 Locatie bevestigd door de community en gepubliceerd op de kaart!',
+  toast_threshold_reached:'🎉 Drempel bereikt — locatie ingediend voor validatie!',
+  toast_confirmation_removed:'Bevestiging verwijderd',
+  toast_place_added:'📍 Locatie toegevoegd!',
+  toast_photos_enabled:"📷 Foto's ingeschakeld",
+  toast_photos_disabled:"🚫 Foto's uitgeschakeld",
+  toast_category_deleted:'Hoofdcategorie verwijderd',
+  toast_subcat_deleted:'Subcategorie verwijderd ✓',
+  toast_login_route:'Log in om Op mijn route te gebruiken',
+  toast_err_route_points:'Voer minimaal een vertrekpunt en bestemming in',
+  toast_err_no_highway_route:'Geen route zonder snelwegen gevonden tussen deze punten',
+  toast_err_no_route:'Geen route gevonden tussen deze punten',
+  toast_err_route_calc:'Fout bij routeberekening',
+  toast_geolocation_unavailable:'Geolocatie niet beschikbaar',
+  toast_position_not_found:'Positie niet gevonden',
+  toast_confirmation_sent:'✅ Bevestigingslink opnieuw verzonden naar ',
+  toast_username_saved:'Gebruikersnaam opgeslagen!',
+  toast_err_delete_subcat_first:'Niet mogelijk: verwijder eerst de subcategorieën',
+  toast_deletion_progress:'Verwijderen…',
+  dash_no_activity_week:'Geen activiteit deze week.<br>Wees de eerste! 🚀',
+  dash_validated_total_label:'recent gevalideerde locaties',
+  lbl_no_place:'Geen locaties',
+  lbl_no_rating_received:'Geen beoordelingen ontvangen',
+  lbl_my_position:'Mijn positie',
+  warning_irreversible:'⚠️ Deze actie is <strong>onomkeerbaar</strong>.'
 }
 };
 
@@ -2995,7 +3394,7 @@ async function init() {
   setTimeout(function() { map.invalidateSize(); }, 200);
 
   var _safeHide = setTimeout(function() { document.getElementById('loading').style.display = 'none'; }, 12000);
-  try { await checkAuth(); } catch(e) { showToast('Erreur auth : ' + (e && e.message ? e.message : e), 'error'); }
+  try { await checkAuth(); } catch(e) { showToast(t('lbl_err_generic') + (e && e.message ? e.message : e), 'error'); }
   try { await loadCats(); } catch(e) {}
   try { await loadCommTypes(); } catch(e) {}
   clearTimeout(_safeHide);
@@ -3479,7 +3878,7 @@ function inviteApp() {
     return;
   }
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(msg).then(function() { showToast('Lien copié !', 'success'); }).catch(function() { _fallbackCopyText(url); });
+    navigator.clipboard.writeText(msg).then(function() { showToast(t('toast_copied'), 'success'); }).catch(function() { _fallbackCopyText(url); });
   } else {
     _fallbackCopyText(url);
   }
@@ -3526,7 +3925,7 @@ async function selectAvatarBg(g) {
   var upd = { avatar_bg: g };
   if (currentUserAvatar) upd.avatar_url = currentUserAvatar;
   var r = await db.from('profiles').update(upd).eq('user_id', currentUser.id);
-  if (r.error) showToast('Erreur : ' + r.error.message, 'error');
+  if (r.error) showToast(t('lbl_err_generic') + r.error.message, 'error');
 }
 
 async function selectAvatar(emoji) {
@@ -3538,8 +3937,8 @@ async function selectAvatar(emoji) {
   localStorage.setItem('vlm_avatar', emoji);
   var upd = { avatar_url: emoji, bio: currentUserBio || null, banner_color: currentUserBannerColor || null, avatar_bg: currentUserAvatarBg || null };
   var saveRes = await db.from('profiles').update(upd).eq('user_id', currentUser.id);
-  if (saveRes.error) { showToast('Erreur sauvegarde : ' + saveRes.error.message, 'error'); return; }
-  showToast('Avatar mis à jour !', 'success');
+  if (saveRes.error) { showToast(t('lbl_err_generic') + saveRes.error.message, 'error'); return; }
+  showToast(t('toast_avatar_updated'), 'success');
 }
 
 async function saveBannerProfile() {
@@ -3555,10 +3954,10 @@ async function saveBannerProfile() {
   var upsertData = { bio: bio || null, banner_color: color, avatar_bg: currentUserAvatarBg || null };
   if (currentUserAvatar) upsertData.avatar_url = currentUserAvatar;
   var r = await db.from('profiles').update(upsertData).eq('user_id', currentUser.id);
-  if (r.error) { showToast('Erreur : ' + r.error.message, 'error'); return; }
+  if (r.error) { showToast(t('lbl_err_generic') + r.error.message, 'error'); return; }
   localStorage.setItem('vlm_banner_color', color);
   if (bio) localStorage.setItem('vlm_bio', bio); else localStorage.removeItem('vlm_bio');
-  showToast('Profil mis à jour !', 'success');
+  showToast(t('toast_profile_updated'), 'success');
 }
 
 function formatLocText(pays, ville) {
@@ -3580,14 +3979,14 @@ async function saveLocationProfile() {
   var pays = (document.getElementById('prof-pays-select') || {}).value || '';
   var ville = ((document.getElementById('prof-ville-input') || {}).value || '').trim();
   var r = await db.from('profiles').update({ pays: pays || null, ville: ville || null }).eq('user_id', currentUser.id);
-  if (r.error) { showToast('Erreur : ' + r.error.message, 'error'); return; }
+  if (r.error) { showToast(t('lbl_err_generic') + r.error.message, 'error'); return; }
   currentUserPays = pays;
   currentUserVille = ville;
   var locText = document.getElementById('prof-loc-text');
   if (locText) { var txt = formatLocText(pays, ville); locText.textContent = txt; locText.style.color = (pays || ville) ? 'var(--text)' : 'var(--text2)'; }
   var edit = document.getElementById('prof-loc-edit');
   if (edit) edit.style.display = 'none';
-  showToast('Localisation mise à jour !', 'success');
+  showToast(t('toast_location_updated'), 'success');
 }
 
 async function loadProfileStats(username) {
@@ -3755,7 +4154,7 @@ async function openPublicProfile(username) {
   var content = document.getElementById('pub-profile-content');
   var titleEl = document.getElementById('pub-prof-sheet-title');
   if (titleEl) titleEl.textContent = '👤 ' + username;
-  content.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text2);">Chargement...</div>';
+  content.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text2);">' + t('lbl_loading') + '</div>';
   openSheet('sheet-pub-profile');
 
   var profileRes = await db.from('profiles').select('user_id,username,created_at,registered_at,avatar_url,bio,banner_color,avatar_bg,pays,ville').eq('username', username).maybeSingle();
@@ -3937,7 +4336,7 @@ function togglePubComments() {
 async function loadPubPlaces() {
   var panel = document.getElementById('pub-places-panel');
   if (!panel || !_pubProfileData) return;
-  panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;">Chargement...</div>';
+  panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;">' + t('lbl_loading') + '</div>';
   var res = _pubProfileData.userId
     ? await db.from('places').select('id,name,latitude,longitude,categories(icon,name)').eq('user_id', _pubProfileData.userId).order('created_at', { ascending: false }).limit(50)
     : await db.from('places').select('id,name,latitude,longitude,categories(icon,name)').eq('user_name', _pubProfileData.username).order('created_at', { ascending: false }).limit(50);
@@ -3956,7 +4355,7 @@ async function loadPubPlaces() {
 async function loadPubValidated() {
   var panel = document.getElementById('pub-validated-panel');
   if (!panel || !_pubProfileData || !_pubProfileData.userId) { if (panel) panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;text-align:center;">' + t('lbl_not_available') + '</div>'; return; }
-  panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;">Chargement...</div>';
+  panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;">' + t('lbl_loading') + '</div>';
   var res = await db.from('place_validations').select('places(id,name,latitude,longitude,categories(icon,name))').eq('user_id', _pubProfileData.userId).order('created_at', { ascending: false }).limit(50);
   var data = (res.data || []).filter(function(r) { return r.places; });
   if (!data.length) { panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;text-align:center;">' + t('profile_validated') + '</div>'; return; }
@@ -3973,7 +4372,7 @@ async function loadPubValidated() {
 async function loadPubComments() {
   var panel = document.getElementById('pub-cmts-panel');
   if (!panel || !_pubProfileData) return;
-  panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;">Chargement...</div>';
+  panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;">' + t('lbl_loading') + '</div>';
   var res = _pubProfileData.userId
     ? await db.from('comments').select('id,content,created_at,places(id,name,latitude,longitude)').eq('user_id', _pubProfileData.userId).order('created_at', { ascending: false }).limit(20)
     : await db.from('comments').select('id,content,created_at,places(id,name,latitude,longitude)').eq('user_name', _pubProfileData.username).order('created_at', { ascending: false }).limit(20);
@@ -4127,7 +4526,7 @@ async function saveUsername() {
   // Save in auth user_metadata
   var res = await db.auth.updateUser({ data: { username: v } });
   if (res.error) {
-    if (status) { status.style.color = '#e74c3c'; status.textContent = '✗ Erreur : ' + res.error.message; }
+    if (status) { status.style.color = '#e74c3c'; status.textContent = '✗ ' + t('lbl_err_generic') + res.error.message; }
     if (btn) { btn.disabled = false; btn.style.opacity = '1'; btn.textContent = t('btn_confirm'); }
     return;
   }
@@ -4139,7 +4538,7 @@ async function saveUsername() {
   document.getElementById('modal-username').style.display = 'none';
   // Also try profiles table (best-effort, ignore errors)
   try { await db.from('profiles').upsert({ user_id: currentUser.id, username: v, registered_at: currentUser.created_at }, { onConflict: 'user_id' }); } catch(e) {}
-  showToast('Pseudo « ' + v + ' » enregistré !', 'success');
+  showToast(t('toast_username_saved'), 'success');
 }
 
 // ===== LOCATION SEARCH (mobile) =====
@@ -4507,9 +4906,9 @@ function locateMeLocationDesk() {
   map.locate({ setView: false });
   map.once('locationfound', function(e) {
     selectedLocationDesk = { lat: e.latlng.lat, lon: e.latlng.lng };
-    document.getElementById('loc-input-desk').value = 'Ma position';
+    document.getElementById('loc-input-desk').value = t('lbl_my_position');
     document.getElementById('loc-clear-desk').style.display = 'block';
-    document.getElementById('loc-chip-desk-text').textContent = 'Ma position';
+    document.getElementById('loc-chip-desk-text').textContent = t('lbl_my_position');
     document.getElementById('loc-chip-desk').style.display = 'block';
     map.setView([selectedLocationDesk.lat, selectedLocationDesk.lon], 13);
   });
@@ -4564,7 +4963,7 @@ function onMapClick(e) {
   var nameEl = document.getElementById('add-name'); if (nameEl) nameEl.value = '';
   var descEl = document.getElementById('add-desc'); if (descEl) descEl.value = '';
   var mainSel = document.getElementById('add-main-cat'); if (mainSel) mainSel.value = '';
-  var subSel = document.getElementById('add-sub-cat'); if (subSel) subSel.innerHTML = '<option value="">-- Choisir la catégorie d\'abord --</option>';
+  var subSel = document.getElementById('add-sub-cat'); if (subSel) subSel.innerHTML = '<option value="">' + t('form_choose_cat_first') + '</option>';
   var pg = document.getElementById('add-photo-group'); if (pg) pg.style.display = 'none';
   openModal('modal-add');
 }
@@ -4629,7 +5028,7 @@ async function handleAuth() {
     var banCheck = await db.from('banned_users').select('reason').eq('user_id', user.id).maybeSingle();
     if (banCheck.data) {
       await db.auth.signOut();
-      showToast('🚫 Compte banni : ' + (banCheck.data.reason || 'violation des règles'), 'error');
+      showToast(t('toast_banned') + ' : ' + (banCheck.data.reason || 'violation des règles'), 'error');
       return;
     }
     currentUser = user;
@@ -4665,14 +5064,14 @@ function showUnconfirmedMessage(email) {
 
 async function resendConfirmEmail() {
   var btn = document.getElementById('btn-resend-email');
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Envoi…'; }
+  if (btn) { btn.disabled = true; btn.textContent = t('btn_sending'); }
   var email = currentUser ? currentUser.email : document.getElementById('confirm-email-addr').textContent;
   var res = await db.auth.resend({ type: 'signup', email: email });
-  if (btn) { btn.disabled = false; btn.textContent = '📨 Renvoyer le lien'; }
+  if (btn) { btn.disabled = false; btn.textContent = t('btn_resend_email'); }
   if (res.error) {
     showToast(res.error.message, 'error');
   } else {
-    showToast('✅ Lien de confirmation renvoyé à ' + email, 'success');
+    showToast(t('toast_confirmation_sent') + email, 'success');
     closeModal('modal-confirm-email');
   }
 }
@@ -4960,7 +5359,7 @@ function clearSoloMode() {
   }
   // Reset button label
   var banner2 = document.getElementById('solo-banner');
-  if (banner2) { var btn = banner2.querySelector('button:first-child'); if (btn) btn.textContent = '← Retour au Profil'; }
+  if (banner2) { var btn = banner2.querySelector('button:first-child'); if (btn) btn.textContent = t('solo_back_profile'); }
 }
 
 function exitSoloToMap() {
@@ -5117,7 +5516,7 @@ function makePopup(p) {
     + '</div>'
 
     + (!isFuel && catAllowsPhotos(p.category_id) ? '<div class="pv2-photos"><div class="pv2-photos-strip" id="photos-' + safeId + '">'
-    + '<span style="font-size:11px;color:var(--text2);">Chargement...</span>'
+    + '<span style="font-size:11px;color:var(--text2);">' + t('lbl_loading') + '</span>'
     + '</div></div>' : '')
 
     + ''
@@ -5144,7 +5543,7 @@ function makePopup(p) {
     + '</div>'
     + '<div class="pv2-comments">'
     + '<div class="pv2-comments-title">&#128172; Commentaires</div>'
-    + '<div id="cmt-' + safeId + '">Chargement...</div>'
+    + '<div id="cmt-' + safeId + '">' + t('lbl_loading') + '</div>'
     + cmtZone
     + '</div>' : '');
 
@@ -5381,9 +5780,9 @@ async function voteValidation(pid) {
   var place = placeRes.data;
   var isImport = place && !place.user_id;
   if (isAdmin || isModerator) { await validatePlace(pid); return; }
-  if (!isImport && place && place.user_id === currentUser.id) { showToast('⛔ Vous ne pouvez pas valider votre propre lieu', 'error'); return; }
+  if (!isImport && place && place.user_id === currentUser.id) { showToast(t('toast_cannot_vote_own'), 'error'); return; }
   var existing = await db.from('place_validations').select('id').eq('place_id', pid).eq('user_id', currentUser.id).maybeSingle();
-  if (existing.data) { showToast(isImport ? 'Vous avez déjà confirmé ce lieu' : 'Vous avez déjà voté pour ce lieu', 'error'); return; }
+  if (existing.data) { showToast(isImport ? t('toast_already_voted_place') : t('toast_already_voted_place'), 'error'); return; }
   var weight = isTrusted ? 2 : 1;
   var voteRes = await db.from('place_validations').insert({ place_id: pid, user_id: currentUser.id, weight: weight });
   if (voteRes.error) { showToast(t('lbl_err_generic') + voteRes.error.message, 'error'); return; }
@@ -5395,13 +5794,13 @@ async function voteValidation(pid) {
   if (isImport) {
     if (voteCount >= threshold) {
       await db.from('places').update({ approved_by_id: currentUser.id }).eq('id', pid).is('approved_by_id', null);
-      showToast('🎉 Lieu confirmé par la communauté et publié sur la carte !', 'success');
+      showToast(t('toast_place_confirmed'), 'success');
     } else {
       showToast('✓ Confirmation enregistrée (' + voteCount + '/' + threshold + ')' + weightLabel, 'success');
     }
     loadValidationCount(pid);
   } else if (voteCount >= threshold) {
-    showToast('🎉 Seuil atteint — lieu soumis à validation !', 'success');
+    showToast(t('toast_threshold_reached'), 'success');
     await validatePlace(pid);
   } else {
     showToast('✓ Vote enregistré (' + voteCount + '/' + threshold + ')' + weightLabel, 'success');
@@ -5506,7 +5905,7 @@ async function toggleValidatorsList(pid) {
   }
   if (arrow) arrow.innerHTML = '&#8964;';
   list.style.display = 'block';
-  list.innerHTML = '<div style="color:var(--text2);font-size:12px;padding:6px 0;">Chargement...</div>';
+  list.innerHTML = '<div style="color:var(--text2);font-size:12px;padding:6px 0;">' + t('lbl_loading') + '</div>';
   var [res, placeRes, trustedRes] = await Promise.all([
     db.from('place_validations').select('user_id, created_at, profiles(username)').eq('place_id', pid).order('created_at', { ascending: true }),
     db.from('places').select('user_id, status').eq('id', pid).maybeSingle(),
@@ -5553,7 +5952,7 @@ async function adminForceValidate(pid) {
   if (!ex.data) await db.from('place_validations').insert({ place_id: pid, user_id: currentUser.id, weight: 2 });
   await db.from('places').update({ validation_weight: 3 }).eq('id', pid);
   userMyValidations[pid] = true;
-  showToast('✅ Lieu validé', 'success');
+  showToast(t('toast_place_validated'), 'success');
   scheduleLoad();
 }
 
@@ -5562,7 +5961,7 @@ async function unvalidatePlace(pid) {
   var res = await db.from('place_validations').delete().eq('place_id', pid).eq('user_id', currentUser.id);
   if (res.error) { showToast(t('lbl_err_generic') + res.error.message, 'error'); return; }
   delete userMyValidations[pid];
-  showToast('Confirmation retirée', 'success');
+  showToast(t('toast_confirmation_removed'), 'success');
   loadValidationSection(pid);
 }
 
@@ -5669,7 +6068,7 @@ async function loadRating(pid) {
   var el = document.getElementById('rating-avg-' + pid);
   if (!el) return;
   var data = res.data || [];
-  if (!data.length) { el.innerHTML = 'Aucune note encore'; return; }
+  if (!data.length) { el.innerHTML = t('lbl_no_rating_received'); return; }
   var avg = data.reduce(function(s, r) { return s + r.score; }, 0) / data.length;
   el.innerHTML = '<span>' + avg.toFixed(1) + ' / 5</span> (' + data.length + ' avis)';
   if (currentUser) {
@@ -5705,7 +6104,7 @@ var currentRankTab = 'places';
 async function loadLeaderboard(tab) {
   currentRankTab = tab;
   var list = document.getElementById('rank-list');
-  list.innerHTML = '<p style="color:var(--text2);font-size:13px;padding:8px 0">Chargement...</p>';
+  list.innerHTML = '<p style="color:var(--text2);font-size:13px;padding:8px 0">' + t('lbl_loading') + '</p>';
   var view = tab === 'places' ? 'leaderboard_places' : 'leaderboard_ratings';
   var col = tab === 'places' ? 'nb_lieux' : 'nb_notes';
   var label = tab === 'places' ? 'lieu' : 'note';
@@ -5749,12 +6148,12 @@ function switchRankTab(tab) {
 async function loadWeeklyRankProfile() {
   var el = document.getElementById('rank-list');
   if (!el) return;
-  el.innerHTML = '<div style="color:var(--text2);font-size:12px;text-align:center;padding:16px 0;">Chargement...</div>';
+  el.innerHTML = '<div style="color:var(--text2);font-size:12px;text-align:center;padding:16px 0;">' + t('lbl_loading') + '</div>';
   var res = await db.rpc('get_weekly_leaderboard', {});
-  if (res.error) { el.innerHTML = '<div style="color:#e74c3c;font-size:12px;">Erreur : ' + res.error.message + '</div>'; return; }
+  if (res.error) { el.innerHTML = '<div style="color:#e74c3c;font-size:12px;">' + t('lbl_err_generic') + res.error.message + '</div>'; return; }
   var entries = res.data || [];
   if (!entries.length) {
-    el.innerHTML = '<div style="color:var(--text2);font-size:12px;text-align:center;padding:16px 0;">Aucune activité cette semaine 🚀</div>';
+    el.innerHTML = '<div style="color:var(--text2);font-size:12px;text-align:center;padding:16px 0;">' + t('dash_no_activity_week') + '</div>';
     return;
   }
   var medals = ['🥇', '🥈', '🥉'];
@@ -5887,7 +6286,7 @@ function toggleProfValidated() {
 async function loadUserValidated() {
   var panel = document.getElementById('prof-validated-panel');
   if (!panel || !currentUser) return;
-  panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;">Chargement...</div>';
+  panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;">' + t('lbl_loading') + '</div>';
   var res = await db.from('place_validations').select('created_at,places(id,name,latitude,longitude,categories(icon,name))').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(50);
   var data = (res.data || []).filter(function(r) { return r.places; });
   if (!data.length) { panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;text-align:center;">' + t('profile_validated') + '</div>'; return; }
@@ -5984,7 +6383,7 @@ async function unbanUser(userId, username) {
 async function loadBannedList() {
   var el = document.getElementById('banned-list');
   if (!el) return;
-  el.innerHTML = '<div style="color:var(--text2);">Chargement...</div>';
+  el.innerHTML = '<div style="color:var(--text2);">' + t('lbl_loading') + '</div>';
   var res = await db.from('banned_users').select('user_id,reason,banned_by_name,created_at,profiles(username)').order('created_at', { ascending: false });
   var data = res.data || [];
   if (!data.length) { el.innerHTML = '<div style="color:var(--text2);text-align:center;padding:8px 0;">' + t('lbl_no_banned') + '</div>'; return; }
@@ -6113,7 +6512,7 @@ async function toggleMembersList() {
   _membersListOpen = !_membersListOpen;
   if (!_membersListOpen) { panel.style.display = 'none'; return; }
   panel.style.display = 'block';
-  panel.innerHTML = '<div style="color:var(--text2);font-size:13px;padding:8px 0;">Chargement...</div>';
+  panel.innerHTML = '<div style="color:var(--text2);font-size:13px;padding:8px 0;">' + t('lbl_loading') + '</div>';
   await loadMembersList();
 }
 
@@ -6124,7 +6523,7 @@ async function loadMembersList() {
     db.from('profiles').select('user_id,username,registered_at,created_at').not('username', 'is', null).order('registered_at', { ascending: true }),
     db.from('trusted_users').select('user_id,role')
   ]);
-  if (res.error) { panel.innerHTML = '<div style="color:#e74c3c;font-size:13px;">Erreur : ' + res.error.message + '</div>'; return; }
+  if (res.error) { panel.innerHTML = '<div style="color:#e74c3c;font-size:13px;">' + t('lbl_err_generic') + res.error.message + '</div>'; return; }
   var members = res.data || [];
   var rolesMap = {};
   (rolesRes.data || []).forEach(function(r) { rolesMap[r.user_id] = r.role; });
@@ -6205,7 +6604,7 @@ function toggleProfVotes() {
 async function loadUserVotes() {
   var panel = document.getElementById('prof-votes-panel');
   if (!panel || !currentUser) return;
-  panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;">Chargement...</div>';
+  panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;">' + t('lbl_loading') + '</div>';
   var res = await db.from('votes').select('vote,places(id,name,latitude,longitude,categories(icon))').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(50);
   var data = res.data || [];
   if (!data.length) {
@@ -6238,7 +6637,7 @@ function toggleProfPlaces() {
 async function loadUserPlaces() {
   var panel = document.getElementById('prof-places-panel');
   if (!panel || !currentUser) return;
-  panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;">Chargement...</div>';
+  panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;">' + t('lbl_loading') + '</div>';
   var res = await db.from('places').select('id,name,latitude,longitude,categories(icon,name)').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(50);
   var data = res.data || [];
   if (!data.length) {
@@ -6270,7 +6669,7 @@ function toggleProfComments() {
 async function loadUserComments() {
   var panel = document.getElementById('prof-cmts-panel');
   if (!panel || !currentUser) return;
-  panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;">Chargement...</div>';
+  panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;">' + t('lbl_loading') + '</div>';
   var res = await db.from('comments').select('id,content,created_at,place_id,places(id,name,latitude,longitude)').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(20);
   var data = res.data || [];
   if (!data.length) {
@@ -6304,7 +6703,7 @@ function toggleProfFavs() {
 async function loadFavoritesInProfile() {
   var el = document.getElementById('prof-favs-panel');
   if (!el) return;
-  el.innerHTML = '<div style="padding:12px 0;color:var(--text2);font-size:13px;">Chargement...</div>';
+  el.innerHTML = '<div style="padding:12px 0;color:var(--text2);font-size:13px;">' + t('lbl_loading') + '</div>';
   var ids = Object.keys(userFavs);
   if (!ids.length) { el.innerHTML = '<div style="padding:12px 0;color:var(--text2);font-size:13px;text-align:center;">' + t('lbl_no_fav') + '</div>'; return; }
   var res = await db.from('places').select('id,name,latitude,longitude,categories(icon,name,color)').in('id', ids);
@@ -6483,7 +6882,7 @@ async function translateText(textId, spanId, orig) {
   if (sp.dataset.translated === '1') {
     el.textContent = orig;
     sp.dataset.translated = '0';
-    sp.textContent = 'Traduire';
+    sp.textContent = t('btn_translate');
     return;
   }
   sp.textContent = '…';
@@ -6495,12 +6894,12 @@ async function translateText(textId, spanId, orig) {
     if (translated && translated !== orig) {
       el.textContent = translated;
       sp.dataset.translated = '1';
-      sp.textContent = 'Original';
+      sp.textContent = t('btn_original');
     } else {
-      sp.textContent = 'Traduire';
+      sp.textContent = t('btn_translate');
     }
   } catch(e) {
-    sp.textContent = 'Traduire';
+    sp.textContent = t('btn_translate');
   }
 }
 
@@ -6533,7 +6932,7 @@ async function loadCmts(pid) {
       + ((isOwn || isAdmin) ? '<button onclick="editCmt(\'' + c.id + '\',\'' + pid + '\')" style="margin-left:auto;background:none;border:none;color:var(--text2);cursor:pointer;font-size:12px;padding:0 2px;">&#9998;</button>' : '')
       + '</div>'
       + '<div class="comment-text" id="cmt-text-' + c.id + '">' + escHtml(c.content) + '</div>'
-      + '<span id="trl-cmt-' + c.id + '" data-orig="' + escHtml(c.content) + '" onclick="translateText(\'cmt-text-' + c.id + '\',\'trl-cmt-' + c.id + '\',this.dataset.orig)" style="font-size:11px;color:var(--text2);cursor:pointer;text-decoration:underline;text-underline-offset:2px;">Traduire</span>'
+      + '<span id="trl-cmt-' + c.id + '" data-orig="' + escHtml(c.content) + '" onclick="translateText(\'cmt-text-' + c.id + '\',\'trl-cmt-' + c.id + '\',this.dataset.orig)" style="font-size:11px;color:var(--text2);cursor:pointer;text-decoration:underline;text-underline-offset:2px;">' + t('btn_translate') + '</span>'
       + (currentUser ? '<div style="display:flex;align-items:center;gap:4px;margin-top:5px;">'
         + '<button onclick="voteComment(\'' + c.id + '\',true,\'' + pid + '\')" style="' + likeStyle + '">&#128077; ' + (likes[c.id] || 0) + '</button>'
         + '<button onclick="voteComment(\'' + c.id + '\',false,\'' + pid + '\')" style="' + dislikeStyle + '">&#128078; ' + (dislikes[c.id] || 0) + '</button>'
@@ -6565,7 +6964,7 @@ async function loadPendingPlaces() {
   var el = document.getElementById('pending-places-list');
   var badge = document.getElementById('pending-count-badge');
   if (!el) return;
-  el.innerHTML = '<div style="color:var(--text2);">Chargement...</div>';
+  el.innerHTML = '<div style="color:var(--text2);">' + t('lbl_loading') + '</div>';
   var res = await db.from('places').select('id,name,user_name,user_id,latitude,longitude,created_at,main_categories(name,icon),categories(name,icon)').eq('status', 'pending').order('created_at', { ascending: false });
   var data = res.data || [];
   if (badge) badge.textContent = data.length;
@@ -6625,9 +7024,9 @@ function viewPendingPlace(pid, lat, lng) {
 async function loadReportedPlaces() {
   var el = document.getElementById('reported-places-list');
   if (!el) return;
-  el.innerHTML = '<div style="color:var(--text2);">Chargement...</div>';
+  el.innerHTML = '<div style="color:var(--text2);">' + t('lbl_loading') + '</div>';
   var res = await db.from('reports').select('id,place_id,reason,details,photo_url,user_id,suggested_lat,suggested_lng,places(id,name,user_name,latitude,longitude)').order('created_at', { ascending: false });
-  if (res.error) { el.innerHTML = '<div style="color:#e74c3c;font-size:12px;">Erreur : ' + escHtml(res.error.message) + '</div>'; return; }
+  if (res.error) { el.innerHTML = '<div style="color:#e74c3c;font-size:12px;">' + t('lbl_err_generic') + escHtml(res.error.message) + '</div>'; return; }
   var data = res.data || [];
   if (!data.length) { el.innerHTML = '<div style="color:var(--text2);">' + t('dash_no_reports') + '</div>'; return; }
   var userIds = [...new Set(data.map(function(r) { return r.user_id; }).filter(Boolean))];
@@ -6731,7 +7130,7 @@ function viewReportedPlace(pid, lat, lng) {
 async function loadReportedComments() {
   var el = document.getElementById('reported-comments-list');
   if (!el) return;
-  el.innerHTML = '<div style="color:var(--text2);">Chargement...</div>';
+  el.innerHTML = '<div style="color:var(--text2);">' + t('lbl_loading') + '</div>';
   var res = await db.from('comment_reports').select('comment_id,user_id').order('created_at', { ascending: false });
   var reports = res.data || [];
   if (!reports.length) { el.innerHTML = '<div style="color:var(--text2);">' + t('dash_no_reports') + '</div>'; return; }
@@ -6986,7 +7385,7 @@ function onAddBtn() {
   if (!currentUser) { showToast(t('toast_login_add'), 'error'); openModal('modal-auth'); return; }
   addingMode = true;
   selectedLatLng = null;
-  document.getElementById('coord-display').textContent = 'Clique sur la carte...';
+  document.getElementById('coord-display').textContent = t('form_click_map');
   document.getElementById('info-adding').style.display = 'block';
   if (isMobile()) { closeSheet('sheet-cats'); closeSheet('sheet-search'); closeSheet('sheet-profile'); }
   showToast(t('toast_click_place'), 'success');
@@ -7026,7 +7425,7 @@ function set24h(val) {
 async function submitPlace() {
   var submitBtn = document.querySelector('#modal-add .btn-p');
   if (submitBtn && submitBtn.disabled) return;
-  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '⏳ Publication…'; }
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = t('btn_publishing'); }
   var _reEnable = function() { if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = t('btn_publish') || 'Publier le lieu'; } };
   var name = document.getElementById('add-name').value.trim();
   var mainId = document.getElementById('add-main-cat').value;
@@ -7077,7 +7476,7 @@ async function submitPlace() {
   closeModal('modal-add');
   addingMode = false;
   document.getElementById('info-adding').style.display = 'none';
-  showToast('\ud83d\udccd Lieu ajout\u00e9 !', 'success');
+  showToast(t('toast_place_added'), 'success');
   scheduleLoad();
 }
 
@@ -7471,7 +7870,7 @@ function showDashDetail(title, renderFn) {
   if (main) main.style.display = 'none';
   if (detail) { detail.style.display = 'flex'; detail.style.flexDirection = 'column'; }
   if (titleEl) titleEl.innerHTML = title;
-  if (content) content.innerHTML = '<div style="color:var(--text2);font-size:13px;">Chargement...</div>';
+  if (content) content.innerHTML = '<div style="color:var(--text2);font-size:13px;">' + t('lbl_loading') + '</div>';
   renderFn();
 }
 
@@ -7580,7 +7979,7 @@ async function loadReportHistory() {
   var el = document.getElementById('report-history-list');
   if (!el) return;
   var res = await db.from('report_history').select('*').order('handled_at', { ascending: false }).limit(100);
-  if (res.error) { el.innerHTML = '<div style="color:#e74c3c;font-size:12px;">Erreur : ' + escHtml(res.error.message) + '</div>'; return; }
+  if (res.error) { el.innerHTML = '<div style="color:#e74c3c;font-size:12px;">' + t('lbl_err_generic') + escHtml(res.error.message) + '</div>'; return; }
   var data = res.data || [];
   if (!data.length) { el.innerHTML = '<div style="color:var(--text2);padding:16px;text-align:center;">' + t('lbl_no_action_mod') + '</div>'; return; }
   var reasonLabels = { closed:t('report_reason_closed'), maintenance:t('report_reason_maintenance'), wrong_location:t('report_reason_location'), duplicate:t('report_reason_duplicate'), wrong_info:t('report_reason_info'), inappropriate:t('report_reason_inappropriate'), bad_photo:t('report_reason_bad_photo'), other:t('report_reason_other') };
@@ -7616,7 +8015,7 @@ async function openHistoryPlace(placeId) {
   if (banner) {
     banner.style.display = 'flex';
     var btnLeft = banner.querySelector('button:first-child');
-    if (btnLeft) btnLeft.textContent = '← Retour à l\'historique';
+    if (btnLeft) btnLeft.textContent = t('btn_back_history');
   }
   map.flyTo([res.data.latitude, res.data.longitude], 16, { duration: 0.8 });
   allPlaces = [res.data];
@@ -7653,7 +8052,7 @@ function showDashNewMembers() {
 function showDashLeaderboard() {
   showDashDetail('🏆 Classement XP — Cette semaine', function() {
     var c = document.getElementById('dash-detail-content');
-    c.innerHTML = '<div id="dash-leaderboard"><div style="color:var(--text2);font-size:13px;text-align:center;padding:24px 0;">Chargement...</div></div>';
+    c.innerHTML = '<div id="dash-leaderboard"><div style="color:var(--text2);font-size:13px;text-align:center;padding:24px 0;">' + t('lbl_loading') + '</div></div>';
     loadDashLeaderboard();
   });
 }
@@ -7662,10 +8061,10 @@ async function loadDashLeaderboard() {
   var el = document.getElementById('dash-leaderboard');
   if (!el) return;
   var res = await db.rpc('get_weekly_leaderboard', {});
-  if (res.error) { el.innerHTML = '<div style="color:#e74c3c;font-size:13px;">Erreur : ' + res.error.message + '</div>'; return; }
+  if (res.error) { el.innerHTML = '<div style="color:#e74c3c;font-size:13px;">' + t('lbl_err_generic') + res.error.message + '</div>'; return; }
   var entries = res.data || [];
   if (!entries.length) {
-    el.innerHTML = '<div style="text-align:center;padding:32px 16px;color:var(--text2);font-size:13px;">Aucune activité cette semaine.<br>Soyez le premier ! 🚀</div>';
+    el.innerHTML = '<div style="text-align:center;padding:32px 16px;color:var(--text2);font-size:13px;">' + t('dash_no_activity_week') + '</div>';
     return;
   }
   var now = new Date();
@@ -7799,7 +8198,7 @@ function showDashValidatedPlaces() {
       var res = await db.from('places').select('id,name,user_name,created_at,latitude,longitude,categories(icon,name)').eq('status', 'active').order('created_at', { ascending: false }).limit(60);
       var places = res.data || [];
       if (!places.length) { listEl.innerHTML = '<div style="color:var(--text2);font-size:13px;text-align:center;padding:16px 0;">' + t('lbl_no_active_place') + '</div>'; return; }
-      listEl.innerHTML = '<div style="font-size:11px;color:var(--text2);margin-bottom:10px;">' + places.length + ' dernier' + (places.length > 1 ? 's' : '') + ' lieu' + (places.length > 1 ? 'x' : '') + ' validé' + (places.length > 1 ? 's' : '') + '</div>'
+      listEl.innerHTML = '<div style="font-size:11px;color:var(--text2);margin-bottom:10px;">' + places.length + ' ' + t('dash_validated_total_label') + '</div>'
         + places.map(function(p) {
           var icon = (p.categories && p.categories.icon) || '\uD83D\uDCCD';
           var catName = (p.categories && p.categories.name) || '';
@@ -7941,15 +8340,15 @@ function showDashCategories() {
 
 async function adminToggleCatPhotos(catId, current) {
   var res = await db.from('categories').update({ allow_photos: !current }).eq('id', catId);
-  if (res.error) { showToast('Erreur : ' + res.error.message, 'error'); return; }
-  showToast(!current ? '📷 Photos activées' : '🚫 Photos désactivées', 'success');
+  if (res.error) { showToast(t('lbl_err_generic') + res.error.message, 'error'); return; }
+  showToast(!current ? t('toast_photos_enabled') : t('toast_photos_disabled'), 'success');
   await loadCats();
   renderDashCategoriesContent();
 }
 
 async function adminConfirmDeleteMainCat(mcId, subCount, name) {
   if (subCount > 0) {
-    showToast('Impossible : supprime d\'abord les ' + subCount + ' sous-catégorie(s)', 'error');
+    showToast(t('toast_err_delete_subcat_first'), 'error');
     return;
   }
   showConfirm('Supprimer la catégorie ?', '« ' + name + ' » sera définitivement supprimée.', '🗑', '#e74c3c', function() { adminDeleteMainCat(mcId); });
@@ -7958,8 +8357,8 @@ async function adminConfirmDeleteMainCat(mcId, subCount, name) {
 async function adminDeleteMainCat(mcId) {
   if (!isAdmin) return;
   var r = await db.from('main_categories').delete().eq('id', mcId);
-  if (r.error) { showToast('Erreur : ' + r.error.message, 'error'); return; }
-  showToast('Grande catégorie supprimée', 'success');
+  if (r.error) { showToast(t('lbl_err_generic') + r.error.message, 'error'); return; }
+  showToast(t('toast_category_deleted'), 'success');
   await loadCats();
   renderDashCategoriesContent();
 }
@@ -7976,22 +8375,22 @@ async function adminDeleteCat(catId, poiCount) {
   try {
     if (poiCount > 0) {
       var deleted = 0;
-      showToast('Suppression en cours… 0 / ' + poiCount, 'info');
+      showToast(t('toast_deletion_progress'), 'info');
       while (true) {
         var r = await db.rpc('admin_delete_places_batch', { cat_id: catId, batch_size: 500 });
-        if (r.error) { showToast('Erreur : ' + r.error.message, 'error'); return; }
+        if (r.error) { showToast(t('lbl_err_generic') + r.error.message, 'error'); return; }
         if (!r.data || r.data === 0) break;
         deleted += r.data;
-        showToast('Suppression en cours… ' + deleted + ' / ' + poiCount, 'info');
+        showToast(t('toast_deletion_progress'), 'info');
       }
     }
     var res = await db.from('categories').delete().eq('id', catId).select('id');
-    if (res.error) { showToast('Erreur : ' + res.error.message, 'error'); return; }
-    if (!res.data || res.data.length === 0) { showToast('Erreur : suppression impossible', 'error'); return; }
-    showToast('Sous-catégorie supprimée ✓', 'success');
+    if (res.error) { showToast(t('lbl_err_generic') + res.error.message, 'error'); return; }
+    if (!res.data || res.data.length === 0) { showToast(t('lbl_err_generic') + 'suppression impossible', 'error'); return; }
+    showToast(t('toast_subcat_deleted'), 'success');
     await loadCats();
     renderDashCategoriesContent();
-  } catch(e) { showToast('Erreur : ' + e.message, 'error'); }
+  } catch(e) { showToast(t('lbl_err_generic') + e.message, 'error'); }
 }
 
 // ===== ADMIN — TYPES COMMUNAUTÉ =====
@@ -8477,7 +8876,7 @@ async function openMemberDash() {
   showMemberDashMain();
   openSheet('sheet-member-dash');
   var el = document.getElementById('member-dash-content');
-  el.innerHTML = '<div style="color:var(--text2);font-size:13px;padding:20px 0;text-align:center;">Chargement...</div>';
+  el.innerHTML = '<div style="color:var(--text2);font-size:13px;padding:20px 0;text-align:center;">' + t('lbl_loading') + '</div>';
   var uid = currentUser.id;
   var weekStart = getWeekStartISO();
 
@@ -8532,7 +8931,7 @@ async function openMemberDash() {
 
   var sectionTitle = (isAdmin||isModerator) ? '🛡️ Administration' : '📊 Statistiques';
   html += '<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin:24px 0 10px;">'+sectionTitle+'</div>';
-  html += '<div id="member-dash-stats-grid" class="dash-grid"><div style="color:var(--text2);font-size:12px;text-align:center;padding:8px 0;">Chargement...</div></div>';
+  html += '<div id="member-dash-stats-grid" class="dash-grid"><div style="color:var(--text2);font-size:12px;text-align:center;padding:8px 0;">' + t('lbl_loading') + '</div></div>';
   html += '<div style="text-align:center;margin-top:20px;padding-bottom:4px;">'
     +'<button onclick="reopenTuto()" style="background:none;border:none;color:var(--text2);font-size:12px;cursor:pointer;text-decoration:underline;font-family:var(--font-body);">📖 Revoir le tutoriel</button>'
     +'</div>';
@@ -8612,7 +9011,7 @@ async function showMemberDashDetail(type) {
   var titles = {places:'📍 Mes lieux', validated:'✅ Lieux validés', merci:'🙏 Merci reçus', validations:'✅ Mes validations', ratings:'⭐ Notes reçues'};
   if (titleEl) titleEl.textContent = titles[type] || '';
   if (type === 'ratings') {
-    content.innerHTML = '<div style="color:var(--text2);font-size:13px;padding:20px 0;text-align:center;">Chargement...</div>';
+    content.innerHTML = '<div style="color:var(--text2);font-size:13px;padding:20px 0;text-align:center;">' + t('lbl_loading') + '</div>';
     loadMemberDashRatings(d.places);
     return;
   }
@@ -8648,7 +9047,7 @@ async function showMemberDashDetail(type) {
     return;
   }
   if (type === 'validations') {
-    content.innerHTML = '<div style="color:var(--text2);font-size:13px;padding:20px 0;text-align:center;">Chargement...</div>';
+    content.innerHTML = '<div style="color:var(--text2);font-size:13px;padding:20px 0;text-align:center;">' + t('lbl_loading') + '</div>';
     var valRes = await db.from('place_validations').select('place_id,created_at,places(id,name,latitude,longitude)').eq('user_id', currentUser.id).order('created_at',{ascending:false}).limit(50);
     var validations = valRes.data || [];
     var valPlaces = {};
@@ -8697,7 +9096,7 @@ async function showMerciVoters(el) {
   var content = document.getElementById('member-dash-detail-content');
   var titleEl = document.getElementById('member-dash-detail-title');
   if (titleEl) titleEl.textContent = '🙏 ' + placeName;
-  content.innerHTML = '<div style="color:var(--text2);font-size:13px;padding:20px 0;text-align:center;">Chargement...</div>';
+  content.innerHTML = '<div style="color:var(--text2);font-size:13px;padding:20px 0;text-align:center;">' + t('lbl_loading') + '</div>';
   var res = await db.from('votes').select('user_id,created_at').eq('place_id', placeId).eq('vote', true).order('created_at',{ascending:false});
   var votes = res.data || [];
   var html = '<button onclick="showMemberDashDetail(\'merci\')" style="background:none;border:none;color:var(--accent);font-size:13px;cursor:pointer;padding:0 0 14px 0;display:flex;align-items:center;gap:4px;">‹ Retour</button>';
@@ -8726,7 +9125,7 @@ async function showMerciVoters(el) {
 async function loadMemberDashRatings(places) {
   var content = document.getElementById('member-dash-detail-content');
   var placeIds = places.map(function(p){return p.id;});
-  if (!placeIds.length) { content.innerHTML = '<div style="color:var(--text2);font-size:13px;text-align:center;padding:20px 0;">Aucun lieu</div>'; return; }
+  if (!placeIds.length) { content.innerHTML = '<div style="color:var(--text2);font-size:13px;text-align:center;padding:20px 0;">' + t('lbl_no_place') + '</div>'; return; }
   var res = await db.from('ratings').select('place_id,score').in('place_id', placeIds);
   var byPlace = {};
   (res.data||[]).forEach(function(r){ if(!byPlace[r.place_id])byPlace[r.place_id]=[]; byPlace[r.place_id].push(r.score); });
@@ -8736,7 +9135,7 @@ async function loadMemberDashRatings(places) {
       var bb=byPlace[b.id].reduce(function(s,r){return s+r;},0)/byPlace[b.id].length;
       return bb-aa;
     });
-  if (!rated.length) { content.innerHTML = '<div style="color:var(--text2);font-size:13px;text-align:center;padding:20px 0;">Aucune note reçue</div>'; return; }
+  if (!rated.length) { content.innerHTML = '<div style="color:var(--text2);font-size:13px;text-align:center;padding:20px 0;">' + t('lbl_no_rating_received') + '</div>'; return; }
   var html = '<div style="display:flex;flex-direction:column;gap:8px;">';
   rated.forEach(function(p) {
     var scores = byPlace[p.id];
@@ -8789,7 +9188,7 @@ var routeState = {
 var _routeDdTimers = {};
 
 function openRouteSheet() {
-  if (!currentUser) { showToast('Connecte-toi pour utiliser Sur ma route', 'info'); openModal('modal-auth'); return; }
+  if (!currentUser) { showToast(t('toast_login_route'), 'info'); openModal('modal-auth'); return; }
   _renderRouteSheet();
   document.getElementById('sheet-route').classList.add('open');
   document.querySelectorAll('.nav-item').forEach(function(b) { b.classList.remove('active'); });
@@ -9085,12 +9484,12 @@ async function _fetchValhalla(validWps) {
 async function calcRoute() {
   var validWps = routeState.wps.filter(function(wp) { return wp.lat !== null; });
   if (validWps.length < 2) {
-    showToast('Renseigne au moins le départ et l\'arrivée', 'error');
+    showToast(t('toast_err_route_points'), 'error');
     return;
   }
   var btn = document.getElementById('route-calc-btn');
   var origTxt = btn.innerHTML;
-  btn.innerHTML = '<div class="spinner" style="position:static;width:18px;height:18px;border-width:2.5px;display:inline-block;vertical-align:middle;margin-right:8px;animation:spin 0.8s linear infinite;"></div> Calcul en cours...';
+  btn.innerHTML = '<div class="spinner" style="position:static;width:18px;height:18px;border-width:2.5px;display:inline-block;vertical-align:middle;margin-right:8px;animation:spin 0.8s linear infinite;"></div> ' + t('btn_calculating');
   btn.disabled = true;
 
   try {
@@ -9101,13 +9500,13 @@ async function calcRoute() {
     if (routeState.avoidHighways) {
       result = await _fetchNoHighwayRoute(coordStr, validWps);
       if (!result) {
-        showToast('Itinéraire sans autoroutes introuvable entre ces points', 'error');
+        showToast(t('toast_err_no_highway_route'), 'error');
         return;
       }
     } else {
       result = await _fetchOSRM(coordStr);
       if (!result) {
-        showToast('Itinéraire introuvable entre ces points', 'error');
+        showToast(t('toast_err_no_route'), 'error');
         return;
       }
     }
@@ -9117,7 +9516,7 @@ async function calcRoute() {
     closeRouteSheet();
     await _activateRouteMode(result.distKm, result.durationMin);
   } catch (e) {
-    showToast('Erreur de calcul de route', 'error');
+    showToast(t('toast_err_route_calc'), 'error');
   } finally {
     btn.innerHTML = origTxt;
     btn.disabled = false;
@@ -9241,10 +9640,10 @@ function useMyPositionAsStart() {
     return;
   }
 
-  if (!navigator.geolocation) { showToast('Géolocalisation non disponible', 'error'); return; }
+  if (!navigator.geolocation) { showToast(t('toast_geolocation_unavailable'), 'error'); return; }
   navigator.geolocation.getCurrentPosition(
     function(pos) { setPos(pos.coords.latitude, pos.coords.longitude); },
-    function() { showToast('Position introuvable', 'error'); },
+    function() { showToast(t('toast_position_not_found'), 'error'); },
     { timeout: 8000, maximumAge: 30000 }
   );
 }
