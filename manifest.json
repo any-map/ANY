@@ -3,7 +3,7 @@
   "short_name": "ANY",
   "description": "La carte communautaire des services autour de vous, 24h/24 — vanlifer, vacancier, citadin ou nomade.",
   "start_url": "/ANY/",
-  "display": "standalone",
+  "display": "fullscreen",
   "display_override": ["fullscreen", "standalone"],
   "background_color": "#1ab8a0",
   "theme_color": "#1a7ac8",
