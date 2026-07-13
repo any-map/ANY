@@ -7719,13 +7719,6 @@ var installPrompt = null;
 
 var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 if (isStandalone) document.documentElement.classList.add('pwa-standalone');
-(function(){
-  var d = document.createElement('div');
-  d.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:red;color:#fff;font-size:10px;line-height:1.4;padding:4px;text-align:center;pointer-events:none;';
-  var sb = getComputedStyle(document.documentElement).getPropertyValue('--safe-bottom');
-  d.textContent = 'DEBUG standalone=' + isStandalone + ' navigator.standalone=' + window.navigator.standalone + ' matchMedia=' + window.matchMedia('(display-mode: standalone)').matches + ' fullscreenMM=' + window.matchMedia('(display-mode: fullscreen)').matches + ' safe-bottom=' + sb + ' innerHeight=' + window.innerHeight;
-  document.body.appendChild(d);
-})();
 var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
 
 function setAppHeight() {
