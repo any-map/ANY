@@ -381,6 +381,14 @@ html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none;font-f
   #places-count{top:10px;right:10px;font-size:11px;padding:5px 10px;}
   #toast{bottom:calc(var(--nav-h) + 12px);}
 }
+/* PWA installée — comble la safe-area sous la navbar (inutile dans Safari, qui l'utilise pour sa propre UI) */
+@media (max-width:768px) and (display-mode: standalone), (max-width:768px) and (display-mode: fullscreen) {
+  #bottom-nav{height:calc(var(--nav-h) + var(--safe-bottom));padding-bottom:var(--safe-bottom);}
+  #btn-locate{bottom:calc(var(--nav-h) + var(--safe-bottom) + 14px);}
+  #btn-compass-mode{bottom:calc(var(--nav-h) + var(--safe-bottom) + 68px);}
+  #btn-compass{bottom:calc(var(--nav-h) + var(--safe-bottom) + 122px);}
+  #toast{bottom:calc(var(--nav-h) + var(--safe-bottom) + 12px);}
+}
 /* LANDSCAPE MOBILE — nav passe à gauche */
 @media (orientation:landscape) and (max-height:500px) {
   #sidebar{display:none !important;}
