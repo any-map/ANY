@@ -381,6 +381,15 @@ html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none;font-f
   #places-count{top:10px;right:10px;font-size:11px;padding:5px 10px;}
   #toast{bottom:calc(var(--nav-h) + 12px);}
 }
+/* PWA installée — comble la zone du home indicator avec un fond uni (sans flou, qui ne se compose pas correctement dans cette zone sur WebKit) */
+/* Valeur fixe 34px (constante sur tous les iPhone Face ID) au lieu de env(safe-area-inset-bottom), qui s'est révélée instable */
+html.pwa-standalone #bottom-nav{height:calc(var(--nav-h) + 34px);padding-bottom:34px;background:var(--surface);backdrop-filter:none;-webkit-backdrop-filter:none;}
+@media(max-width:768px){
+  html.pwa-standalone #btn-locate{bottom:calc(var(--nav-h) + 34px + 14px);}
+  html.pwa-standalone #btn-compass-mode{bottom:calc(var(--nav-h) + 34px + 68px);}
+  html.pwa-standalone #btn-compass{bottom:calc(var(--nav-h) + 34px + 122px);}
+  html.pwa-standalone #toast{bottom:calc(var(--nav-h) + 34px + 12px);}
+}
 /* LANDSCAPE MOBILE — nav passe à gauche */
 @media (orientation:landscape) and (max-height:500px) {
   #sidebar{display:none !important;}
