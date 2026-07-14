@@ -382,7 +382,7 @@ html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none;font-f
   #toast{bottom:calc(var(--nav-h) + 12px);}
 }
 /* PWA installée — la navbar s'étend de 34px (hauteur du home indicator) pour que son fond touche le vrai bord de l'écran, sans flou (bug de rendu WebKit dans cette zone) */
-html.pwa-standalone #bottom-nav{height:calc(var(--nav-h) + 34px);padding-bottom:34px;background:linear-gradient(to bottom, var(--surface) 0, var(--surface) var(--nav-h), var(--bg) 100%);backdrop-filter:none;-webkit-backdrop-filter:none;}
+html.pwa-standalone #bottom-nav{height:calc(var(--nav-h) + 34px);padding-bottom:34px;background:var(--surface);backdrop-filter:none;-webkit-backdrop-filter:none;}
 @media(max-width:768px){
   html.pwa-standalone #btn-locate{bottom:calc(var(--nav-h) + 34px + 14px);}
   html.pwa-standalone #btn-compass-mode{bottom:calc(var(--nav-h) + 34px + 68px);}
