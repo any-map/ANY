@@ -1198,6 +1198,7 @@ var db;
 
 var map, cluster;
 var layerStreet, layerSat, layerLabels, isSat = false;
+var _autoLocateSkip = false;
 var currentUser = null;
 var currentUsername = '';
 var ADMINS = ['mypoiuytreza@gmail.com', 'unverredericard@gmail.com'];
@@ -3417,6 +3418,7 @@ async function init() {
   var sharedLon = parseFloat(params.get('lon'));
   var sharedZoom = parseInt(params.get('zoom')) || 16;
   var hasSharedLocation = !isNaN(sharedLat) && !isNaN(sharedLon);
+  _autoLocateSkip = hasSharedLocation;
 
   map = L.map('map', { zoomControl: false, rotate: true, touchRotate: false, rotateControl: false, bearing: 0 }).setView([46.603354, 1.888334], 6);
   map.on('rotate', function() {
@@ -5051,6 +5053,7 @@ async function checkAuth() {
     loadModReportsCount();
     startRealtimeNotifs();
     loadUserFavorites(); loadUserValidations();
+    autoLocateOnConnect();
     if (!currentUser.email_confirmed_at && !sessionStorage.getItem('emailReminderShown')) {
       sessionStorage.setItem('emailReminderShown', '1');
       setTimeout(function() {
@@ -5111,6 +5114,7 @@ async function handleAuth() {
     loadModReportsCount();
     startRealtimeNotifs();
     loadUserFavorites(); loadUserValidations();
+    autoLocateOnConnect();
     showToast(t('toast_connected'), 'success');
     if (document.getElementById('sheet-profile').classList.contains('open')) {
       renderProfile();
@@ -7581,6 +7585,13 @@ var _orientListenerAdded = false;
   document.addEventListener('click', _preOrient, { once: true });
 })();
 var compassModeActive = false;
+
+function autoLocateOnConnect() {
+  if (_autoLocateSkip || !navigator.geolocation || !map) return;
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    map.setView([pos.coords.latitude, pos.coords.longitude], 15);
+  }, function() {}, { timeout: 8000, maximumAge: 60000 });
+}
 
 function toggleLiveTracking() {
   if (liveTrackActive) { stopLiveTracking(); } else { startLiveTracking(); }
