@@ -7950,8 +7950,8 @@ async function loadDashboardTiles(gridId) {
   if (!grid) return;
   var weekStart = getWeekStartISO();
   var results = await Promise.all([
-    db.rpc('get_registered_users_count'),
-    db.rpc('get_new_users_count', { since: weekStart }),
+    (isAdmin || isModerator) ? db.rpc('get_registered_users_count') : Promise.resolve({ data: 0 }),
+    (isAdmin || isModerator) ? db.rpc('get_new_users_count', { since: weekStart }) : Promise.resolve({ data: 0 }),
     db.from('places').select('id', { count: 'exact', head: true }).eq('status', 'active').not('user_id', 'is', null),
     db.from('places').select('id', { count: 'exact', head: true }).gte('created_at', weekStart).not('user_id', 'is', null),
     db.from('places').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
@@ -7981,11 +7981,11 @@ async function loadDashboardTiles(gridId) {
       + '</div>';
   }
 
-  var html = tile('&#128101;', t('dash_registered_members'), totalMembers, (isAdmin || isModerator) ? 'showDashMembers()' : '')
-    + tile('&#127381;', t('dash_new_members'), newMembers, (isAdmin || isModerator) ? 'showDashNewMembers()' : '', 0, 'week', t('lbl_this_week'))
-    + tile('&#128205;', t('dash_validated_total'), totalPlaces, (isAdmin || isModerator) ? 'showDashValidatedPlaces()' : '')
+  var html = tile('&#128205;', t('dash_validated_total'), totalPlaces, (isAdmin || isModerator) ? 'showDashValidatedPlaces()' : '')
     + tile('&#10024;', t('dash_new_places'), newPlaces, (isAdmin || isModerator) ? 'showDashNewPlaces()' : '', 0, 'week', t('lbl_this_week'));
   if (isAdmin || isModerator) {
+    html += tile('&#128101;', t('dash_registered_members'), totalMembers, 'showDashMembers()')
+      + tile('&#127381;', t('dash_new_members'), newMembers, 'showDashNewMembers()', 0, 'week', t('lbl_this_week'));
     html += tile('&#9888;&#65039;', t('dash_reported_places'), reportedPlaces, 'showDashReportedPlaces()', reportedPlaces, reportedPlaces > 0 ? 'urgent' : '')
       + tile('&#128172;', t('dash_reported_comments'), reportedCmts, 'showDashReportedComments()', reportedCmts, reportedCmts > 0 ? 'urgent' : '');
     html += tile('&#127942;', 'Classement XP', '', 'showDashLeaderboard()', 0, '')
