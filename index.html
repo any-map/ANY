@@ -510,6 +510,7 @@ html.pwa-standalone #bottom-nav{background:var(--bg);backdrop-filter:none;-webki
 .dash-tile.week{border-color:rgba(39,174,96,0.3);background:rgba(39,174,96,0.04);}
 .dash-tile.week .dash-tile-val{color:#27ae60;}
 .dash-tile-week-label{font-size:9px;color:var(--text2);margin-top:1px;text-transform:uppercase;letter-spacing:0.4px;}
+.dash-tile-dragging{opacity:0.88;box-shadow:0 10px 24px rgba(0,0,0,0.35);z-index:5;transition:none!important;cursor:grabbing;touch-action:none;}
 
 /* BADGES */
 .prof-badges-wrap{background:var(--surface);padding:14px 20px;border-bottom:1px solid var(--border);}
@@ -1514,6 +1515,7 @@ fr:{
   lbl_remove_from_trusted:'Retirer des membres de confiance',
   lbl_remove_from_mods:'Retirer des modérateurs',
   toast_trusted_added:'ajouté comme membre de confiance',
+  toast_tile_order_saved:'Ordre des tuiles enregistré',
   lbl_ban_prompt_reason:'Raison du bannissement (optionnel) :',
   lbl_members_count:'membres inscrits',
   lbl_retirer:'Retirer',
@@ -1807,6 +1809,7 @@ en:{
   lbl_remove_from_trusted:'Remove from trusted members',
   lbl_remove_from_mods:'Remove from moderators',
   toast_trusted_added:'added as trusted member',
+  toast_tile_order_saved:'Tile order saved',
   lbl_ban_prompt_reason:'Ban reason (optional):',
   lbl_members_count:'members registered',
   lbl_retirer:'Remove',
@@ -2090,6 +2093,7 @@ es:{
   lbl_remove_from_trusted:'Quitar de miembros de confianza',
   lbl_remove_from_mods:'Quitar de moderadores',
   toast_trusted_added:'añadido como miembro de confianza',
+  toast_tile_order_saved:'Orden de las tarjetas guardado',
   lbl_ban_prompt_reason:'Razón del baneo (opcional):',
   lbl_members_count:'miembros inscritos',
   lbl_retirer:'Quitar',
@@ -2380,6 +2384,7 @@ de:{
   lbl_remove_from_trusted:'Von Vertrauensmitgliedern entfernen',
   lbl_remove_from_mods:'Von Moderatoren entfernen',
   toast_trusted_added:'als Vertrauensmitglied hinzugefügt',
+  toast_tile_order_saved:'Kachel-Reihenfolge gespeichert',
   lbl_ban_prompt_reason:'Sperrgrund (optional):',
   lbl_members_count:'Mitglieder registriert',
   lbl_retirer:'Entfernen',
@@ -2670,6 +2675,7 @@ it:{
   lbl_remove_from_trusted:'Rimuovere dai membri fidati',
   lbl_remove_from_mods:'Rimuovere dai moderatori',
   toast_trusted_added:'aggiunto come membro fidato',
+  toast_tile_order_saved:'Ordine delle tessere salvato',
   lbl_ban_prompt_reason:'Motivo del ban (opzionale):',
   lbl_members_count:'membri registrati',
   lbl_retirer:'Rimuovi',
@@ -2960,6 +2966,7 @@ pt:{
   lbl_remove_from_trusted:'Remover dos membros de confiança',
   lbl_remove_from_mods:'Remover dos moderadores',
   toast_trusted_added:'adicionado como membro de confiança',
+  toast_tile_order_saved:'Ordem dos blocos guardada',
   lbl_ban_prompt_reason:'Motivo do banimento (opcional):',
   lbl_members_count:'membros inscritos',
   lbl_retirer:'Remover',
@@ -3250,6 +3257,7 @@ nl:{
   lbl_remove_from_trusted:'Verwijderen uit vertrouwde leden',
   lbl_remove_from_mods:'Verwijderen uit moderatoren',
   toast_trusted_added:'toegevoegd als vertrouwd lid',
+  toast_tile_order_saved:'Tegelvolgorde opgeslagen',
   lbl_ban_prompt_reason:'Reden voor verbanning (optioneel):',
   lbl_members_count:'leden geregistreerd',
   lbl_retirer:'Verwijderen',
@@ -8969,10 +8977,11 @@ async function openMemberDash() {
       +'<div style="font-size:10px;color:var(--accent);margin-top:5px;">Voir ›</div>'
       +'</div>';
   }
-  function dTile(icon, label, val, onclick, badge, cls, weekLabel) {
+  function dTile(icon, label, val, onclick, badge, cls, weekLabel, reorderKey) {
     var badgeHtml = (badge > 0) ? '<div class="dash-tile-badge">'+(badge>99?'99+':badge)+'</div>' : '';
     var weekHtml = weekLabel ? '<div class="dash-tile-week-label">'+weekLabel+'</div>' : '';
-    return '<div class="dash-tile'+(cls?' '+cls:'')+'"'+(onclick?' onclick="'+onclick+'"':'')+'>'+badgeHtml+'<div class="dash-tile-icon">'+icon+'</div>'+(val!==''?'<div class="dash-tile-val">'+val+'</div>':'')+'<div class="dash-tile-lbl">'+label+'</div>'+weekHtml+'</div>';
+    var dragAttrs = reorderKey ? ' data-tile-key="'+reorderKey+'" onpointerdown="dashTileDragStart(event,\''+reorderKey+'\')" onpointermove="dashTileDragMove(event)" onpointerup="dashTileDragEnd(event)" onpointercancel="dashTileDragEnd(event)"' : '';
+    return '<div class="dash-tile'+(cls?' '+cls:'')+'"'+(onclick?' onclick="'+onclick+'"':'')+dragAttrs+'>'+badgeHtml+'<div class="dash-tile-icon">'+icon+'</div>'+(val!==''?'<div class="dash-tile-val">'+val+'</div>':'')+'<div class="dash-tile-lbl">'+label+'</div>'+weekHtml+'</div>';
   }
 
   var html = '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">'
@@ -9033,27 +9042,111 @@ async function openMemberDash() {
   var nb = document.getElementById('dash-nav-badge');
   if (nb) { nb.textContent = urgent > 99 ? '99+' : urgent; nb.style.display = urgent > 0 ? 'block' : 'none'; }
 
-  var dashHtml = '';
-  if (isAdmin||isModerator) {
-    dashHtml += dTile('&#128101;', t('dash_registered_members'), totalMembers, 'showDashMembers()')
-      + dTile('&#128205;', t('dash_validated_total'), totalPlaces, 'showDashValidatedPlaces()')
-      + dTile('&#127381;', t('dash_new_members'), newMembers, 'showDashNewMembers()', 0, 'week', t('lbl_this_week'))
-      + dTile('&#10024;', t('dash_new_places'), newPlaces, 'showDashNewPlaces()', 0, 'week', t('lbl_this_week'));
-    dashHtml += dTile('&#9888;&#65039;', t('dash_reported_places'), reportedPlaces, 'showDashReportedPlaces()', reportedPlaces, reportedPlaces>0?'urgent':'')
-      + dTile('&#128172;', t('dash_reported_comments'), reportedCmts, 'showDashReportedComments()', reportedCmts, reportedCmts>0?'urgent':'')
-      + dTile('&#127942;', 'Classement XP', '', 'showDashLeaderboard()')
-      + dTile('&#9203;', t('dash_pending'), pendingCount, 'showDashPending()', pendingCount, pendingCount>0?'urgent':'')
-      + dTile('&#128202;', t('dash_global_stats'), '', 'showDashStats()');
+  var tileOrder = null;
+  if (isAdmin || isModerator) {
+    var orderRes = await db.from('dashboard_settings').select('tile_order').eq('id', 1).maybeSingle();
+    if (orderRes.data && orderRes.data.tile_order && orderRes.data.tile_order.length) tileOrder = orderRes.data.tile_order;
   }
-  if (isAdmin) {
-    dashHtml += dTile('&#128737;&#65039;', t('dash_team'), '', 'showDashTeam()', 0, 'admin-only')
-      + dTile('&#128296;', t('dash_bans'), '', 'showDashBan()', 0, 'admin-only')
-      + dTile('&#128221;', t('dash_history_mod'), '', 'showDashReportHistory()', 0, 'admin-only')
-      + dTile('&#128193;', t('dash_categories'), '', 'showDashCategories()', 0, 'admin-only')
-      + dTile('&#128172;', t('dash_comm_types'), '', 'showDashCommTypes()', 0, 'admin-only');
+
+  var tileRegistry = {
+    members:      { adminOnly:false, html:function(){ return dTile('&#128101;', t('dash_registered_members'), totalMembers, 'showDashMembers()', 0, '', '', 'members'); } },
+    validated:    { adminOnly:false, html:function(){ return dTile('&#128205;', t('dash_validated_total'), totalPlaces, 'showDashValidatedPlaces()', 0, '', '', 'validated'); } },
+    newMembers:   { adminOnly:false, html:function(){ return dTile('&#127381;', t('dash_new_members'), newMembers, 'showDashNewMembers()', 0, 'week', t('lbl_this_week'), 'newMembers'); } },
+    newPlaces:    { adminOnly:false, html:function(){ return dTile('&#10024;', t('dash_new_places'), newPlaces, 'showDashNewPlaces()', 0, 'week', t('lbl_this_week'), 'newPlaces'); } },
+    reported:     { adminOnly:false, html:function(){ return dTile('&#9888;&#65039;', t('dash_reported_places'), reportedPlaces, 'showDashReportedPlaces()', reportedPlaces, reportedPlaces>0?'urgent':'', '', 'reported'); } },
+    reportedCmts: { adminOnly:false, html:function(){ return dTile('&#128172;', t('dash_reported_comments'), reportedCmts, 'showDashReportedComments()', reportedCmts, reportedCmts>0?'urgent':'', '', 'reportedCmts'); } },
+    leaderboard:  { adminOnly:false, html:function(){ return dTile('&#127942;', 'Classement XP', '', 'showDashLeaderboard()', 0, '', '', 'leaderboard'); } },
+    pending:      { adminOnly:false, html:function(){ return dTile('&#9203;', t('dash_pending'), pendingCount, 'showDashPending()', pendingCount, pendingCount>0?'urgent':'', '', 'pending'); } },
+    globalStats:  { adminOnly:false, html:function(){ return dTile('&#128202;', t('dash_global_stats'), '', 'showDashStats()', 0, '', '', 'globalStats'); } },
+    team:         { adminOnly:true,  html:function(){ return dTile('&#128737;&#65039;', t('dash_team'), '', 'showDashTeam()', 0, 'admin-only', '', 'team'); } },
+    bans:         { adminOnly:true,  html:function(){ return dTile('&#128296;', t('dash_bans'), '', 'showDashBan()', 0, 'admin-only', '', 'bans'); } },
+    history:      { adminOnly:true,  html:function(){ return dTile('&#128221;', t('dash_history_mod'), '', 'showDashReportHistory()', 0, 'admin-only', '', 'history'); } },
+    categories:   { adminOnly:true,  html:function(){ return dTile('&#128193;', t('dash_categories'), '', 'showDashCategories()', 0, 'admin-only', '', 'categories'); } },
+    commTypes:    { adminOnly:true,  html:function(){ return dTile('&#128172;', t('dash_comm_types'), '', 'showDashCommTypes()', 0, 'admin-only', '', 'commTypes'); } }
+  };
+  var defaultOrder = ['members','validated','newMembers','newPlaces','reported','reportedCmts','leaderboard','pending','globalStats','team','bans','history','categories','commTypes'];
+  var order = (tileOrder || defaultOrder).slice();
+  defaultOrder.forEach(function(k){ if (order.indexOf(k) === -1) order.push(k); });
+
+  var dashHtml = '';
+  if (isAdmin || isModerator) {
+    order.forEach(function(key) {
+      var def = tileRegistry[key];
+      if (!def) return;
+      if (def.adminOnly && !isAdmin) return;
+      dashHtml += def.html();
+    });
   }
   var statsGrid = document.getElementById('member-dash-stats-grid');
   if (statsGrid) statsGrid.innerHTML = dashHtml;
+}
+
+var _dashDrag = null;
+function dashTileDragStart(e, key) {
+  if (_dashDrag) return;
+  _dashDrag = { key:key, el:e.currentTarget, pointerId:e.pointerId, startX:e.clientX, startY:e.clientY, armed:false, timer:null };
+  _dashDrag.timer = setTimeout(function() {
+    if (!_dashDrag) return;
+    _dashDrag.armed = true;
+    _dashDrag.el.classList.add('dash-tile-dragging');
+    try { _dashDrag.el.setPointerCapture(_dashDrag.pointerId); } catch(err) {}
+    if (navigator.vibrate) navigator.vibrate(15);
+  }, 500);
+}
+function dashTileDragMove(e) {
+  if (!_dashDrag) return;
+  if (!_dashDrag.armed) {
+    if (Math.abs(e.clientX - _dashDrag.startX) > 10 || Math.abs(e.clientY - _dashDrag.startY) > 10) {
+      clearTimeout(_dashDrag.timer);
+      _dashDrag = null;
+    }
+    return;
+  }
+  e.preventDefault();
+  var dx = e.clientX - _dashDrag.startX, dy = e.clientY - _dashDrag.startY;
+  _dashDrag.el.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(1.05)';
+  var grid = document.getElementById('member-dash-stats-grid');
+  if (!grid) return;
+  _dashDrag.el.style.pointerEvents = 'none';
+  var target = document.elementFromPoint(e.clientX, e.clientY);
+  _dashDrag.el.style.pointerEvents = '';
+  var targetTile = target && target.closest ? target.closest('.dash-tile') : null;
+  if (targetTile && targetTile !== _dashDrag.el && grid.contains(targetTile)) {
+    var tiles = Array.prototype.slice.call(grid.children);
+    var dragIdx = tiles.indexOf(_dashDrag.el), targetIdx = tiles.indexOf(targetTile);
+    if (dragIdx === -1 || targetIdx === -1) return;
+    if (dragIdx < targetIdx) grid.insertBefore(_dashDrag.el, targetTile.nextSibling);
+    else grid.insertBefore(_dashDrag.el, targetTile);
+    _dashDrag.startX = e.clientX; _dashDrag.startY = e.clientY;
+    _dashDrag.el.style.transform = 'scale(1.05)';
+  }
+}
+function dashTileDragEnd(e) {
+  if (!_dashDrag) return;
+  clearTimeout(_dashDrag.timer);
+  var wasArmed = _dashDrag.armed;
+  var el = _dashDrag.el;
+  if (wasArmed) {
+    el.style.transform = '';
+    el.classList.remove('dash-tile-dragging');
+    _dashJustDragged = true;
+    saveDashTileOrder();
+  }
+  _dashDrag = null;
+}
+var _dashJustDragged = false;
+document.addEventListener('click', function(e) {
+  if (_dashJustDragged) {
+    _dashJustDragged = false;
+    if (e.target.closest && e.target.closest('.dash-tile')) { e.stopImmediatePropagation(); e.preventDefault(); }
+  }
+}, true);
+async function saveDashTileOrder() {
+  var grid = document.getElementById('member-dash-stats-grid');
+  if (!grid) return;
+  var order = Array.prototype.slice.call(grid.children).map(function(el){ return el.getAttribute('data-tile-key'); }).filter(Boolean);
+  await db.from('dashboard_settings').update({ tile_order: order, updated_at: new Date().toISOString() }).eq('id', 1);
+  showToast('✅ ' + t('toast_tile_order_saved'), 'success');
 }
 
 function showMemberDashMain() {
