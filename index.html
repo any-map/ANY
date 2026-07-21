@@ -7572,18 +7572,8 @@ var liveMarker = null;
 var liveAccCircle = null;
 var liveHeading = null;
 var _orientListenerAdded = false;
-// Pré-requête orientation au premier touch si déjà accordé avant (évite le dialog iOS à chaque session)
-(function() {
-  if (localStorage.getItem('orientPermGranted') !== '1') return;
-  if (typeof DeviceOrientationEvent === 'undefined' || typeof DeviceOrientationEvent.requestPermission !== 'function') return;
-  function _preOrient() {
-    DeviceOrientationEvent.requestPermission().then(function(s) {
-      if (s !== 'granted') { localStorage.removeItem('orientPermGranted'); }
-    }).catch(function() {});
-  }
-  document.addEventListener('touchend', _preOrient, { once: true, passive: true });
-  document.addEventListener('click', _preOrient, { once: true });
-})();
+var _orientPermGrantedThisSession = false;
+var _orientPermDeniedThisSession = false;
 var compassModeActive = false;
 
 function autoLocateOnConnect() {
@@ -7606,12 +7596,19 @@ function startLiveTracking() {
       _orientListenerAdded = true;
     }
   };
-  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+  if (_orientPermGrantedThisSession) {
+    addOrient();
+  } else if (_orientPermDeniedThisSession) {
+    // ne redemande pas deux fois dans la même session si déjà refusé
+  } else if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
     DeviceOrientationEvent.requestPermission().then(function(s) {
-      if (s === 'granted') { localStorage.setItem('orientPermGranted', '1'); addOrient(); }
-      else { localStorage.removeItem('orientPermGranted'); }
+      if (s === 'granted') { _orientPermGrantedThisSession = true; addOrient(); }
+      else { _orientPermDeniedThisSession = true; }
     }).catch(function(){});
-  } else { addOrient(); }
+  } else {
+    _orientPermGrantedThisSession = true;
+    addOrient();
+  }
   liveTrackActive = true;
   document.getElementById('btn-locate').classList.add('live');
   var bcm = document.getElementById('btn-compass-mode');
