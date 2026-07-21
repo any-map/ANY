@@ -8980,7 +8980,7 @@ async function openMemberDash() {
   function dTile(icon, label, val, onclick, badge, cls, weekLabel, reorderKey) {
     var badgeHtml = (badge > 0) ? '<div class="dash-tile-badge">'+(badge>99?'99+':badge)+'</div>' : '';
     var weekHtml = weekLabel ? '<div class="dash-tile-week-label">'+weekLabel+'</div>' : '';
-    var dragAttrs = reorderKey ? ' data-tile-key="'+reorderKey+'" onpointerdown="dashTileDragStart(event,\''+reorderKey+'\')" onpointermove="dashTileDragMove(event)" onpointerup="dashTileDragEnd(event)" onpointercancel="dashTileDragEnd(event)"' : '';
+    var dragAttrs = (reorderKey && isAdmin) ? ' data-tile-key="'+reorderKey+'" onpointerdown="dashTileDragStart(event,\''+reorderKey+'\')" onpointermove="dashTileDragMove(event)" onpointerup="dashTileDragEnd(event)" onpointercancel="dashTileDragEnd(event)"' : '';
     return '<div class="dash-tile'+(cls?' '+cls:'')+'"'+(onclick?' onclick="'+onclick+'"':'')+dragAttrs+'>'+badgeHtml+'<div class="dash-tile-icon">'+icon+'</div>'+(val!==''?'<div class="dash-tile-val">'+val+'</div>':'')+'<div class="dash-tile-lbl">'+label+'</div>'+weekHtml+'</div>';
   }
 
