@@ -7953,7 +7953,7 @@ async function loadDashboardTiles(gridId) {
     (isAdmin || isModerator) ? db.rpc('get_registered_users_count') : Promise.resolve({ data: 0 }),
     (isAdmin || isModerator) ? db.rpc('get_new_users_count', { since: weekStart }) : Promise.resolve({ data: 0 }),
     (isAdmin || isModerator) ? db.from('places').select('id', { count: 'exact', head: true }).eq('status', 'active').not('user_id', 'is', null) : Promise.resolve({ count: 0 }),
-    db.from('places').select('id', { count: 'exact', head: true }).gte('created_at', weekStart).not('user_id', 'is', null),
+    (isAdmin || isModerator) ? db.from('places').select('id', { count: 'exact', head: true }).gte('created_at', weekStart).not('user_id', 'is', null) : Promise.resolve({ count: 0 }),
     db.from('places').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
     db.from('reports').select('id', { count: 'exact', head: true }),
     db.from('comment_reports').select('id', { count: 'exact', head: true })
@@ -7981,11 +7981,12 @@ async function loadDashboardTiles(gridId) {
       + '</div>';
   }
 
-  var html = tile('&#10024;', t('dash_new_places'), newPlaces, (isAdmin || isModerator) ? 'showDashNewPlaces()' : '', 0, 'week', t('lbl_this_week'));
+  var html = '';
   if (isAdmin || isModerator) {
     html += tile('&#128101;', t('dash_registered_members'), totalMembers, 'showDashMembers()')
       + tile('&#127381;', t('dash_new_members'), newMembers, 'showDashNewMembers()', 0, 'week', t('lbl_this_week'))
-      + tile('&#128205;', t('dash_validated_total'), totalPlaces, 'showDashValidatedPlaces()');
+      + tile('&#128205;', t('dash_validated_total'), totalPlaces, 'showDashValidatedPlaces()')
+      + tile('&#10024;', t('dash_new_places'), newPlaces, 'showDashNewPlaces()', 0, 'week', t('lbl_this_week'));
     html += tile('&#9888;&#65039;', t('dash_reported_places'), reportedPlaces, 'showDashReportedPlaces()', reportedPlaces, reportedPlaces > 0 ? 'urgent' : '')
       + tile('&#128172;', t('dash_reported_comments'), reportedCmts, 'showDashReportedComments()', reportedCmts, reportedCmts > 0 ? 'urgent' : '');
     html += tile('&#127942;', 'Classement XP', '', 'showDashLeaderboard()', 0, '')
@@ -8990,8 +8991,9 @@ async function openMemberDash() {
     ? '<div onclick="openMemberDashFavs()" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;font-weight:600;color:var(--text);">Voir mes '+favsCount+' favoris</span><span style="color:var(--accent);font-size:18px;">›</span></div>'
     : '<div style="color:var(--text2);font-size:13px;text-align:center;padding:14px 0;">Aucun favori</div>';
 
-  var sectionTitle = (isAdmin||isModerator) ? '🛡️ Administration' : '📊 Statistiques';
-  html += '<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin:24px 0 10px;">'+sectionTitle+'</div>';
+  if (isAdmin||isModerator) {
+    html += '<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin:24px 0 10px;">🛡️ Administration</div>';
+  }
   html += '<div id="member-dash-stats-grid" class="dash-grid"><div style="color:var(--text2);font-size:12px;text-align:center;padding:8px 0;">' + t('lbl_loading') + '</div></div>';
   html += '<div style="text-align:center;margin-top:20px;padding-bottom:4px;">'
     +'<button onclick="reopenTuto()" style="background:none;border:none;color:var(--text2);font-size:12px;cursor:pointer;text-decoration:underline;font-family:var(--font-body);">📖 Revoir le tutoriel</button>'
@@ -9012,7 +9014,7 @@ async function openMemberDash() {
       (isAdmin||isModerator) ? db.rpc('get_registered_users_count') : Promise.resolve({data:0}),
       (isAdmin||isModerator) ? db.rpc('get_new_users_count',{since:weekStart}) : Promise.resolve({data:0}),
       (isAdmin||isModerator) ? db.from('places').select('id',{count:'exact',head:true}).eq('status','active').not('user_id','is',null) : Promise.resolve({count:0}),
-      db.from('places').select('id',{count:'exact',head:true}).gte('created_at',weekStart).not('user_id','is',null),
+      (isAdmin||isModerator) ? db.from('places').select('id',{count:'exact',head:true}).gte('created_at',weekStart).not('user_id','is',null) : Promise.resolve({count:0}),
       (isAdmin||isModerator) ? db.from('places').select('id',{count:'exact',head:true}).eq('status','pending') : Promise.resolve({count:0}),
       (isAdmin||isModerator) ? db.from('reports').select('id',{count:'exact',head:true}) : Promise.resolve({count:0}),
       (isAdmin||isModerator) ? db.from('comment_reports').select('id',{count:'exact',head:true}) : Promise.resolve({count:0})
@@ -9031,11 +9033,12 @@ async function openMemberDash() {
   var nb = document.getElementById('dash-nav-badge');
   if (nb) { nb.textContent = urgent > 99 ? '99+' : urgent; nb.style.display = urgent > 0 ? 'block' : 'none'; }
 
-  var dashHtml = dTile('&#10024;', t('dash_new_places'), newPlaces, 'showDashNewPlaces()', 0, 'week', t('lbl_this_week'));
+  var dashHtml = '';
   if (isAdmin||isModerator) {
     dashHtml += dTile('&#128101;', t('dash_registered_members'), totalMembers, 'showDashMembers()')
       + dTile('&#128205;', t('dash_validated_total'), totalPlaces, 'showDashValidatedPlaces()')
-      + dTile('&#127381;', t('dash_new_members'), newMembers, 'showDashNewMembers()', 0, 'week', t('lbl_this_week'));
+      + dTile('&#127381;', t('dash_new_members'), newMembers, 'showDashNewMembers()', 0, 'week', t('lbl_this_week'))
+      + dTile('&#10024;', t('dash_new_places'), newPlaces, 'showDashNewPlaces()', 0, 'week', t('lbl_this_week'));
     dashHtml += dTile('&#9888;&#65039;', t('dash_reported_places'), reportedPlaces, 'showDashReportedPlaces()', reportedPlaces, reportedPlaces>0?'urgent':'')
       + dTile('&#128172;', t('dash_reported_comments'), reportedCmts, 'showDashReportedComments()', reportedCmts, reportedCmts>0?'urgent':'')
       + dTile('&#127942;', 'Classement XP', '', 'showDashLeaderboard()')
