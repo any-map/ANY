@@ -1203,6 +1203,7 @@ var currentUser = null;
 var currentUsername = '';
 var ADMINS = ['mypoiuytreza@gmail.com', 'unverredericard@gmail.com'];
 var isAdmin = false, isModerator = false, isTrusted = false;
+var weeklyActiveCount = null;
 var userXPIdx = 0;
 var currentUserAvatar = null;
 var currentUserAvatarBg = '';
@@ -1379,6 +1380,7 @@ fr:{
   place_available:'24h/24', place_limited:'Horaires limités', place_by:'Ajouté par',
   place_pending_banner:'⏳ En attente de validation — visible uniquement par toi et les modérateurs',
   place_hidden_banner:'🚫 Lieu masqué — visible uniquement par les modérateurs',
+  admin_weekly_active_banner_label:'connecté(e)s uniques (7 derniers jours)', admin_weekly_active_title:'👥 Connectés uniques (7 jours)', admin_weekly_active_empty:'Aucune connexion enregistrée ces 7 derniers jours',
   place_comments_title:'💬 Commentaires', place_rate:'⭐ Votre note',
   place_comment_ph:'Ton avis...', place_send:'Envoyer', place_loading:'Chargement...',
   place_no_reviews:'Aucun avis pour l\'instant', place_validate_btn:'👍 Valider ce lieu',
@@ -1674,6 +1676,7 @@ en:{
   place_available:'24/7', place_limited:'Limited hours', place_by:'Added by',
   place_pending_banner:'⏳ Pending validation — visible only to you and moderators',
   place_hidden_banner:'🚫 Hidden place — visible only to moderators',
+  admin_weekly_active_banner_label:'unique users active (last 7 days)', admin_weekly_active_title:'👥 Active users (7 days)', admin_weekly_active_empty:'No activity recorded in the last 7 days',
   place_comments_title:'💬 Comments', place_rate:'⭐ Your rating',
   place_comment_ph:'Your review...', place_send:'Send', place_loading:'Loading...',
   place_no_reviews:'No reviews yet', place_validate_btn:'👍 Validate this place',
@@ -1958,6 +1961,7 @@ es:{
   place_available:'24h', place_limited:'Horario limitado', place_by:'Añadido por',
   place_pending_banner:'⏳ Pendiente de validación — solo visible para ti y los moderadores',
   place_hidden_banner:'🚫 Lugar oculto — solo visible para los moderadores',
+  admin_weekly_active_banner_label:'usuarios únicos activos (últimos 7 días)', admin_weekly_active_title:'👥 Usuarios activos (7 días)', admin_weekly_active_empty:'Sin actividad registrada en los últimos 7 días',
   place_comments_title:'💬 Comentarios', place_rate:'⭐ Tu nota',
   place_comment_ph:'Tu opinión...', place_send:'Enviar', place_loading:'Cargando...',
   place_no_reviews:'Sin opiniones todavía', place_validate_btn:'👍 Validar este lugar',
@@ -2249,6 +2253,7 @@ de:{
   place_available:'24/7', place_limited:'Begrenzte Öffnungszeiten', place_by:'Hinzugefügt von',
   place_pending_banner:'⏳ Ausstehende Validierung — nur für dich und Moderatoren sichtbar',
   place_hidden_banner:'🚫 Versteckter Ort — nur für Moderatoren sichtbar',
+  admin_weekly_active_banner_label:'eindeutige Nutzer aktiv (letzte 7 Tage)', admin_weekly_active_title:'👥 Aktive Nutzer (7 Tage)', admin_weekly_active_empty:'Keine Aktivität in den letzten 7 Tagen erfasst',
   place_comments_title:'💬 Kommentare', place_rate:'⭐ Ihre Bewertung',
   place_comment_ph:'Ihre Meinung...', place_send:'Senden', place_loading:'Laden...',
   place_no_reviews:'Noch keine Bewertungen', place_validate_btn:'👍 Diesen Ort validieren',
@@ -2540,6 +2545,7 @@ it:{
   place_available:'24h', place_limited:'Orari limitati', place_by:'Aggiunto da',
   place_pending_banner:'⏳ In attesa di validazione — visibile solo a te e ai moderatori',
   place_hidden_banner:'🚫 Luogo nascosto — visibile solo ai moderatori',
+  admin_weekly_active_banner_label:'utenti unici attivi (ultimi 7 giorni)', admin_weekly_active_title:'👥 Utenti attivi (7 giorni)', admin_weekly_active_empty:'Nessuna attività registrata negli ultimi 7 giorni',
   place_comments_title:'💬 Commenti', place_rate:'⭐ La tua valutazione',
   place_comment_ph:'La tua opinione...', place_send:'Invia', place_loading:'Caricamento...',
   place_no_reviews:'Nessuna recensione ancora', place_validate_btn:'👍 Valida questo luogo',
@@ -2831,6 +2837,7 @@ pt:{
   place_available:'24h', place_limited:'Horário limitado', place_by:'Adicionado por',
   place_pending_banner:'⏳ Aguardando validação — visível apenas para você e moderadores',
   place_hidden_banner:'🚫 Local oculto — visível apenas para moderadores',
+  admin_weekly_active_banner_label:'utilizadores únicos ativos (últimos 7 dias)', admin_weekly_active_title:'👥 Utilizadores ativos (7 dias)', admin_weekly_active_empty:'Nenhuma atividade registada nos últimos 7 dias',
   place_comments_title:'💬 Comentários', place_rate:'⭐ Sua avaliação',
   place_comment_ph:'Sua opinião...', place_send:'Enviar', place_loading:'Carregando...',
   place_no_reviews:'Sem avaliações ainda', place_validate_btn:'👍 Validar este local',
@@ -3122,6 +3129,7 @@ nl:{
   place_available:'24/7', place_limited:'Beperkte openingstijden', place_by:'Toegevoegd door',
   place_pending_banner:'⏳ Wacht op validatie — alleen zichtbaar voor jou en moderatoren',
   place_hidden_banner:'🚫 Verborgen locatie — alleen zichtbaar voor moderatoren',
+  admin_weekly_active_banner_label:'unieke actieve gebruikers (laatste 7 dagen)', admin_weekly_active_title:'👥 Actieve gebruikers (7 dagen)', admin_weekly_active_empty:'Geen activiteit geregistreerd in de laatste 7 dagen',
   place_comments_title:'💬 Reacties', place_rate:'⭐ Jouw beoordeling',
   place_comment_ph:'Jouw mening...', place_send:'Versturen', place_loading:'Laden...',
   place_no_reviews:'Nog geen beoordelingen', place_validate_btn:'👍 Deze locatie valideren',
@@ -4492,6 +4500,8 @@ function signOut() {
   userPrefs = { satellite: false };
   applySat(false);
   updateSatBtn();
+  var adminBanner = document.getElementById('admin-activity-banner');
+  if (adminBanner) adminBanner.style.display = 'none';
   document.getElementById('auth-info').textContent = t('auth_not_connected');
   document.getElementById('btn-auth').textContent = t('btn_connect');
   var navMD = document.getElementById('nav-member-dash');
@@ -4547,6 +4557,47 @@ async function loadUserProfile() {
     document.getElementById('btn-auth').textContent = t('btn_disconnect');
     openUsernameModal();
   }
+}
+
+function updateLastSeen() {
+  if (!currentUser) return;
+  db.from('profiles').update({ last_seen_at: new Date().toISOString() }).eq('user_id', currentUser.id).then(function(){}, function(){});
+}
+
+async function initAdminActivityBanner() {
+  var banner = document.getElementById('admin-activity-banner');
+  if (!banner) return;
+  if (!isAdmin) { banner.style.display = 'none'; weeklyActiveCount = null; return; }
+  try {
+    var res = await db.rpc('get_weekly_active_users_count');
+    if (res.error || res.data == null) return;
+    weeklyActiveCount = res.data;
+    document.getElementById('admin-activity-count').textContent = weeklyActiveCount;
+    document.getElementById('admin-activity-label').textContent = t('admin_weekly_active_banner_label');
+    if (!_moveModePlaceId) banner.style.display = 'flex';
+  } catch(e) {}
+}
+
+function showWeeklyActiveDetail() {
+  showDashDetail(t('admin_weekly_active_title'), function() {
+    var c = document.getElementById('dash-detail-content');
+    c.innerHTML = '<div style="color:var(--text2);font-size:13px;">' + t('lbl_loading') + '</div>';
+    (async function() {
+      var res = await db.rpc('admin_get_weekly_active_users');
+      if (res.error) { c.innerHTML = '<div style="color:#e74c3c;font-size:13px;">' + t('lbl_err_generic') + '</div>'; return; }
+      var rows = res.data || [];
+      if (!rows.length) { c.innerHTML = '<div style="color:var(--text2);font-size:13px;text-align:center;padding:16px 0;">' + t('admin_weekly_active_empty') + '</div>'; return; }
+      c.innerHTML = '<div style="font-size:11px;color:var(--text2);margin-bottom:10px;">' + rows.length + ' ' + t('admin_weekly_active_banner_label') + '</div>'
+        + rows.map(function(r) {
+          var d = r.last_seen_at ? new Date(r.last_seen_at).toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }) : '';
+          var displayName = r.username ? escHtml(r.username) : '<span style="color:var(--text2);font-style:italic;">(sans pseudo)</span>';
+          return '<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);">'
+            + '<span style="font-size:13px;font-weight:600;color:var(--text);">' + displayName + '</span>'
+            + '<span style="font-size:11px;color:var(--text2);">' + d + '</span>'
+            + '</div>';
+        }).join('');
+    })();
+  });
 }
 
 function openUsernameModal() {
@@ -5054,6 +5105,8 @@ async function checkAuth() {
     startRealtimeNotifs();
     loadUserFavorites(); loadUserValidations();
     autoLocateOnConnect();
+    updateLastSeen();
+    initAdminActivityBanner();
     if (!currentUser.email_confirmed_at && !sessionStorage.getItem('emailReminderShown')) {
       sessionStorage.setItem('emailReminderShown', '1');
       setTimeout(function() {
@@ -5115,6 +5168,8 @@ async function handleAuth() {
     startRealtimeNotifs();
     loadUserFavorites(); loadUserValidations();
     autoLocateOnConnect();
+    updateLastSeen();
+    initAdminActivityBanner();
     showToast(t('toast_connected'), 'success');
     if (document.getElementById('sheet-profile').classList.contains('open')) {
       renderProfile();
@@ -5743,12 +5798,19 @@ function startMoveMode() {
   closePlaceSheet();
   var banner = document.getElementById('move-mode-banner');
   if (banner) banner.style.display = 'flex';
+  // évite le chevauchement avec la bande admin (même position tout en haut)
+  var adminBanner = document.getElementById('admin-activity-banner');
+  if (adminBanner) adminBanner.style.display = 'none';
 }
 
 function cancelMoveMode() {
   _moveModePlaceId = null;
   var banner = document.getElementById('move-mode-banner');
   if (banner) banner.style.display = 'none';
+  if (isAdmin && weeklyActiveCount != null) {
+    var adminBanner = document.getElementById('admin-activity-banner');
+    if (adminBanner) adminBanner.style.display = 'flex';
+  }
 }
 var _locationSuggestionReportId = null;
 var _locationSuggestionPlaceId = null;
@@ -9983,6 +10045,12 @@ function closeTuto() {
 <div id="move-mode-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:6000;background:rgba(255,140,0,0.95);color:#000;padding:14px 16px;align-items:center;justify-content:space-between;gap:10px;">
   <span style="font-size:14px;font-weight:700;">&#128205; Tapez sur la carte pour déplacer le lieu</span>
   <button onclick="cancelMoveMode()" style="background:rgba(0,0,0,0.18);border:none;color:#000;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer;">Annuler</button>
+</div>
+
+<!-- ADMIN WEEKLY ACTIVITY BANNER (admin uniquement) -->
+<div id="admin-activity-banner" onclick="showWeeklyActiveDetail()" style="display:none;position:fixed;top:0;left:0;right:0;z-index:5900;background:rgba(255,209,64,0.95);color:#1a1400;padding:12px 16px;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;">
+  <span style="font-size:13px;font-weight:700;">&#128101; <span id="admin-activity-count">—</span> <span id="admin-activity-label"></span></span>
+  <span style="color:rgba(0,0,0,0.5);font-size:16px;">&#8250;</span>
 </div>
 
 <!-- EDIT PLACE MODAL -->
