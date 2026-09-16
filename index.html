@@ -3462,7 +3462,7 @@ async function init() {
   map.addLayer(cluster);
   map.on('click', onMapClick);
   map.on('moveend', function() { scheduleLoad(); });
-  map.on('zoomend', function() { _autoSpiderfied = false; scheduleLoad(); if (map.getZoom() >= 14) scheduleAutoSpiderfy(350); });
+  map.on('zoomend', function() { _autoSpiderfied = false; scheduleLoad(); });
   cluster.on('animationend', function() { if (!_autoSpiderfied && map.getZoom() >= 14) scheduleAutoSpiderfy(200); });
   window.addEventListener('resize', function() { map.invalidateSize(); });
   setTimeout(function() { map.invalidateSize(); }, 200);
@@ -5546,6 +5546,7 @@ function renderMarkers(places) {
     markers.push(mk);
   });
   cluster.addLayers(markers);
+  if (map.getZoom() >= 14) scheduleAutoSpiderfy(200);
 }
 
 function parseFuelPrices(desc) {
