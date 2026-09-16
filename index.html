@@ -5656,7 +5656,7 @@ function makePopup(p) {
     + ''
 
     + '<div class="pv2-nav">'
-    + '<button onclick="toggleNav(\'' + safeId + '\',' + p.latitude + ',' + p.longitude + ',\'' + safeName + '\')" class="pv2-nav-btn pv2-btn-goto">&#128205; M\'y rendre' + (distText ? ' : ' + distText : '') + '</button>'
+    + '<button id="btn-goto-' + safeId + '" onclick="toggleNav(\'' + safeId + '\',' + p.latitude + ',' + p.longitude + ',\'' + safeName + '\')" class="pv2-nav-btn pv2-btn-goto">&#128205; M\'y rendre' + (distText ? ' : ' + distText : '') + '</button>'
     + (currentUser ? '<button id="btn-fav-' + safeId + '" onclick="toggleFavorite(\'' + safeId + '\')" class="pv2-nav-btn pv2-btn-fav" title="Favoris">&#9825;</button>' : '')
     + (currentUser && (currentUser.id === p.user_id || isAdmin || isModerator) ? '<button onclick="openEditPlace()" class="pv2-nav-btn pv2-btn-edit" title="Modifier">&#9998;</button>' : '')
     + '<button onclick="sharePlace(\'' + safeId + '\',\'' + safeName + '\',' + p.latitude + ',' + p.longitude + ')" class="pv2-nav-btn pv2-btn-share" title="Partager"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>'
@@ -5688,6 +5688,9 @@ function makePopup(p) {
   }
   loadReportInfo(p.id);
   if (currentUser) { checkFavorite(p.id); }
+  if (userLatLng && p.latitude != null && p.longitude != null) {
+    _updateGotoRoadDistance(safeId, userLatLng, p.latitude, p.longitude);
+  }
   return el;
 }
 
@@ -9609,6 +9612,32 @@ async function _fetchOSRM(coordStr) {
     } catch (e) { /* next server */ }
   }
   return null;
+}
+
+// distance par la route (km, décimale) pour l'affichage sur le bouton "M'y rendre" -
+// version légère de _fetchOSRM (pas de géométrie) puisqu'on n'a besoin que de la distance
+async function fetchRoadDistanceKm(fromLatLng, toLat, toLng) {
+  var coordStr = fromLatLng.lng + ',' + fromLatLng.lat + ';' + toLng + ',' + toLat;
+  for (var i = 0; i < _OSRM_SERVERS.length; i++) {
+    try {
+      var res = await Promise.race([
+        fetch(_OSRM_SERVERS[i] + coordStr + '?overview=false'),
+        new Promise(function(_, rej) { setTimeout(function() { rej(new Error('timeout')); }, 6000); })
+      ]);
+      if (!res.ok) continue;
+      var data = await res.json();
+      if (data.routes && data.routes.length) return data.routes[0].distance / 1000;
+    } catch (e) { /* next server */ }
+  }
+  return null;
+}
+
+async function _updateGotoRoadDistance(safeId, fromLatLng, toLat, toLng) {
+  var km = await fetchRoadDistanceKm(fromLatLng, toLat, toLng);
+  if (km == null) return;
+  var btn = document.getElementById('btn-goto-' + safeId);
+  if (!btn) return;
+  btn.innerHTML = '&#128205; M\'y rendre : ' + formatDistance(km);
 }
 
 function _decodePolyline6(str) {
