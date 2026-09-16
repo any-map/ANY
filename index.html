@@ -7610,6 +7610,7 @@ async function submitPlace() {
   closeModal('modal-add');
   addingMode = false;
   document.getElementById('info-adding').style.display = 'none';
+  _reEnable();
   showToast(t('toast_place_added'), 'success');
   scheduleLoad();
 }
