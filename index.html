@@ -3539,6 +3539,8 @@ function toggleCompassMode() {
   compassModeActive = !compassModeActive;
   var btn = document.getElementById('btn-compass-mode');
   if (btn) btn.classList.toggle('active', compassModeActive);
+  // le tracking a pu démarrer automatiquement (auto=true) sans demander la permission d'orientation
+  if (compassModeActive && !_orientListenerAdded) ensureOrientationPermission();
   if (!compassModeActive && map.setBearing) map.setBearing(0);
 }
 
@@ -7643,31 +7645,14 @@ var compassModeActive = false;
 
 function autoLocateOnConnect() {
   if (_autoLocateSkip || !navigator.geolocation || !map) return;
-  navigator.geolocation.getCurrentPosition(function(pos) {
-    var latlng = L.latLng(pos.coords.latitude, pos.coords.longitude);
-    map.setView(latlng, 15);
-    if (liveTrackActive) return;
-    if (!liveMarker) {
-      var icon = L.divIcon({
-        className: '',
-        html: '<div class="my-loc-wrap" id="my-loc-wrap"><div class="my-loc-cone"></div><div class="my-loc-dot"></div></div>',
-        iconSize: [40, 40], iconAnchor: [20, 20]
-      });
-      liveMarker = L.marker(latlng, { icon: icon, zIndexOffset: 1000, interactive: false }).addTo(map);
-      liveAccCircle = L.circle(latlng, { radius: Math.max(pos.coords.accuracy / 2, 8), color: '#4285f4', weight: 1, fillColor: '#4285f4', fillOpacity: 0.12 }).addTo(map);
-    } else {
-      liveMarker.setLatLng(latlng);
-      liveAccCircle.setLatLng(latlng).setRadius(Math.max(pos.coords.accuracy / 2, 8));
-    }
-  }, function() {}, { timeout: 8000, maximumAge: 60000 });
+  startLiveTracking(true);
 }
 
 function toggleLiveTracking() {
   if (liveTrackActive) { stopLiveTracking(); } else { startLiveTracking(); }
 }
 
-function startLiveTracking() {
-  if (!navigator.geolocation) { showToast(t('toast_location_error'), 'error'); return; }
+function ensureOrientationPermission() {
   var addOrient = function() {
     if (!_orientListenerAdded) {
       window.addEventListener('deviceorientationabsolute', onDeviceOrientation, true);
@@ -7688,6 +7673,13 @@ function startLiveTracking() {
     _orientPermGrantedThisSession = true;
     addOrient();
   }
+}
+
+// auto=true : déclenché automatiquement au lancement — suit la position en continu
+// mais ne demande PAS la permission d'orientation (boussole) et reste silencieux en cas d'échec
+function startLiveTracking(auto) {
+  if (!navigator.geolocation) { if (!auto) showToast(t('toast_location_error'), 'error'); return; }
+  if (!auto) ensureOrientationPermission();
   liveTrackActive = true;
   document.getElementById('btn-locate').classList.add('live');
   var bcm = document.getElementById('btn-compass-mode');
@@ -7709,7 +7701,7 @@ function startLiveTracking() {
       liveAccCircle.setLatLng(latlng).setRadius(Math.max(acc / 2, 8));
     }
     updateLiveMarkerHeading();
-  }, function() { showToast(t('toast_location_error'), 'error'); stopLiveTracking(); },
+  }, function() { if (!auto) showToast(t('toast_location_error'), 'error'); stopLiveTracking(); },
   { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 });
 }
 
