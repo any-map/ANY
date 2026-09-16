@@ -3462,7 +3462,7 @@ async function init() {
   map.addLayer(cluster);
   map.on('click', onMapClick);
   map.on('moveend', function() { scheduleLoad(); });
-  map.on('zoomend', function() { _autoSpiderfied = false; scheduleLoad(); });
+  map.on('zoomend', function() { _autoSpiderfied = false; scheduleLoad(); if (map.getZoom() >= 14) scheduleAutoSpiderfy(0); });
   cluster.on('animationend', function() { if (!_autoSpiderfied && map.getZoom() >= 14) scheduleAutoSpiderfy(200); });
   window.addEventListener('resize', function() { map.invalidateSize(); });
   setTimeout(function() { map.invalidateSize(); }, 200);
@@ -5512,7 +5512,7 @@ function scheduleAutoSpiderfy(delay) {
         }
       });
     } catch(e) {}
-  }, delay || 300);
+  }, typeof delay === 'number' ? delay : 300);
 }
 
 function renderMarkers(places) {
