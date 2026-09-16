@@ -5599,6 +5599,9 @@ function makePopup(p) {
   var starHtml = [1,2,3,4,5].map(function(n) {
     return '<span class="star" onclick="ratePlace(\'' + safeId + '\',' + n + ')" onmouseover="hoverStars(\'' + safeId + '\',' + n + ')" onmouseout="resetStars(\'' + safeId + '\')">&#9733;</span>';
   }).join('');
+  var distText = (userLatLng && p.latitude != null && p.longitude != null)
+    ? formatDistance(_haversineKm(userLatLng.lat, userLatLng.lng, p.latitude, p.longitude))
+    : null;
 
   // Mod actions HTML (mod\u00e9rateurs et admins uniquement)
   var modHtml = '';
@@ -5624,7 +5627,7 @@ function makePopup(p) {
     + '<div class="pv2-header" style="background:' + color + '">'
     + '<div class="pv2-emoji">' + icon + '</div>'
     + '<div class="pv2-header-info">'
-    + '<div class="pv2-hcat">' + escHtml(catName) + '</div>'
+    + '<div class="pv2-hcat">' + escHtml(catName) + (distText ? ' · ' + distText : '') + '</div>'
     + '<div class="pv2-hname">' + escHtml(p.name) + '</div>'
     + '</div>'
     + '</div>'
@@ -7642,6 +7645,12 @@ var _orientListenerAdded = false;
 var _orientPermGrantedThisSession = false;
 var _orientPermDeniedThisSession = false;
 var compassModeActive = false;
+var userLatLng = null;
+
+function formatDistance(km) {
+  if (km < 1) return Math.round(km * 1000) + ' m';
+  return (km < 10 ? km.toFixed(1) : Math.round(km)) + ' km';
+}
 
 function autoLocateOnConnect() {
   if (_autoLocateSkip || !navigator.geolocation || !map) return;
@@ -7687,6 +7696,7 @@ function startLiveTracking(auto) {
   liveWatchId = navigator.geolocation.watchPosition(function(pos) {
     var latlng = L.latLng(pos.coords.latitude, pos.coords.longitude);
     var acc = pos.coords.accuracy;
+    userLatLng = latlng;
     if (!liveMarker) {
       var icon = L.divIcon({
         className: '',
