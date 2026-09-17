@@ -5435,8 +5435,11 @@ var soloPlaceId = null;
 
 function scheduleLoad() {
   if (soloPlaceId) return;
-  if (routeState && routeState.active) return;
   if (loadTimer) clearTimeout(loadTimer);
+  if (routeState && routeState.active) {
+    loadTimer = setTimeout(_loadPlacesAlongRoute, 400);
+    return;
+  }
   loadTimer = setTimeout(loadPlaces, 400);
 }
 
