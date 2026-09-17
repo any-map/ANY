@@ -6369,6 +6369,10 @@ function toggleNav(pid, lat, lng, name) {
   document.getElementById('nav-link-google').href = 'https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng;
   document.getElementById('nav-link-apple').href = 'https://maps.apple.com/?daddr=' + lat + ',' + lng;
   document.getElementById('modal-nav-name').textContent = name || '';
+  ['nav-link-waze','nav-link-google','nav-link-apple'].forEach(function(id) {
+    var a = document.getElementById(id);
+    if (a) { a.style.background = 'var(--surface2)'; a.style.borderColor = 'var(--border)'; a.style.color = 'var(--text)'; }
+  });
   document.getElementById('modal-nav').style.display = 'flex';
 }
 
