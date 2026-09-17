@@ -6102,6 +6102,8 @@ async function adminForceValidate(pid) {
   if (!ex.data) await db.from('place_validations').insert({ place_id: pid, user_id: currentUser.id, weight: 2 });
   await db.from('places').update({ validation_weight: 3 }).eq('id', pid);
   userMyValidations[pid] = true;
+  var localPlace = allPlaces.find(function(p) { return p.id === pid; });
+  if (localPlace) { localPlace.validation_weight = 3; renderMarkers(allPlaces); }
   showToast(t('toast_place_validated'), 'success');
   scheduleLoad();
 }
@@ -6129,6 +6131,9 @@ async function confirmApprovePlace() {
   var placeRes = await db.from('places').select('user_id, name').eq('id', a.pid).maybeSingle();
   var res = await db.from('places').update({ status: 'active', approved_by_id: currentUser.id, validation_weight: 3 }).eq('id', a.pid);
   if (res.error) { showToast(t('lbl_err_generic') + res.error.message, 'error'); return; }
+  userMyValidations[a.pid] = true;
+  var localPlace = allPlaces.find(function(p) { return p.id === a.pid; });
+  if (localPlace) { localPlace.status = 'active'; localPlace.validation_weight = 3; renderMarkers(allPlaces); }
   if (placeRes.data) {
     insertPlaceNotif(placeRes.data.user_id, 'place_validated', '&#10003; Votre lieu « ' + placeRes.data.name + ' » a été validé et publié !', a.pid);
     sendPush([placeRes.data.user_id], '&#10003; Lieu validé !', 'Votre lieu « ' + placeRes.data.name + ' » a été publié sur la carte', '/');
