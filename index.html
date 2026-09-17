@@ -8353,8 +8353,7 @@ async function loadDashMembersList() {
       return '<div ' + clickable + '>'
         + '<div style="width:30px;height:30px;border-radius:50%;background:rgba(11,166,179,0.15);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--accent);flex-shrink:0;">' + (i + 1) + '</div>'
         + '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + roleLabel + ' ' + displayName + '</div>'
-        + (date ? '<div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text2);">' + t('member_registered') + ' ' + date + '</span>' + (m.username ? '<span style="color:var(--text2);font-size:16px;">&#8250;</span>' : '') + '</div>' : '')
-        + (statusLabel ? '<div style="font-size:11px;color:var(--text2);margin-top:2px;">' + statusLabel + '</div>' : '') + '</div>'
+        + (date ? '<div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text2);">' + t('member_registered') + ' ' + date + (statusLabel ? ' · ' + statusLabel : '') + '</span>' + (m.username ? '<span style="color:var(--text2);font-size:16px;">&#8250;</span>' : '') + '</div>' : '') + '</div>'
         + '</div>';
     }).join('');
 }
