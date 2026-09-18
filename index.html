@@ -3834,8 +3834,8 @@ async function renderProfile() {
           + '</div>';
       })()
     + '<div style="margin:0 16px 14px;display:flex;gap:8px;">'
-    + '<button onclick="window.open(\'https://paypal.me/anyprojet\',\'_blank\')" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:#e74c3c;border-radius:var(--radius-sm);padding:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;justify-content:center;gap:5px;">&#10084; Soutenir</button>'
     + '<button onclick="closeSheet(\'sheet-profile\');navTo(\'member-dash\');" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;justify-content:center;gap:5px;">📊 Mon espace</button>'
+    + '<button onclick="window.open(\'https://paypal.me/anyprojet\',\'_blank\')" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:#e74c3c;border-radius:var(--radius-sm);padding:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;justify-content:center;gap:5px;">&#10084; Soutenir</button>'
     + '</div>'
     + '<div class="prof-stats"><div class="prof-stats-grid">'
     + '<div class="prof-stat" onclick="toggleProfPlaces()" style="cursor:pointer;" title="Voir mes lieux"><div class="prof-stat-icon pic-green">&#128205;</div><div style="flex:1"><div class="prof-stat-val" id="prof-places">\u2014</div><div class="prof-stat-lbl">' + t('profile_places_added') + '</div></div><span id="prof-places-arrow" style="color:var(--text2);font-size:16px;">\u203a</span></div>'
@@ -9190,7 +9190,10 @@ async function openMemberDash() {
     return '<div class="dash-tile'+(cls?' '+cls:'')+'"'+(onclick?' onclick="'+onclick+'"':'')+dragAttrs+'>'+badgeHtml+'<div class="dash-tile-icon">'+icon+'</div>'+(val!==''?'<div class="dash-tile-val">'+val+'</div>':'')+'<div class="dash-tile-lbl">'+label+'</div>'+weekHtml+'</div>';
   }
 
-  var html = '<div onclick="closeSheet(\'sheet-member-dash\');navTo(\'profile\');" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;"><span style="font-size:13px;font-weight:600;color:var(--text);">👤 Voir mon profil</span><span style="color:var(--accent);font-size:18px;">›</span></div>';
+  var html = '<div style="display:flex;gap:8px;margin-bottom:14px;">'
+    + '<button onclick="closeSheet(\'sheet-member-dash\');navTo(\'profile\');" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;justify-content:center;gap:5px;">👤 Mon profil</button>'
+    + '<button onclick="window.open(\'https://paypal.me/anyprojet\',\'_blank\')" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:#e74c3c;border-radius:var(--radius-sm);padding:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;justify-content:center;gap:5px;">&#10084; Soutenir</button>'
+    + '</div>';
   html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">'
     +mTile('📍', places.length, 'Lieux ajoutés', "showMemberDashDetail('places')")
     +mTile('✅', validatedCount+'/'+places.length, 'Lieux validés', "showMemberDashDetail('validated')")
