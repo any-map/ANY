@@ -9194,11 +9194,19 @@ async function openMemberDash() {
     + '<button onclick="closeSheet(\'sheet-member-dash\');navTo(\'profile\');" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;justify-content:center;gap:5px;">👤 Mon profil</button>'
     + '<button onclick="window.open(\'https://paypal.me/anyprojet\',\'_blank\')" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:#e74c3c;border-radius:var(--radius-sm);padding:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;justify-content:center;gap:5px;">&#10084; Soutenir</button>'
     + '</div>';
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">'
+  var pendingMineCount = places.length - validatedCount;
+  var favsCount = Object.keys(userFavs).length;
+
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">'
     +mTile('📍', places.length, 'Lieux ajoutés', "showMemberDashDetail('places')")
-    +mTile('✅', validatedCount+'/'+places.length, 'Lieux validés', "showMemberDashDetail('validated')")
+    +mTile('✅', validatedCount, 'Lieux validés', "showMemberDashDetail('validated')")
+    +mTile('⏳', pendingMineCount, 'En attente', "showMemberDashDetail('pending')")
     +mTile('🙏', merciCount, 'Merci reçus', "showMemberDashDetail('merci')")
     +'</div>';
+
+  html += '<div onclick="closeSheet(\'sheet-member-dash\');navTo(\'favorites\');" style="margin-top:10px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;">'
+    +'<span style="font-size:13px;font-weight:600;color:var(--text);">⭐ Mes favoris ('+favsCount+')</span>'
+    +'<span style="color:var(--accent);font-size:18px;">›</span></div>';
 
   html += '<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin:20px 0 8px;">✅ Mes validations ('+valCount+')</div>';
   html += '<div onclick="showMemberDashDetail(\'validations\')" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;">'
@@ -9370,7 +9378,7 @@ async function showMemberDashDetail(type) {
   if (main) main.style.display='none';
   if (detail) { detail.style.display='flex'; detail.style.flexDirection='column'; }
   var d = _memberDashData;
-  var titles = {places:'📍 Mes lieux', validated:'✅ Lieux validés', merci:'🙏 Merci reçus', validations:'✅ Mes validations', ratings:'⭐ Notes reçues'};
+  var titles = {places:'📍 Mes lieux', validated:'✅ Lieux validés', pending:'⏳ En attente de validation', merci:'🙏 Merci reçus', validations:'✅ Mes validations', ratings:'⭐ Notes reçues'};
   if (titleEl) titleEl.textContent = titles[type] || '';
   if (type === 'ratings') {
     content.innerHTML = '<div style="color:var(--text2);font-size:13px;padding:20px 0;text-align:center;">' + t('lbl_loading') + '</div>';
@@ -9378,9 +9386,10 @@ async function showMemberDashDetail(type) {
     return;
   }
   var html = '';
-  if (type === 'places' || type === 'validated' || type === 'merci') {
+  if (type === 'places' || type === 'validated' || type === 'pending' || type === 'merci') {
     var list = d.places.slice();
     if (type === 'validated') list = list.filter(function(p){return (p.validation_weight||0)>=3;});
+    if (type === 'pending') list = list.filter(function(p){return (p.validation_weight||0)<3;});
     if (type === 'merci') list = list.filter(function(p){return (p.votes_positifs||0)>0;}).sort(function(a,b){return (b.votes_positifs||0)-(a.votes_positifs||0);});
     if (!list.length) {
       html = '<div style="color:var(--text2);font-size:13px;text-align:center;padding:20px 0;">Aucun lieu</div>';
