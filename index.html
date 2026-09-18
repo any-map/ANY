@@ -7500,6 +7500,10 @@ async function addCmt(pid) {
   input.value = '';
   loadCmts(pid);
   showToast(t('toast_comment_sent'), 'success');
+  var cmtPlaceRes = await db.from('places').select('user_id, name').eq('id', pid).maybeSingle();
+  if (cmtPlaceRes.data && cmtPlaceRes.data.user_id && cmtPlaceRes.data.user_id !== currentUser.id) {
+    insertPlaceNotif(cmtPlaceRes.data.user_id, 'new_comment', '💬 Nouveau commentaire sur « ' + escHtml(cmtPlaceRes.data.name || '') + ' »', pid);
+  }
 }
 
 async function vote(pid, pos) {
@@ -7534,6 +7538,9 @@ async function vote(pid, pos) {
           await db.from('places').update({ validation_weight: voteCount }).eq('id', pid);
         }
       }
+    }
+    if (placeData && placeData.user_id && placeData.user_id !== currentUser.id) {
+      insertPlaceNotif(placeData.user_id, 'place_thanks', '🙏 Quelqu\'un a dit merci pour « ' + escHtml((place && place.name) || 'votre lieu') + ' »', pid);
     }
   }
   showToast(t('toast_voted_useful'), 'success');
@@ -8047,7 +8054,21 @@ function renderTypeBadge(slug) {
   return '<span class="comm-badge" style="color:' + t.color + ';background:' + t.bg_color + ';">' + t.icon + ' ' + t.name + '</span>';
 }
 
-function loadNotifCount() {}
+var _unreadNotifCount = 0;
+var _adminUrgentCount = 0;
+function refreshDashBadge() {
+  var nb = document.getElementById('dash-nav-badge');
+  if (!nb) return;
+  var total = _unreadNotifCount + _adminUrgentCount;
+  nb.textContent = total > 99 ? '99+' : total;
+  nb.style.display = total > 0 ? 'block' : 'none';
+}
+async function loadNotifCount() {
+  if (!currentUser) { _unreadNotifCount = 0; refreshDashBadge(); return; }
+  var res = await db.from('notifications').select('id', { count: 'exact', head: true }).eq('user_id', currentUser.id).eq('is_read', false);
+  _unreadNotifCount = res.count || 0;
+  refreshDashBadge();
+}
 
 async function insertNotif(userId, type, message, postId) {
   if (!userId || userId === (currentUser && currentUser.id)) return;
@@ -8096,11 +8117,8 @@ async function loadModReportsCount() {
     db.from('comment_reports').select('id', { count: 'exact', head: true })
   ]);
   var total = (r1.count || 0) + (r2.count || 0);
-  var badge = document.getElementById('dash-nav-badge');
-  if (badge) {
-    if (total > 0) { badge.textContent = total > 99 ? '99+' : total; badge.style.display = 'block'; }
-    else { badge.style.display = 'none'; }
-  }
+  _adminUrgentCount = total;
+  refreshDashBadge();
 }
 
 function startRealtimeReports() {
@@ -9169,6 +9187,7 @@ async function openMemberDash() {
     places = r0.data || []; valCount = r1.count || 0;
     _saveDashP1Cache({uid:uid, places:places, valCount:valCount});
   }
+  await loadNotifCount();
 
   _memberDashData = {places:places};
 
@@ -9194,6 +9213,9 @@ async function openMemberDash() {
     + '<button onclick="closeSheet(\'sheet-member-dash\');navTo(\'profile\');" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;justify-content:center;gap:5px;">👤 Mon profil</button>'
     + '<button onclick="window.open(\'https://paypal.me/anyprojet\',\'_blank\')" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:#e74c3c;border-radius:var(--radius-sm);padding:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;justify-content:center;gap:5px;">&#10084; Soutenir</button>'
     + '</div>';
+  html += '<div onclick="showMemberDashDetail(\'notifications\')" style="margin-bottom:14px;background:'+(_unreadNotifCount>0?'rgba(11,166,179,0.12)':'var(--surface2)')+';border:1px solid '+(_unreadNotifCount>0?'var(--accent)':'var(--border)')+';border-radius:10px;padding:11px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;">'
+    +'<span style="font-size:13px;font-weight:700;color:var(--text);">🔔 Notifications'+(_unreadNotifCount>0?' <span style="background:#e74c3c;color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;margin-left:6px;">'+(_unreadNotifCount>99?'99+':_unreadNotifCount)+'</span>':'')+'</span>'
+    +'<span style="color:var(--accent);font-size:18px;">›</span></div>';
   var pendingMineCount = places.length - validatedCount;
   var favsCount = Object.keys(userFavs).length;
 
@@ -9252,8 +9274,8 @@ async function openMemberDash() {
   }
 
   var urgent = pendingCount + reportedPlaces + reportedCmts;
-  var nb = document.getElementById('dash-nav-badge');
-  if (nb) { nb.textContent = urgent > 99 ? '99+' : urgent; nb.style.display = urgent > 0 ? 'block' : 'none'; }
+  _adminUrgentCount = urgent;
+  refreshDashBadge();
 
   var tileOrder = null;
   if (isAdmin || isModerator) {
@@ -9378,7 +9400,7 @@ async function showMemberDashDetail(type) {
   if (main) main.style.display='none';
   if (detail) { detail.style.display='flex'; detail.style.flexDirection='column'; }
   var d = _memberDashData;
-  var titles = {places:'📍 Mes lieux', validated:'✅ Lieux validés', pending:'⏳ En attente de validation', merci:'🙏 Merci reçus', validations:'✅ Mes validations', ratings:'⭐ Notes reçues'};
+  var titles = {places:'📍 Mes lieux', validated:'✅ Lieux validés', pending:'⏳ En attente de validation', merci:'🙏 Merci reçus', validations:'✅ Mes validations', ratings:'⭐ Notes reçues', notifications:'🔔 Notifications'};
   if (titleEl) titleEl.textContent = titles[type] || '';
   if (type === 'ratings') {
     content.innerHTML = '<div style="color:var(--text2);font-size:13px;padding:20px 0;text-align:center;">' + t('lbl_loading') + '</div>';
@@ -9440,6 +9462,33 @@ async function showMemberDashDetail(type) {
       valHtml += '</div>';
     }
     content.innerHTML = valHtml;
+    return;
+  }
+  if (type === 'notifications') {
+    content.innerHTML = '<div style="color:var(--text2);font-size:13px;padding:20px 0;text-align:center;">' + t('lbl_loading') + '</div>';
+    var notifRes = await db.from('notifications').select('id,message,place_id,is_read,created_at,places(latitude,longitude)').eq('user_id', currentUser.id).order('created_at',{ascending:false}).limit(50);
+    var notifs = notifRes.data || [];
+    var notifHtml = '';
+    if (!notifs.length) {
+      notifHtml = '<div style="color:var(--text2);font-size:13px;text-align:center;padding:20px 0;">' + t('lbl_no_notif') + '</div>';
+    } else {
+      notifHtml = '<div style="display:flex;flex-direction:column;gap:6px;">';
+      notifs.forEach(function(n) {
+        var pl = n.places;
+        var oc = pl ? 'goToPlaceOnMap(\''+n.place_id+'\','+pl.latitude+','+pl.longitude+')' : '';
+        var date = n.created_at ? timeAgo(n.created_at) : '';
+        notifHtml += '<div '+(oc?'onclick="'+oc+'"':'')+' style="background:'+(n.is_read?'var(--surface2)':'rgba(11,166,179,0.10)')+';border:1px solid '+(n.is_read?'var(--border)':'var(--accent)')+';border-radius:10px;padding:10px 12px;'+(oc?'cursor:pointer;':'')+' display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">'
+          +'<div style="font-size:13px;color:var(--text);flex:1;min-width:0;line-height:1.35;">'+n.message+'</div>'
+          +'<div style="font-size:10px;color:var(--text2);white-space:nowrap;flex-shrink:0;">'+date+'</div></div>';
+      });
+      notifHtml += '</div>';
+    }
+    content.innerHTML = notifHtml;
+    var unreadIds = notifs.filter(function(n){return !n.is_read;}).map(function(n){return n.id;});
+    if (unreadIds.length) {
+      await db.from('notifications').update({is_read:true}).in('id', unreadIds);
+      loadNotifCount();
+    }
     return;
   }
   content.innerHTML = html;
