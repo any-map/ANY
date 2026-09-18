@@ -3833,6 +3833,9 @@ async function renderProfile() {
           + '</div>'
           + '</div>';
       })()
+    + '<div style="margin:0 16px 14px;">'
+    + '<button onclick="window.open(\'https://paypal.me/anyprojet\',\'_blank\')" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:#e74c3c;border-radius:var(--radius-sm);padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;justify-content:center;gap:6px;">&#10084; Soutenir le projet</button>'
+    + '</div>'
     + '<div onclick="closeSheet(\'sheet-profile\');navTo(\'member-dash\');" style="margin:0 16px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;font-weight:600;color:var(--text);">📊 Voir Mon espace</span><span style="color:var(--accent);font-size:18px;">›</span></div>'
     + '<div class="prof-stats"><div class="prof-stats-grid">'
     + '<div class="prof-stat" onclick="toggleProfPlaces()" style="cursor:pointer;" title="Voir mes lieux"><div class="prof-stat-icon pic-green">&#128205;</div><div style="flex:1"><div class="prof-stat-val" id="prof-places">\u2014</div><div class="prof-stat-lbl">' + t('profile_places_added') + '</div></div><span id="prof-places-arrow" style="color:var(--text2);font-size:16px;">\u203a</span></div>'
@@ -3891,7 +3894,6 @@ async function renderProfile() {
     + '</div>'
     + '</div>'
     + '<div style="padding:0 16px 16px;">'
-    + '<button onclick="window.open(\'https://paypal.me/anyprojet\',\'_blank\')" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:#e74c3c;border-radius:var(--radius-sm);padding:11px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:10px;">&#10084; Soutenir le projet</button>'
     + '<button onclick="showConfirm(t(\'confirm_logout_title\'),t(\'confirm_logout_msg\'),t(\'confirm_logout_btn\'),\'#e74c3c\',signOut)" style="width:100%;background:none;border:1px solid #e74c3c;color:#e74c3c;border-radius:var(--radius-sm);padding:11px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font-body);">' + t('profile_signout') + '</button>'
     + '</div>'
     + '</div>';
