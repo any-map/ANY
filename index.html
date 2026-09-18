@@ -7503,6 +7503,7 @@ async function addCmt(pid) {
   var cmtPlaceRes = await db.from('places').select('user_id, name').eq('id', pid).maybeSingle();
   if (cmtPlaceRes.data && cmtPlaceRes.data.user_id && cmtPlaceRes.data.user_id !== currentUser.id) {
     insertPlaceNotif(cmtPlaceRes.data.user_id, 'new_comment', '💬 Nouveau commentaire sur « ' + escHtml(cmtPlaceRes.data.name || '') + ' »', pid);
+    sendPush([cmtPlaceRes.data.user_id], '💬 Nouveau commentaire', 'Quelqu\'un a commenté « ' + (cmtPlaceRes.data.name || '') + ' »', '/');
   }
 }
 
@@ -7540,7 +7541,9 @@ async function vote(pid, pos) {
       }
     }
     if (placeData && placeData.user_id && placeData.user_id !== currentUser.id) {
-      insertPlaceNotif(placeData.user_id, 'place_thanks', '🙏 Quelqu\'un a dit merci pour « ' + escHtml((place && place.name) || 'votre lieu') + ' »', pid);
+      var thanksPlaceName = (place && place.name) || 'votre lieu';
+      insertPlaceNotif(placeData.user_id, 'place_thanks', '🙏 Quelqu\'un a dit merci pour « ' + escHtml(thanksPlaceName) + ' »', pid);
+      sendPush([placeData.user_id], '🙏 Merci reçu', 'Quelqu\'un a dit merci pour « ' + thanksPlaceName + ' »', '/');
     }
   }
   showToast(t('toast_voted_useful'), 'success');
