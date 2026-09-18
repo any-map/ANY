@@ -5618,7 +5618,7 @@ function makePopup(p) {
   var fuel = parseFuelPrices(p.description);
   var isFuel = !!fuel;
   var cmtZone = currentUser
-    ? '<div class="comment-input-zone"><input class="c-input" id="ci-' + safeId + '" placeholder="Ajouter un commentaire..."><button class="c-send" onclick="addCmt(\'' + safeId + '\')">&#8594;</button></div>'
+    ? '<div class="comment-input-zone" id="cmt-add-zone-' + safeId + '"><input class="c-input" id="ci-' + safeId + '" placeholder="Ajouter un commentaire..."><button class="c-send" onclick="addCmt(\'' + safeId + '\')">&#8594;</button></div>'
     : '<p style="font-size:11px;color:var(--text2);margin-top:6px">Connectez-vous pour commenter</p>';
   var availBadge = p.disponible_24h
     ? '<span class="pv2-badge pv2-badge-avail">&#9989; 24h/24</span>'
@@ -7178,7 +7178,7 @@ function renderCmtItem(c, pid, likes, dislikes, myVote, isReply) {
     + (currentUser ? '<div style="display:flex;align-items:center;gap:4px;margin-top:5px;">'
       + '<button onclick="voteComment(\'' + c.id + '\',true,\'' + pid + '\')" style="' + likeStyle + '">&#128077; ' + (likes[c.id] || 0) + '</button>'
       + '<button onclick="voteComment(\'' + c.id + '\',false,\'' + pid + '\')" style="' + dislikeStyle + '">&#128078; ' + (dislikes[c.id] || 0) + '</button>'
-      + (!isReply ? '<button class="comment-reply-btn" onclick="toggleReplyBox(\'' + c.id + '\')">&#8617; Répondre</button>' : '')
+      + (!isReply ? '<button class="comment-reply-btn" onclick="toggleReplyBox(\'' + c.id + '\',\'' + pid + '\')">&#8617; Répondre</button>' : '')
       + (isAdmin ? '<button onclick="showConfirm(\'Supprimer ce commentaire ?\',\'Ce commentaire sera supprimé définitivement. Action irréversible.\',\'🗑 Supprimer\',\'#e74c3c\',function(){adminDeleteComment(\'' + c.id + '\',\'' + pid + '\')})" title="Supprimer" style="background:none;border:none;cursor:pointer;font-size:12px;color:#e74c3c;padding:2px 4px;margin-left:auto;">&#128465;&#65039;</button>' : (!isOwn ? '<button onclick="showConfirm(\'Signaler ce commentaire ?\',\'Ce commentaire sera signalé aux modérateurs pour examen.\',\'⚠️ Signaler\',\'#e67e22\',function(){reportComment(\'' + c.id + '\')})" title="Signaler" style="background:none;border:none;cursor:pointer;font-size:11px;color:var(--text2);padding:2px 4px;margin-left:auto;">&#9888;&#65039;</button>' : ''))
       + '</div>' : '')
     + '</div>';
@@ -7225,12 +7225,14 @@ async function loadCmts(pid) {
   }).join('');
 }
 
-function toggleReplyBox(cid) {
+function toggleReplyBox(cid, pid) {
   document.querySelectorAll('[id^="reply-box-"]').forEach(function(box) { if (box.id !== 'reply-box-' + cid) box.style.display = 'none'; });
   var box = document.getElementById('reply-box-' + cid);
   if (!box) return;
   var opening = box.style.display === 'none' || !box.style.display;
   box.style.display = opening ? 'block' : 'none';
+  var addZone = document.getElementById('cmt-add-zone-' + pid);
+  if (addZone) addZone.style.display = opening ? 'none' : '';
   if (opening) { var inp = document.getElementById('ri-' + cid); if (inp) inp.focus(); }
 }
 
@@ -7242,6 +7244,8 @@ async function addReply(pid, parentId) {
   await db.from('comments').insert({ place_id: pid, user_id: currentUser.id, user_name: currentUsername || currentUser.email.split('@')[0], content: content, parent_id: parentId });
   input.value = '';
   loadCmts(pid);
+  var addZone = document.getElementById('cmt-add-zone-' + pid);
+  if (addZone) addZone.style.display = '';
   showToast(t('toast_comment_sent'), 'success');
   var [parentRes, placeRes] = await Promise.all([
     db.from('comments').select('user_id').eq('id', parentId).maybeSingle(),
