@@ -3833,10 +3833,10 @@ async function renderProfile() {
           + '</div>'
           + '</div>';
       })()
-    + '<div style="margin:0 16px 14px;">'
-    + '<button onclick="window.open(\'https://paypal.me/anyprojet\',\'_blank\')" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:#e74c3c;border-radius:var(--radius-sm);padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;justify-content:center;gap:6px;">&#10084; Soutenir le projet</button>'
+    + '<div style="margin:0 16px 14px;display:flex;gap:8px;">'
+    + '<button onclick="window.open(\'https://paypal.me/anyprojet\',\'_blank\')" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:#e74c3c;border-radius:var(--radius-sm);padding:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;justify-content:center;gap:5px;">&#10084; Soutenir</button>'
+    + '<button onclick="closeSheet(\'sheet-profile\');navTo(\'member-dash\');" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;justify-content:center;gap:5px;">📊 Mon espace</button>'
     + '</div>'
-    + '<div onclick="closeSheet(\'sheet-profile\');navTo(\'member-dash\');" style="margin:0 16px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;font-weight:600;color:var(--text);">📊 Voir Mon espace</span><span style="color:var(--accent);font-size:18px;">›</span></div>'
     + '<div class="prof-stats"><div class="prof-stats-grid">'
     + '<div class="prof-stat" onclick="toggleProfPlaces()" style="cursor:pointer;" title="Voir mes lieux"><div class="prof-stat-icon pic-green">&#128205;</div><div style="flex:1"><div class="prof-stat-val" id="prof-places">\u2014</div><div class="prof-stat-lbl">' + t('profile_places_added') + '</div></div><span id="prof-places-arrow" style="color:var(--text2);font-size:16px;">\u203a</span></div>'
     + '<div class="prof-stat" onclick="toggleProfValidated()" style="cursor:pointer;" title="Voir mes confirmations de lieux"><div class="prof-stat-icon pic-teal">&#9989;</div><div style="flex:1"><div class="prof-stat-val" id="prof-validated">\u2014</div><div class="prof-stat-lbl">' + t('profile_validated') + '</div></div><span id="prof-validated-arrow" style="color:var(--text2);font-size:16px;">\u203a</span></div>'
