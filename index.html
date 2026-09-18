@@ -342,6 +342,9 @@ html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none;font-f
 .c-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:13px;color:var(--text);font-family:var(--font-body);outline:none;}
 .c-input:focus{border-color:var(--accent);}
 .c-send{background:var(--accent);border:none;border-radius:6px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;color:#fff;}
+.comment-replies{margin:4px 0 0 14px;padding-left:10px;border-left:2px solid var(--border);}
+.comment-replies .comment-item{margin-bottom:6px;}
+.comment-reply-btn{background:none;border:none;color:var(--text2);cursor:pointer;font-size:11px;padding:0 2px;font-family:var(--font-body);}
 /* lightbox */
 #lightbox{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.95);display:none;align-items:center;justify-content:center;}
 #lb-img{max-width:92vw;max-height:84vh;object-fit:contain;border-radius:8px;}
@@ -7157,13 +7160,48 @@ async function translateText(textId, spanId, orig) {
   }
 }
 
+function renderCmtItem(c, pid, likes, dislikes, myVote, isReply) {
+  var d = c.created_at ? new Date(c.created_at).toLocaleDateString('fr-FR', {day:'numeric',month:'short',year:'numeric'}) : '';
+  var isOwn = currentUser && c.user_id === currentUser.id;
+  var mv = myVote.hasOwnProperty(c.id) ? myVote[c.id] : null;
+  var likeActive = mv === true, dislikeActive = mv === false;
+  var likeStyle = 'background:none;border:none;cursor:pointer;font-size:12px;padding:2px 5px;border-radius:5px;font-family:var(--font-body);' + (likeActive ? 'background:rgba(39,174,96,0.15);color:#27ae60;font-weight:700;' : 'color:var(--text2);');
+  var dislikeStyle = 'background:none;border:none;cursor:pointer;font-size:12px;padding:2px 5px;border-radius:5px;font-family:var(--font-body);' + (dislikeActive ? 'background:rgba(231,76,60,0.15);color:#e74c3c;font-weight:700;' : 'color:var(--text2);');
+  return '<div class="comment-item">'
+    + '<div style="display:flex;align-items:center;gap:6px;">'
+    + '<div class="comment-author" style="cursor:pointer;" onclick="openPublicProfile(this.dataset.u)" data-u="' + escHtml(c.user_name || '') + '">' + escHtml(c.user_name || t('lbl_anonymous')) + '</div>'
+    + (d ? '<div style="font-size:10px;color:var(--text2)">' + d + '</div>' : '')
+    + ((isOwn || isAdmin) ? '<button onclick="editCmt(\'' + c.id + '\',\'' + pid + '\')" style="margin-left:auto;background:none;border:none;color:var(--text2);cursor:pointer;font-size:12px;padding:0 2px;">&#9998;</button>' : '')
+    + '</div>'
+    + '<div class="comment-text" id="cmt-text-' + c.id + '">' + escHtml(c.content) + '</div>'
+    + '<span id="trl-cmt-' + c.id + '" data-orig="' + escHtml(c.content) + '" onclick="translateText(\'cmt-text-' + c.id + '\',\'trl-cmt-' + c.id + '\',this.dataset.orig)" style="font-size:11px;color:var(--text2);cursor:pointer;text-decoration:underline;text-underline-offset:2px;">' + t('btn_translate') + '</span>'
+    + (currentUser ? '<div style="display:flex;align-items:center;gap:4px;margin-top:5px;">'
+      + '<button onclick="voteComment(\'' + c.id + '\',true,\'' + pid + '\')" style="' + likeStyle + '">&#128077; ' + (likes[c.id] || 0) + '</button>'
+      + '<button onclick="voteComment(\'' + c.id + '\',false,\'' + pid + '\')" style="' + dislikeStyle + '">&#128078; ' + (dislikes[c.id] || 0) + '</button>'
+      + (!isReply ? '<button class="comment-reply-btn" onclick="toggleReplyBox(\'' + c.id + '\')">&#8617; Répondre</button>' : '')
+      + (isAdmin ? '<button onclick="showConfirm(\'Supprimer ce commentaire ?\',\'Ce commentaire sera supprimé définitivement. Action irréversible.\',\'🗑 Supprimer\',\'#e74c3c\',function(){adminDeleteComment(\'' + c.id + '\',\'' + pid + '\')})" title="Supprimer" style="background:none;border:none;cursor:pointer;font-size:12px;color:#e74c3c;padding:2px 4px;margin-left:auto;">&#128465;&#65039;</button>' : (!isOwn ? '<button onclick="showConfirm(\'Signaler ce commentaire ?\',\'Ce commentaire sera signalé aux modérateurs pour examen.\',\'⚠️ Signaler\',\'#e67e22\',function(){reportComment(\'' + c.id + '\')})" title="Signaler" style="background:none;border:none;cursor:pointer;font-size:11px;color:var(--text2);padding:2px 4px;margin-left:auto;">&#9888;&#65039;</button>' : ''))
+      + '</div>' : '')
+    + '</div>';
+}
+
 async function loadCmts(pid) {
-  var result = await db.from('comments').select('*').eq('place_id', pid).order('created_at', { ascending: false }).limit(5);
+  var result = await db.from('comments').select('*').eq('place_id', pid).order('created_at', { ascending: false });
   var el = document.getElementById('cmt-' + pid);
   if (!el) return;
-  var data = result.data;
-  if (!data || !data.length) { el.innerHTML = '<p style="font-size:11px;color:var(--text2)">' + t('lbl_no_comment') + '</p>'; return; }
-  var cmtIds = data.map(function(c) { return c.id; });
+  var all = result.data || [];
+  if (!all.length) { el.innerHTML = '<p style="font-size:11px;color:var(--text2)">' + t('lbl_no_comment') + '</p>'; return; }
+  var topLevel = all.filter(function(c){ return !c.parent_id; }).slice(0, 5);
+  var topIds = topLevel.map(function(c){ return c.id; });
+  var repliesByParent = {};
+  all.forEach(function(c) {
+    if (c.parent_id && topIds.indexOf(c.parent_id) !== -1) {
+      (repliesByParent[c.parent_id] = repliesByParent[c.parent_id] || []).push(c);
+    }
+  });
+  Object.keys(repliesByParent).forEach(function(k) {
+    repliesByParent[k].sort(function(a,b){ return new Date(a.created_at) - new Date(b.created_at); });
+  });
+  var cmtIds = all.map(function(c) { return c.id; });
   var votesRes = await db.from('comment_votes').select('comment_id,vote,user_id').in('comment_id', cmtIds);
   var allVotes = votesRes.data || [];
   var likes = {}, dislikes = {}, myVote = {};
@@ -7172,28 +7210,55 @@ async function loadCmts(pid) {
     else dislikes[v.comment_id] = (dislikes[v.comment_id] || 0) + 1;
     if (currentUser && v.user_id === currentUser.id) myVote[v.comment_id] = v.vote;
   });
-  el.innerHTML = data.map(function(c) {
-    var d = c.created_at ? new Date(c.created_at).toLocaleDateString('fr-FR', {day:'numeric',month:'short',year:'numeric'}) : '';
-    var isOwn = currentUser && c.user_id === currentUser.id;
-    var mv = myVote.hasOwnProperty(c.id) ? myVote[c.id] : null;
-    var likeActive = mv === true, dislikeActive = mv === false;
-    var likeStyle = 'background:none;border:none;cursor:pointer;font-size:12px;padding:2px 5px;border-radius:5px;font-family:var(--font-body);' + (likeActive ? 'background:rgba(39,174,96,0.15);color:#27ae60;font-weight:700;' : 'color:var(--text2);');
-    var dislikeStyle = 'background:none;border:none;cursor:pointer;font-size:12px;padding:2px 5px;border-radius:5px;font-family:var(--font-body);' + (dislikeActive ? 'background:rgba(231,76,60,0.15);color:#e74c3c;font-weight:700;' : 'color:var(--text2);');
-    return '<div class="comment-item">'
-      + '<div style="display:flex;align-items:center;gap:6px;">'
-      + '<div class="comment-author" style="cursor:pointer;" onclick="openPublicProfile(this.dataset.u)" data-u="' + escHtml(c.user_name || '') + '">' + escHtml(c.user_name || t('lbl_anonymous')) + '</div>'
-      + (d ? '<div style="font-size:10px;color:var(--text2)">' + d + '</div>' : '')
-      + ((isOwn || isAdmin) ? '<button onclick="editCmt(\'' + c.id + '\',\'' + pid + '\')" style="margin-left:auto;background:none;border:none;color:var(--text2);cursor:pointer;font-size:12px;padding:0 2px;">&#9998;</button>' : '')
-      + '</div>'
-      + '<div class="comment-text" id="cmt-text-' + c.id + '">' + escHtml(c.content) + '</div>'
-      + '<span id="trl-cmt-' + c.id + '" data-orig="' + escHtml(c.content) + '" onclick="translateText(\'cmt-text-' + c.id + '\',\'trl-cmt-' + c.id + '\',this.dataset.orig)" style="font-size:11px;color:var(--text2);cursor:pointer;text-decoration:underline;text-underline-offset:2px;">' + t('btn_translate') + '</span>'
-      + (currentUser ? '<div style="display:flex;align-items:center;gap:4px;margin-top:5px;">'
-        + '<button onclick="voteComment(\'' + c.id + '\',true,\'' + pid + '\')" style="' + likeStyle + '">&#128077; ' + (likes[c.id] || 0) + '</button>'
-        + '<button onclick="voteComment(\'' + c.id + '\',false,\'' + pid + '\')" style="' + dislikeStyle + '">&#128078; ' + (dislikes[c.id] || 0) + '</button>'
-        + (isAdmin ? '<button onclick="showConfirm(\'Supprimer ce commentaire ?\',\'Ce commentaire sera supprimé définitivement. Action irréversible.\',\'🗑 Supprimer\',\'#e74c3c\',function(){adminDeleteComment(\'' + c.id + '\',\'' + pid + '\')})" title="Supprimer" style="background:none;border:none;cursor:pointer;font-size:12px;color:#e74c3c;padding:2px 4px;margin-left:auto;">&#128465;&#65039;</button>' : (!isOwn ? '<button onclick="showConfirm(\'Signaler ce commentaire ?\',\'Ce commentaire sera signalé aux modérateurs pour examen.\',\'⚠️ Signaler\',\'#e67e22\',function(){reportComment(\'' + c.id + '\')})" title="Signaler" style="background:none;border:none;cursor:pointer;font-size:11px;color:var(--text2);padding:2px 4px;margin-left:auto;">&#9888;&#65039;</button>' : ''))
-        + '</div>' : '')
-      + '</div>';
+  el.innerHTML = topLevel.map(function(c) {
+    var html = renderCmtItem(c, pid, likes, dislikes, myVote, false);
+    var replies = repliesByParent[c.id] || [];
+    if (replies.length) {
+      html += '<div class="comment-replies">' + replies.map(function(r){ return renderCmtItem(r, pid, likes, dislikes, myVote, true); }).join('') + '</div>';
+    }
+    if (currentUser) {
+      html += '<div id="reply-box-' + c.id + '" style="display:none;margin:4px 0 4px 14px;">'
+        + '<div class="comment-input-zone"><input class="c-input" id="ri-' + c.id + '" placeholder="Répondre..."><button class="c-send" onclick="addReply(\'' + pid + '\',\'' + c.id + '\')">&#8594;</button></div>'
+        + '</div>';
+    }
+    return html;
   }).join('');
+}
+
+function toggleReplyBox(cid) {
+  document.querySelectorAll('[id^="reply-box-"]').forEach(function(box) { if (box.id !== 'reply-box-' + cid) box.style.display = 'none'; });
+  var box = document.getElementById('reply-box-' + cid);
+  if (!box) return;
+  var opening = box.style.display === 'none' || !box.style.display;
+  box.style.display = opening ? 'block' : 'none';
+  if (opening) { var inp = document.getElementById('ri-' + cid); if (inp) inp.focus(); }
+}
+
+async function addReply(pid, parentId) {
+  if (!currentUser) { showToast(t('toast_login_comment'), 'error'); return; }
+  var input = document.getElementById('ri-' + parentId);
+  var content = input.value.trim();
+  if (!content) return;
+  await db.from('comments').insert({ place_id: pid, user_id: currentUser.id, user_name: currentUsername || currentUser.email.split('@')[0], content: content, parent_id: parentId });
+  input.value = '';
+  loadCmts(pid);
+  showToast(t('toast_comment_sent'), 'success');
+  var [parentRes, placeRes] = await Promise.all([
+    db.from('comments').select('user_id').eq('id', parentId).maybeSingle(),
+    db.from('places').select('user_id, name').eq('id', pid).maybeSingle()
+  ]);
+  var placeName = (placeRes.data && placeRes.data.name) || '';
+  var notified = [];
+  if (parentRes.data && parentRes.data.user_id && parentRes.data.user_id !== currentUser.id) {
+    insertPlaceNotif(parentRes.data.user_id, 'comment_reply', '&#8617; Quelqu\'un a répondu à votre commentaire sur « ' + escHtml(placeName) + ' »', pid);
+    sendPush([parentRes.data.user_id], '↩️ Nouvelle réponse', 'Quelqu\'un a répondu à votre commentaire', '/');
+    notified.push(parentRes.data.user_id);
+  }
+  var ownerId = placeRes.data && placeRes.data.user_id;
+  if (ownerId && ownerId !== currentUser.id && notified.indexOf(ownerId) === -1) {
+    insertPlaceNotif(ownerId, 'new_comment', '💬 Nouveau commentaire sur « ' + escHtml(placeName) + ' »', pid);
+    sendPush([ownerId], '💬 Nouveau commentaire', 'Quelqu\'un a commenté « ' + placeName + ' »', '/');
+  }
 }
 
 async function voteComment(cid, vote, pid) {
@@ -7516,12 +7581,6 @@ async function addCmt(pid) {
   if (ownerId && ownerId !== currentUser.id) {
     insertPlaceNotif(ownerId, 'new_comment', '💬 Nouveau commentaire sur « ' + escHtml(placeName) + ' »', pid);
     sendPush([ownerId], '💬 Nouveau commentaire', 'Quelqu\'un a commenté « ' + placeName + ' »', '/');
-  }
-  var priorRes = await db.from('comments').select('user_id').eq('place_id', pid).neq('user_id', currentUser.id);
-  var participantIds = Array.from(new Set((priorRes.data || []).map(function(c){return c.user_id;}).filter(function(uid){return uid && uid !== ownerId;})));
-  if (participantIds.length) {
-    participantIds.forEach(function(uid) { insertPlaceNotif(uid, 'thread_reply', '💬 Nouvelle réponse sur « ' + escHtml(placeName) + ' »', pid); });
-    sendPush(participantIds, '💬 Nouvelle réponse', 'Quelqu\'un a répondu sur « ' + placeName + ' »', '/');
   }
 }
 
