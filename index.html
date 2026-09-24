@@ -666,7 +666,7 @@ path.leaflet-cluster-spider-leg{stroke:#fff!important;stroke-width:1.5px!importa
     <div id="map"></div>
     <div id="info-adding">&#128205; Clique sur la carte pour placer le lieu</div>
     <button id="btn-compass" onclick="resetBearing()" title="Réinitialiser le nord"><span id="btn-compass-arrow" style="display:inline-block;transition:transform 0.3s;">&#8593; N</span></button>
-    <button id="btn-compass-mode" onclick="toggleCompassMode()" title="Mode boussole"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><polygon points="12,4 14.5,12 12,10.5 9.5,12" fill="currentColor"/><polygon points="12,20 9.5,12 12,13.5 14.5,12" fill="currentColor" opacity="0.4"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg></button>
+    <button id="btn-compass-mode" onclick="toggleCompassMode()" title="Mode boussole (oriente la carte selon ton regard)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.5"/><polygon points="12,4.5 14.2,12 12,10.7 9.8,12" fill="#e8543f"/><polygon points="12,19.5 9.8,12 12,13.3 14.2,12" fill="currentColor" opacity="0.5"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/></svg></button>
     <div id="map-search-bar">
       <div class="map-srch-row">
         <div class="map-srch-wrap">
@@ -683,7 +683,7 @@ path.leaflet-cluster-spider-leg{stroke:#fff!important;stroke-width:1.5px!importa
         </div>
       </div>
     </div>
-    <button id="btn-locate">📡</button>
+    <button id="btn-locate" title="Suivre ma position en direct"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="7" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
     <div id="places-count">Lieux : <span id="count-num">0</span></div>
     <div id="solo-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:1500;background:var(--surface);border-top:2px solid var(--accent);height:var(--nav-h);align-items:stretch;">
       <button onclick="clearSoloMode()" data-i18n="solo_back_profile" style="flex:1;background:none;border:none;border-right:1px solid var(--border);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font-body);">&#8592; Retour au Profil</button>
