@@ -6546,7 +6546,8 @@ async function addTrusted() {
   var res = await db.from('profiles').select('user_id').eq('username', uname).maybeSingle();
   if (!res.data) { showToast(t('toast_user_not_found'), 'error'); return; }
   showRoleConfirm('⭐ ' + uname + ' — ' + t('lbl_add_as_trusted') + ' ?', function() {
-    return db.from('trusted_users').upsert({ user_id: res.data.user_id, role: 'trusted' }, { onConflict: 'user_id' }).then(function() {
+    return db.from('trusted_users').upsert({ user_id: res.data.user_id, role: 'trusted' }, { onConflict: 'user_id' }).then(function(r) {
+      if (r.error) { showToast(t('lbl_err_generic') + r.error.message, 'error'); return; }
       if (inp) inp.value = '';
       showToast('⭐ ' + uname + ' ' + t('toast_trusted_added'), 'success');
       loadTrustedList();
@@ -6557,7 +6558,8 @@ async function addTrusted() {
 function removeTrusted(uid, uname) {
   if (!isAdmin) return;
   showRoleConfirm(t('lbl_remove_from_trusted') + (uname ? ' — ' + uname : '') + ' ?', function() {
-    return db.from('trusted_users').delete().eq('user_id', uid).then(function() {
+    return db.from('trusted_users').delete().eq('user_id', uid).then(function(r) {
+      if (r.error) { showToast(t('lbl_err_generic') + r.error.message, 'error'); return; }
       showToast(t('toast_trusted_removed'), '');
       loadTrustedList();
     });
@@ -6755,7 +6757,8 @@ async function addValidator() {
   var res = await db.from('profiles').select('user_id').eq('username', uname).maybeSingle();
   if (!res.data) { showToast(t('toast_user_not_found'), 'error'); return; }
   showRoleConfirm('🛡️ ' + uname + ' — ' + t('lbl_add_as_mod') + ' ?', function() {
-    return db.from('trusted_users').upsert({ user_id: res.data.user_id, role: 'moderator' }, { onConflict: 'user_id' }).then(function() {
+    return db.from('trusted_users').upsert({ user_id: res.data.user_id, role: 'moderator' }, { onConflict: 'user_id' }).then(function(r) {
+      if (r.error) { showToast(t('lbl_err_generic') + r.error.message, 'error'); return; }
       if (inp) inp.value = '';
       showToast(uname + ' ' + t('toast_mod_added'), 'success');
       loadValidatorsList();
@@ -6766,7 +6769,8 @@ async function addValidator() {
 function removeValidator(uid, uname) {
   if (!isAdmin) return;
   showRoleConfirm(t('lbl_remove_from_mods') + (uname ? ' — ' + uname : '') + ' ?', function() {
-    return db.from('trusted_users').delete().eq('user_id', uid).then(function() {
+    return db.from('trusted_users').delete().eq('user_id', uid).then(function(r) {
+      if (r.error) { showToast(t('lbl_err_generic') + r.error.message, 'error'); return; }
       showToast(t('toast_mod_removed'), '');
       loadValidatorsList();
     });
