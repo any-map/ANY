@@ -7862,7 +7862,12 @@ function autoLocateOnConnect() {
 }
 
 function toggleLiveTracking() {
-  if (liveTrackActive) { stopLiveTracking(); } else { startLiveTracking(); }
+  if (liveTrackActive) {
+    if (!_orientPermGrantedThisSession && !_orientPermDeniedThisSession) { ensureOrientationPermission(); return; }
+    stopLiveTracking();
+  } else {
+    startLiveTracking();
+  }
 }
 
 function ensureOrientationPermission(auto) {
