@@ -23,14 +23,28 @@ Deno.serve(async (req) => {
 
     const { user_ids, title, body, url } = await req.json();
 
+    if (!Array.isArray(user_ids) || user_ids.length === 0) {
+      return new Response(JSON.stringify({ error: "user_ids requis (tableau non vide)" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (user_ids.length > 20) {
+      return new Response(JSON.stringify({ error: "user_ids: 20 maximum" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    let query = supabase.from("push_subscriptions").select("id,endpoint,p256dh,auth");
-    if (user_ids && user_ids.length > 0) query = query.in("user_id", user_ids);
-    const { data: subs } = await query;
+    const { data: subs } = await supabase
+      .from("push_subscriptions")
+      .select("id,endpoint,p256dh,auth")
+      .in("user_id", user_ids);
 
     if (!subs || subs.length === 0) {
       return new Response(JSON.stringify({ sent: 0, total: 0 }), {
