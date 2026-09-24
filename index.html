@@ -5572,7 +5572,7 @@ function makePopup(p) {
   var catName = cat ? cat.name : 'Lieu';
   var el = document.createElement('div');
   var safeId = p.id;
-  var safeName = p.name.replace(/'/g, "\\'");
+  var safeName = escJsAttr(p.name);
   var fuel = parseFuelPrices(p.description);
   var isFuel = !!fuel;
   var cmtZone = currentUser
@@ -6305,7 +6305,7 @@ async function loadWeeklyRankProfile() {
     var avatar = e.avatar_url || (e.username ? e.username.slice(0, 2).toUpperCase() : '?');
     var isEmoji = avatar.length > 2;
     var avatarBg = e.avatar_bg ? 'background:linear-gradient(' + e.avatar_bg + ');color:#fff;' : 'background:rgba(11,166,179,0.15);color:var(--accent);';
-    return '<div onclick="' + (e.username ? 'openPublicProfile(\'' + escHtml(e.username).replace(/'/g, "\\'") + '\')' : '') + '" style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);' + (e.username ? 'cursor:pointer;' : '') + '">'
+    return '<div onclick="' + (e.username ? 'openPublicProfile(\'' + escJsAttr(e.username) + '\')' : '') + '" style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);' + (e.username ? 'cursor:pointer;' : '') + '">'
       + '<div style="font-size:' + (i < 3 ? '18' : '12') + 'px;width:24px;text-align:center;flex-shrink:0;' + (i >= 3 ? 'color:var(--text2);font-weight:700;' : '') + '">' + (i < 3 ? medals[i] : i + 1) + '</div>'
       + '<div style="width:32px;height:32px;border-radius:50%;' + avatarBg + 'display:flex;align-items:center;justify-content:center;font-size:' + (isEmoji ? '18' : '12') + 'px;font-weight:700;flex-shrink:0;">' + avatar + '</div>'
       + '<div style="flex:1;font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escHtml(e.username || '(sans pseudo)') + '</div>'
@@ -6448,7 +6448,7 @@ async function loadValidatorsList() {
     return '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);">'
       + '<div><span style="font-size:13px;font-weight:600;color:var(--text);">' + escHtml(uname) + '</span>'
       + '<span style="font-size:11px;color:var(--text2);margin-left:8px;">' + t('role_moderator') + '</span></div>'
-      + '<button onclick="removeValidator(\'' + u.user_id + '\',\'' + escHtml(uname).replace(/'/g,"\\'") + '\')" style="background:rgba(231,76,60,0.12);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;font-family:var(--font-body);">' + t('lbl_retirer') + '</button>'
+      + '<button onclick="removeValidator(\'' + u.user_id + '\',\'' + escJsAttr(uname) + '\')" style="background:rgba(231,76,60,0.12);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;font-family:var(--font-body);">' + t('lbl_retirer') + '</button>'
       + '</div>';
   }).join(''); }
   loadTrustedList();
@@ -6465,7 +6465,7 @@ async function loadTrustedList() {
     return '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);">'
       + '<div><span style="font-size:13px;font-weight:600;color:var(--text);">' + escHtml(uname) + '</span>'
       + '<span style="font-size:11px;color:var(--accent);margin-left:8px;">⭐ Confiance</span></div>'
-      + '<button onclick="removeTrusted(\'' + u.user_id + '\',\'' + escHtml(uname).replace(/'/g,"\\'") + '\')" style="background:rgba(231,76,60,0.12);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;font-family:var(--font-body);">Retirer</button>'
+      + '<button onclick="removeTrusted(\'' + u.user_id + '\',\'' + escJsAttr(uname) + '\')" style="background:rgba(231,76,60,0.12);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;font-family:var(--font-body);">Retirer</button>'
       + '</div>';
   }).join('');
 }
@@ -6669,7 +6669,7 @@ async function loadMembersList() {
       var roleLabel = role === 'admin' ? '&#128081;' : role === 'moderator' ? '&#128737;&#65039;' : role === 'trusted' ? '&#11088;' : '';
       var dateStr = (m.registered_at || m.created_at) ? new Date(m.registered_at || m.created_at).toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' }) : '—';
       var uname = m.username || '(sans pseudo)';
-      return '<div onclick="openPublicProfile(\'' + escHtml(uname).replace(/'/g, "\\'") + '\')" style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer;">'
+      return '<div onclick="openPublicProfile(\'' + escJsAttr(uname) + '\')" style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer;">'
         + '<div style="font-size:12px;font-weight:700;color:var(--text2);min-width:24px;text-align:right;">#' + (i + 1) + '</div>'
         + '<div style="flex:1;min-width:0;">'
         + '<div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + roleLabel + ' ' + escHtml(uname) + '</div>'
@@ -7090,6 +7090,15 @@ function escHtml(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
+// Pour embarquer une valeur dans un littéral JS à l'intérieur d'un attribut HTML
+// (ex: onclick="fn('...')") : il FAUT échapper pour le contexte JS (backslash, quote)
+// AVANT d'échapper pour HTML, car le navigateur décode les entités HTML de l'attribut
+// avant de compiler le JS — escHtml(x).replace(/'/g,"\\'") ne protège pas (le \' ajouté
+// après coup n'existe plus une fois l'apostrophe déjà convertie en &#39; par escHtml).
+function escJsAttr(str) {
+  return escHtml(String(str == null ? '' : str).replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
+}
+
 async function translateText(textId, spanId, orig) {
   var el = document.getElementById(textId);
   var sp = document.getElementById(spanId);
@@ -7350,9 +7359,9 @@ async function loadReportedPlaces() {
       + reportsList
       + '<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">'
       + (place.latitude ? '<button onclick="viewReportedPlace(\'' + pid + '\',' + place.latitude + ',' + place.longitude + ')" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font-body);">&#128205; ' + t('btn_see_map') + '</button>' : '')
-      + '<button onclick="hidePlace(\'' + pid + '\',\'' + escHtml(place.name||'').replace(/'/g,"\\'") + '\',true)" style="flex:1;background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.4);color:#e74c3c;border-radius:6px;padding:5px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);">&#128683; Masquer</button>'
-      + '<button onclick="showConfirm(t(\'confirm_ignore_report\'),t(\'confirm_ignore_report_msg\'),\'✓\',\'\',function(){dismissPlaceReport(\'' + pid + '\',\'' + escHtml((place.name||'').replace(/'/g,"\\'")) + '\',\'dismissed\')})" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text2);border-radius:6px;padding:5px;font-size:12px;cursor:pointer;font-family:var(--font-body);">&#10003; Ignorer</button>'
-      + (g.reports.some(function(r) { return r.suggested_lat && r.suggested_lng; }) ? (function() { var sr = g.reports.find(function(r) { return r.suggested_lat && r.suggested_lng; }); return '<div style="margin:6px 0;padding:6px 8px;background:rgba(41,128,185,0.1);border:1px solid rgba(41,128,185,0.3);border-radius:6px;font-size:11px;color:#3498db;">&#128205; Emplacement suggéré : ' + sr.suggested_lat.toFixed(5) + ', ' + sr.suggested_lng.toFixed(5) + '<br><button onclick="showConfirm(\'Approuver cet emplacement ?\',\'Les coordonnées du lieu seront mises à jour avec la suggestion.\',\'📍 Approuver\',\'#2980b9\',function(){approveLocationSuggestion(\'' + sr.id + '\',\'' + pid + '\'' + ',' + sr.suggested_lat + ',' + sr.suggested_lng + ',\'' + escHtml((place.name||'').replace(/'/g,"\'")) + '\')})" style="margin-top:4px;background:rgba(41,128,185,0.2);border:1px solid rgba(41,128,185,0.5);color:#3498db;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;">&#128205; Approuver cet emplacement</button></div>'; })() : '')
+      + '<button onclick="hidePlace(\'' + pid + '\',\'' + escJsAttr(place.name||'') + '\',true)" style="flex:1;background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.4);color:#e74c3c;border-radius:6px;padding:5px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);">&#128683; Masquer</button>'
+      + '<button onclick="showConfirm(t(\'confirm_ignore_report\'),t(\'confirm_ignore_report_msg\'),\'✓\',\'\',function(){dismissPlaceReport(\'' + pid + '\',\'' + escJsAttr(place.name||'') + '\',\'dismissed\')})" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text2);border-radius:6px;padding:5px;font-size:12px;cursor:pointer;font-family:var(--font-body);">&#10003; Ignorer</button>'
+      + (g.reports.some(function(r) { return r.suggested_lat && r.suggested_lng; }) ? (function() { var sr = g.reports.find(function(r) { return r.suggested_lat && r.suggested_lng; }); return '<div style="margin:6px 0;padding:6px 8px;background:rgba(41,128,185,0.1);border:1px solid rgba(41,128,185,0.3);border-radius:6px;font-size:11px;color:#3498db;">&#128205; Emplacement suggéré : ' + sr.suggested_lat.toFixed(5) + ', ' + sr.suggested_lng.toFixed(5) + '<br><button onclick="showConfirm(\'Approuver cet emplacement ?\',\'Les coordonnées du lieu seront mises à jour avec la suggestion.\',\'📍 Approuver\',\'#2980b9\',function(){approveLocationSuggestion(\'' + sr.id + '\',\'' + pid + '\'' + ',' + sr.suggested_lat + ',' + sr.suggested_lng + ',\'' + escJsAttr(place.name||'') + '\')})" style="margin-top:4px;background:rgba(41,128,185,0.2);border:1px solid rgba(41,128,185,0.5);color:#3498db;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;">&#128205; Approuver cet emplacement</button></div>'; })() : '')
       + '</div></div>';
   }).join('');
 }
@@ -7459,7 +7468,7 @@ async function loadReportedComments() {
       + '<div style="font-size:13px;color:var(--text);margin-bottom:8px;line-height:1.4;padding:6px 8px;background:var(--surface2);border-radius:6px;">' + escHtml(c.content) + '</div>'
       + '<div style="margin-bottom:8px;font-size:11px;color:var(--text2);">' + t('lbl_reported_by') + ' : ' + reporterList + '</div>'
       + '<div style="display:flex;gap:6px;">'
-      + '<button onclick="deleteReportedComment(\'' + c.id + '\',\'' + escHtml(c.content || '').replace(/'/g,"\\'").slice(0,80) + '\')" style="flex:1;background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.4);color:#e74c3c;border-radius:6px;padding:5px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);">&#128465;&#65039; Supprimer</button>'
+      + '<button onclick="deleteReportedComment(\'' + c.id + '\',\'' + escJsAttr((c.content || '').slice(0,80)) + '\')" style="flex:1;background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.4);color:#e74c3c;border-radius:6px;padding:5px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);">&#128465;&#65039; Supprimer</button>'
       + '<button onclick="showConfirm(t(\'confirm_ignore_comment\'),t(\'confirm_ignore_comment_msg\'),\'✓\',\'\',function(){dismissCommentReport(\'' + c.id + '\')})" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text2);border-radius:6px;padding:5px;font-size:12px;cursor:pointer;font-family:var(--font-body);">&#10003; Ignorer</button>'
       + '</div></div>';
   }).join('');
@@ -8371,7 +8380,7 @@ function showDashNewMembers() {
         + members.map(function(m) {
           var date = m.registered_at ? new Date(m.registered_at).toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }) : '';
           var displayName = m.username ? escHtml(m.username) : '<span style="font-style:italic;color:var(--text2);">(sans pseudo)</span>';
-          var clickable = m.username ? 'onclick="openPublicProfile(\'' + escHtml(m.username).replace(/'/g,"\\'") + '\')" style="cursor:pointer;"' : '';
+          var clickable = m.username ? 'onclick="openPublicProfile(\'' + escJsAttr(m.username) + '\')" style="cursor:pointer;"' : '';
           return '<div ' + clickable + ' style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);">'
             + '<div style="width:30px;height:30px;border-radius:50%;background:rgba(39,174,96,0.15);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">&#127381;</div>'
             + '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;color:var(--text);">' + displayName + '</div>'
@@ -8427,7 +8436,7 @@ async function loadDashLeaderboard() {
     if (e.votes_cnt > 0) breakdown.push('👍 ' + e.votes_cnt);
     var rowBg = isSelf ? 'background:rgba(11,166,179,0.08);border-radius:10px;padding:10px 8px;margin:2px -8px;' : '';
     var posLabel = i < 3 ? '<span style="font-size:20px;">' + medals[i] + '</span>' : '<span style="font-size:13px;font-weight:700;color:var(--text2);width:26px;display:inline-block;text-align:center;">' + (i + 1) + '</span>';
-    return '<div onclick="' + (e.username ? 'openPublicProfile(\'' + escHtml(e.username).replace(/'/g, "\\'") + '\')' : '') + '" style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);' + rowBg + (e.username ? 'cursor:pointer;' : '') + '">'
+    return '<div onclick="' + (e.username ? 'openPublicProfile(\'' + escJsAttr(e.username) + '\')' : '') + '" style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);' + rowBg + (e.username ? 'cursor:pointer;' : '') + '">'
       + '<div style="width:28px;flex-shrink:0;text-align:center;">' + posLabel + '</div>'
       + '<div style="width:38px;height:38px;border-radius:50%;' + avatarBg + avatarColor + 'display:flex;align-items:center;justify-content:center;font-size:' + avatarFontSize + ';font-weight:700;flex-shrink:0;">' + avatar + '</div>'
       + '<div style="flex:1;min-width:0;">'
@@ -8517,7 +8526,7 @@ async function loadDashMembersList() {
         ? '<span style="color:#2ecc71;">&#9679; ' + t('member_online') + '</span>'
         : (lastSeen ? t('member_offline_since') + ' ' + lastSeen.toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }) : '');
       var displayName = m.username ? escHtml(m.username) : '<span style="color:var(--text2);font-style:italic;">(sans pseudo)</span>';
-      var clickable = m.username ? 'onclick="openPublicProfile(\'' + escHtml(m.username).replace(/'/g,"\\'") + '\')" style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer;"' : 'style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);"';
+      var clickable = m.username ? 'onclick="openPublicProfile(\'' + escJsAttr(m.username) + '\')" style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer;"' : 'style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);"';
       return '<div ' + clickable + '>'
         + '<div style="width:30px;height:30px;border-radius:50%;background:rgba(11,166,179,0.15);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--accent);flex-shrink:0;">' + (i + 1) + '</div>'
         + '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + roleLabel + ' ' + displayName + '</div>'
@@ -8949,7 +8958,7 @@ function renderDashCategoriesContent() {
       + '<span style="font-size:11px;color:var(--text2);flex:1;">Déplacer :</span>'
       + (isFirst ? '' : '<button ' + lpBtn + ' onclick="adminMoveCatOrder(\'' + mc.id + '\',-1)">&#8593; Monter</button>')
       + (isLast  ? '' : '<button ' + lpBtn + ' onclick="adminMoveCatOrder(\'' + mc.id + '\',1)">&#8595; Descendre</button>')
-      + '<button ' + lpBtn + ' onclick="adminConfirmDeleteMainCat(\'' + mc.id + '\',' + allSubsRaw.length + ',\'' + mc.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'") + '\')" style="background:rgba(231,76,60,0.12);color:#e74c3c;border-color:rgba(231,76,60,0.3);">🗑 Supprimer</button>'
+      + '<button ' + lpBtn + ' onclick="adminConfirmDeleteMainCat(\'' + mc.id + '\',' + allSubsRaw.length + ',\'' + escJsAttr(mc.name) + '\')" style="background:rgba(231,76,60,0.12);color:#e74c3c;border-color:rgba(231,76,60,0.3);">🗑 Supprimer</button>'
       + '</div>'
       + '<div id="admin-edit-maincat-' + mc.id + '"></div>'
       + '<div id="admin-subcat-form-' + mc.id + '"></div>';
@@ -8981,7 +8990,7 @@ function renderDashCategoriesContent() {
           + (isLastS  ? '' : '<button ' + lpBtn + ' onclick="adminMoveSubCatOrder(\'' + s.id + '\',1,\'' + mc.id + '\')">&#8595;</button>')
           + '<span style="flex:1;"></span>'
           + '<button ' + lpBtn + ' onclick="adminToggleCatPhotos(\'' + s.id + '\',' + (!!s.allow_photos) + ')" style="background:' + (s.allow_photos ? 'rgba(39,174,96,0.15)' : 'var(--surface2)') + ';border-color:' + (s.allow_photos ? '#27ae60' : 'var(--border)') + ';color:' + (s.allow_photos ? '#27ae60' : 'var(--text2)') + ';">' + (s.allow_photos ? '📷 Photos ON' : '📷 Photos OFF') + '</button>'
-          + '<button ' + lpBtn + ' onclick="adminConfirmDeleteSubCat(\'' + s.id + '\',\'' + s.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'") + '\')" style="background:rgba(231,76,60,0.12);color:#e74c3c;border-color:rgba(231,76,60,0.3);">🗑 Supprimer</button>'
+          + '<button ' + lpBtn + ' onclick="adminConfirmDeleteSubCat(\'' + s.id + '\',\'' + escJsAttr(s.name) + '\')" style="background:rgba(231,76,60,0.12);color:#e74c3c;border-color:rgba(231,76,60,0.3);">🗑 Supprimer</button>'
           + '</div>'
           + '<div id="admin-edit-subcat-' + s.id + '"></div>'
           + '</div>';
