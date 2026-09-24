@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ANY — Admin</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -96,6 +96,11 @@ header button{background:var(--surface2);border:1px solid var(--border);color:va
 </div>
 
 <script>
+function escHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 var SUPABASE_URL = 'https://xssfehwbmvrxtxmocowc.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_lB89hOOAXUCIheGRbS2wEQ_L7uVajNV';
 var ADMIN_EMAIL = 'mypoiuytreza@gmail.com';
@@ -156,9 +161,9 @@ async function loadReports() {
     return '<div class="card" id="rep-' + r.id + '">'
       + '<div class="card-top">'
       + '<div>'
-      + '<div class="card-title">' + (place ? place.name : 'Lieu supprimé') + ' <span class="badge badge-warn">' + (reasons[r.reason] || r.reason) + '</span></div>'
+      + '<div class="card-title">' + (place ? escHtml(place.name) : 'Lieu supprimé') + ' <span class="badge badge-warn">' + escHtml(reasons[r.reason] || r.reason) + '</span></div>'
       + '<div class="card-meta">'
-      + (r.details ? 'Précision : <span>' + r.details + '</span><br>' : '')
+      + (r.details ? 'Précision : <span>' + escHtml(r.details) + '</span><br>' : '')
       + 'Signalé le : ' + new Date(r.created_at).toLocaleDateString('fr')
       + '</div>'
       + '</div>'
@@ -185,10 +190,10 @@ function renderPlaces(data) {
     return '<div class="card" id="pl-' + p.id + '">'
       + '<div class="card-top">'
       + '<div>'
-      + '<div class="card-title">' + (cat ? cat.icon + ' ' : '') + p.name + '</div>'
+      + '<div class="card-title">' + (cat ? escHtml(cat.icon) + ' ' : '') + escHtml(p.name) + '</div>'
       + '<div class="card-meta">'
-      + 'Catégorie : <span>' + (cat ? cat.name : '—') + '</span><br>'
-      + 'Ajouté par : <span>' + (p.user_name || 'Anonyme') + '</span> · ' + new Date(p.created_at).toLocaleDateString('fr')
+      + 'Catégorie : <span>' + (cat ? escHtml(cat.name) : '—') + '</span><br>'
+      + 'Ajouté par : <span>' + escHtml(p.user_name || 'Anonyme') + '</span> · ' + new Date(p.created_at).toLocaleDateString('fr')
       + '</div>'
       + '</div>'
       + '</div>'
