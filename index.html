@@ -3721,7 +3721,7 @@ async function renderProfile() {
   var bannerGrad = currentUserBannerColor || localStorage.getItem('vlm_banner_color') || BANNER_PRESETS[0].g;
   var bio = currentUserBio || localStorage.getItem('vlm_bio') || '';
   var avatarBg = currentUserAvatarBg || localStorage.getItem('vlm_avatar_bg') || '';
-  var avatarBgStyle = avatarBg ? 'background:linear-gradient(' + avatarBg + ');' : '';
+  var avatarBgStyle = avatarBg ? 'background:linear-gradient(' + escHtml(avatarBg) + ');' : '';
   var swatchesHtml = BANNER_PRESETS.map(function(p) {
     return '<div class="pbe-swatch' + (p.g === bannerGrad ? ' sel' : '') + '" data-g="' + p.g + '" style="background:linear-gradient(' + p.g + ')"></div>';
   }).join('');
@@ -3733,7 +3733,7 @@ async function renderProfile() {
   }).join('');
   var invBtnStyle = 'flex-shrink:0;background:var(--surface2);border:1px solid var(--border);color:var(--text2);border-radius:10px;padding:7px 13px;font-size:12px;cursor:pointer;font-family:var(--font-body);font-weight:600;';
   el.innerHTML = '<div class="prof-card">'
-    + '<div class="prof-banner" id="prof-banner" style="background:linear-gradient(' + bannerGrad + ')">'
+    + '<div class="prof-banner" id="prof-banner" style="background:linear-gradient(' + escHtml(bannerGrad) + ')">'
     + '<div class="prof-bio-text" id="prof-bio-display">' + escHtml(bio) + '</div>'
     + '<button class="prof-banner-edit-btn" onclick="openPersonalizeOverlay(\'banner\')">&#9998;</button>'
     + '<div class="prof-banner-edit-overlay" id="prof-banner-overlay">'
@@ -3762,7 +3762,7 @@ async function renderProfile() {
     + '</div>'
     + '</div>'
     + '<div class="prof-avatar-wrap">'
-    + '<div class="prof-avatar" id="prof-avatar" style="' + avatarBgStyle + '">' + avatarInner + '</div>'
+    + '<div class="prof-avatar" id="prof-avatar" style="' + avatarBgStyle + '">' + escHtml(avatarInner) + '</div>'
     + '<div class="prof-avatar-edit-badge" onclick="openPersonalizeOverlay(\'avatar\')">&#9998;</div>'
     + '</div>'
     + '<span id="prof-role-label" style="position:absolute;bottom:-28px;left:100px;font-size:12px;font-weight:700;color:#fff;background:rgba(11,166,179,0.85);border-radius:20px;padding:3px 10px;white-space:nowrap;"></span>'
@@ -4286,10 +4286,10 @@ async function openPublicProfile(username) {
     + '</div>' : '';
 
   content.innerHTML = '<div class="prof-card">'
-    + '<div class="prof-banner" style="background:linear-gradient(' + pubBannerGrad + ')">'
+    + '<div class="prof-banner" style="background:linear-gradient(' + escHtml(pubBannerGrad) + ')">'
     + (pubBio ? '<div class="prof-bio-text" style="white-space:pre-line">' + escHtml(pubBio) + '</div>' : '')
     + '<div class="prof-avatar-wrap">'
-    + '<div class="prof-avatar" style="cursor:default;' + (pubAvatarBg ? 'background:linear-gradient(' + pubAvatarBg + ');' : '') + '">' + escHtml(pubAvatar) + '</div>'
+    + '<div class="prof-avatar" style="cursor:default;' + (pubAvatarBg ? 'background:linear-gradient(' + escHtml(pubAvatarBg) + ');' : '') + '">' + escHtml(pubAvatar) + '</div>'
     + '</div>'
     + '<span style="position:absolute;bottom:-28px;left:100px;font-size:12px;font-weight:700;color:#fff;background:rgba(11,166,179,0.85);border-radius:20px;padding:3px 10px;white-space:nowrap;">' + communityRole + '</span>'
     + '</div>'
@@ -6304,10 +6304,10 @@ async function loadWeeklyRankProfile() {
     if (isSelf) return '';
     var avatar = e.avatar_url || (e.username ? e.username.slice(0, 2).toUpperCase() : '?');
     var isEmoji = avatar.length > 2;
-    var avatarBg = e.avatar_bg ? 'background:linear-gradient(' + e.avatar_bg + ');color:#fff;' : 'background:rgba(11,166,179,0.15);color:var(--accent);';
+    var avatarBg = e.avatar_bg ? 'background:linear-gradient(' + escHtml(e.avatar_bg) + ');color:#fff;' : 'background:rgba(11,166,179,0.15);color:var(--accent);';
     return '<div onclick="' + (e.username ? 'openPublicProfile(\'' + escJsAttr(e.username) + '\')' : '') + '" style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);' + (e.username ? 'cursor:pointer;' : '') + '">'
       + '<div style="font-size:' + (i < 3 ? '18' : '12') + 'px;width:24px;text-align:center;flex-shrink:0;' + (i >= 3 ? 'color:var(--text2);font-weight:700;' : '') + '">' + (i < 3 ? medals[i] : i + 1) + '</div>'
-      + '<div style="width:32px;height:32px;border-radius:50%;' + avatarBg + 'display:flex;align-items:center;justify-content:center;font-size:' + (isEmoji ? '18' : '12') + 'px;font-weight:700;flex-shrink:0;">' + avatar + '</div>'
+      + '<div style="width:32px;height:32px;border-radius:50%;' + avatarBg + 'display:flex;align-items:center;justify-content:center;font-size:' + (isEmoji ? '18' : '12') + 'px;font-weight:700;flex-shrink:0;">' + escHtml(avatar) + '</div>'
       + '<div style="flex:1;font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escHtml(e.username || '(sans pseudo)') + '</div>'
       + '<div style="font-size:13px;font-weight:800;color:var(--accent);flex-shrink:0;">' + e.weekly_xp + ' <span style="font-size:10px;font-weight:400;color:var(--text2);">XP</span></div>'
       + '</div>';
@@ -8425,7 +8425,7 @@ async function loadDashLeaderboard() {
     var isSelf = currentUsername && e.username === currentUsername;
     var avatar = e.avatar_url || (e.username ? e.username.slice(0, 2).toUpperCase() : '?');
     var isEmoji = avatar.length > 2;
-    var avatarBg = e.avatar_bg ? 'background:linear-gradient(' + e.avatar_bg + ');' : 'background:rgba(11,166,179,0.15);';
+    var avatarBg = e.avatar_bg ? 'background:linear-gradient(' + escHtml(e.avatar_bg) + ');' : 'background:rgba(11,166,179,0.15);';
     var avatarColor = e.avatar_bg ? 'color:#fff;' : 'color:var(--accent);';
     var avatarFontSize = isEmoji ? '20px' : '13px';
     var breakdown = [];
@@ -8438,7 +8438,7 @@ async function loadDashLeaderboard() {
     var posLabel = i < 3 ? '<span style="font-size:20px;">' + medals[i] + '</span>' : '<span style="font-size:13px;font-weight:700;color:var(--text2);width:26px;display:inline-block;text-align:center;">' + (i + 1) + '</span>';
     return '<div onclick="' + (e.username ? 'openPublicProfile(\'' + escJsAttr(e.username) + '\')' : '') + '" style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);' + rowBg + (e.username ? 'cursor:pointer;' : '') + '">'
       + '<div style="width:28px;flex-shrink:0;text-align:center;">' + posLabel + '</div>'
-      + '<div style="width:38px;height:38px;border-radius:50%;' + avatarBg + avatarColor + 'display:flex;align-items:center;justify-content:center;font-size:' + avatarFontSize + ';font-weight:700;flex-shrink:0;">' + avatar + '</div>'
+      + '<div style="width:38px;height:38px;border-radius:50%;' + avatarBg + avatarColor + 'display:flex;align-items:center;justify-content:center;font-size:' + avatarFontSize + ';font-weight:700;flex-shrink:0;">' + escHtml(avatar) + '</div>'
       + '<div style="flex:1;min-width:0;">'
       + '<div style="font-size:13px;font-weight:' + (isSelf ? '800' : '600') + ';color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (isSelf ? '👤 ' : '') + escHtml(e.username || '(sans pseudo)') + '</div>'
       + (breakdown.length ? '<div style="font-size:11px;color:var(--text2);">' + breakdown.join(' · ') + '</div>' : '')
