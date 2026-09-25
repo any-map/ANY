@@ -3471,6 +3471,12 @@ async function init() {
   cluster.on('animationend', function() { if (!_autoSpiderfied && map.getZoom() >= 14) scheduleAutoSpiderfy(200); });
   window.addEventListener('resize', function() { map.invalidateSize(); });
   setTimeout(function() { map.invalidateSize(); }, 200);
+  if (window.ResizeObserver) {
+    var _mapWrapEl = document.getElementById('map-wrap');
+    if (_mapWrapEl) {
+      new ResizeObserver(function() { map.invalidateSize(); }).observe(_mapWrapEl);
+    }
+  }
 
   var _safeHide = setTimeout(function() { document.getElementById('loading').style.display = 'none'; }, 12000);
   try { await checkAuth(); } catch(e) { showToast(t('lbl_err_generic') + (e && e.message ? e.message : e), 'error'); }
