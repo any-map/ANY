@@ -36,8 +36,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="dns-prefetch" href="https://unpkg.com">
 <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-<link rel="preload" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"></noscript>
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=Roboto:wght@400;500;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"></noscript>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
@@ -86,6 +86,21 @@ html[data-theme="explorer"] .prof-card,
 html[data-theme="explorer"] .modal {
   border-radius:20px;
 }
+/* THEME MAPS — palette et composants façon Google Maps (clair, accent bleu, boutons ronds/pilule, ombres douces) */
+html[data-theme="maps"] {
+  --bg:#ffffff;--surface:#ffffff;--surface2:#f1f3f4;--border:#dadce0;
+  --accent:#1a73e8;--text:#202124;--text2:#5f6368;--danger:#d93025;
+  --font-head:'Roboto',sans-serif;--font-body:'Roboto',sans-serif;
+}
+html[data-theme="maps"] #bottom-nav{background:rgba(255,255,255,0.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:none;box-shadow:0 -1px 4px rgba(60,64,67,0.15);}
+html[data-theme="maps"] .nav-item.active{background:rgba(26,115,232,0.12);color:var(--accent);border-radius:20px;margin:2px 3px;}
+html[data-theme="maps"] .nav-add-btn{border:none;box-shadow:0 1px 2px rgba(60,64,67,0.3),0 2px 6px 2px rgba(60,64,67,0.15);}
+html[data-theme="maps"] .map-srch-field{border-radius:24px;border:none;box-shadow:0 1px 2px rgba(60,64,67,0.3),0 1px 3px 1px rgba(60,64,67,0.15);}
+html[data-theme="maps"] #btn-locate,
+html[data-theme="maps"] #btn-map-style{border-radius:50%;border:none;box-shadow:0 1px 2px rgba(60,64,67,0.3),0 1px 3px 1px rgba(60,64,67,0.15);}
+html[data-theme="maps"] #places-count{border:none;border-radius:16px;box-shadow:0 1px 2px rgba(60,64,67,0.3),0 1px 3px 1px rgba(60,64,67,0.15);}
+html[data-theme="maps"] .btn-p{border-radius:24px;}
+html[data-theme="maps"] .modal{border-radius:20px;box-shadow:0 -1px 10px rgba(60,64,67,0.2);}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none;font-family:var(--font-body);background:var(--bg);color:var(--text);}
 #app{display:flex;width:100vw;height:var(--app-height,100dvh);padding-top:env(safe-area-inset-top,0px);}
@@ -247,6 +262,9 @@ html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none;font-f
 .toggle.on{background:var(--accent);}
 .toggle::after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left 0.2s;}
 .toggle.on::after{left:23px;}
+.theme-picker{display:flex;gap:4px;background:var(--surface2);border-radius:14px;padding:3px;margin-top:8px;}
+.theme-picker button{flex:1;background:none;border:none;color:var(--text2);font-family:var(--font-body);font-size:12px;font-weight:600;padding:8px 4px;border-radius:11px;cursor:pointer;transition:background 0.15s,color 0.15s;}
+.theme-picker button.active{background:var(--accent);color:#fff;}
 
 /* MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
@@ -1325,17 +1343,18 @@ var currentLang = (function(){
 
 // ===== THEME =====
 var currentTheme = localStorage.getItem('vlm_theme') || 'default';
-if (currentTheme === 'explorer') document.documentElement.setAttribute('data-theme', 'explorer');
+if (currentTheme !== 'default') document.documentElement.setAttribute('data-theme', currentTheme);
 function applyTheme(theme) {
   currentTheme = theme;
-  if (theme === 'explorer') document.documentElement.setAttribute('data-theme', 'explorer');
-  else document.documentElement.removeAttribute('data-theme');
+  if (theme === 'default') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme', theme);
   localStorage.setItem('vlm_theme', theme);
-}
-function toggleThemeSetting() {
-  applyTheme(currentTheme === 'explorer' ? 'default' : 'explorer');
-  var el = document.getElementById('toggle-theme');
-  if (el) el.classList.toggle('on', currentTheme === 'explorer');
+  var picker = document.getElementById('theme-picker');
+  if (picker) {
+    Array.prototype.forEach.call(picker.querySelectorAll('button'), function(b) {
+      b.classList.toggle('active', b.getAttribute('data-theme') === theme);
+    });
+  }
 }
 
 var i18n = {
@@ -3954,8 +3973,13 @@ async function renderProfile() {
     + '<div class="setting-row"><div><div class="setting-label">' + t('profile_satellite') + '</div><div class="setting-desc">' + t('profile_satellite_desc') + '</div></div>'
     + '<div class="toggle" id="toggle-sat" onclick="toggleSatSetting()"></div>'
     + '</div>'
-    + '<div class="setting-row"><div><div class="setting-label">' + t('profile_theme') + '</div><div class="setting-desc">' + t('profile_theme_desc') + '</div></div>'
-    + '<div class="toggle' + (currentTheme === 'explorer' ? ' on' : '') + '" id="toggle-theme" onclick="toggleThemeSetting()"></div>'
+    + '<div class="setting-row" style="flex-direction:column;align-items:stretch;">'
+    + '<div><div class="setting-label">' + t('profile_theme') + '</div><div class="setting-desc">' + t('profile_theme_desc') + '</div></div>'
+    + '<div class="theme-picker" id="theme-picker">'
+    + '<button data-theme="default" class="' + (currentTheme === 'default' ? 'active' : '') + '" onclick="applyTheme(\'default\')">Normal</button>'
+    + '<button data-theme="explorer" class="' + (currentTheme === 'explorer' ? 'active' : '') + '" onclick="applyTheme(\'explorer\')">Exploration</button>'
+    + '<button data-theme="maps" class="' + (currentTheme === 'maps' ? 'active' : '') + '" onclick="applyTheme(\'maps\')">Maps</button>'
+    + '</div>'
     + '</div>'
     + '<div id="push-notif-row" class="setting-row" style="display:none;"><div><div class="setting-label">' + t('profile_push') + '</div><div class="setting-desc" id="push-notif-desc">' + t('profile_push_desc') + '</div></div>'
     + '<div class="toggle" id="toggle-push" onclick="togglePushSetting()"></div>'
