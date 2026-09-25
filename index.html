@@ -3490,12 +3490,17 @@ async function init() {
   map.on('moveend', function() { scheduleLoad(); });
   map.on('zoomend', function() { _autoSpiderfied = false; scheduleLoad(); if (map.getZoom() >= 14) scheduleAutoSpiderfy(0); });
   cluster.on('animationend', function() { if (!_autoSpiderfied && map.getZoom() >= 14) scheduleAutoSpiderfy(200); });
-  window.addEventListener('resize', function() { map.invalidateSize(); });
-  setTimeout(function() { map.invalidateSize(); }, 200);
+  window.forceMapRedraw = function() {
+    if (!map) return;
+    map.invalidateSize();
+    map.setView(map.getCenter(), map.getZoom(), { animate: false });
+  };
+  window.addEventListener('resize', forceMapRedraw);
+  setTimeout(forceMapRedraw, 200);
   if (window.ResizeObserver) {
     var _mapWrapEl = document.getElementById('map-wrap');
     if (_mapWrapEl) {
-      new ResizeObserver(function() { map.invalidateSize(); }).observe(_mapWrapEl);
+      new ResizeObserver(forceMapRedraw).observe(_mapWrapEl);
     }
   }
 
@@ -8154,7 +8159,7 @@ function setAppHeight() {
 }
 setAppHeight();
 window.addEventListener('resize', setAppHeight);
-window.addEventListener('orientationchange', function() { setTimeout(function() { setAppHeight(); if (map) map.invalidateSize(); }, 300); });
+window.addEventListener('orientationchange', function() { setTimeout(function() { setAppHeight(); if (window.forceMapRedraw) window.forceMapRedraw(); }, 300); });
 
 if (isIOS && !isStandalone && !localStorage.getItem('install-dismissed')) {
   document.getElementById('install-steps-ios').style.display = 'flex';
