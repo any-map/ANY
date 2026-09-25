@@ -416,9 +416,9 @@ html.pwa-standalone #bottom-nav{background:var(--bg);backdrop-filter:none;-webki
 /* LANDSCAPE MOBILE — nav passe à gauche */
 @media (orientation:landscape) and (max-height:500px) {
   #sidebar{display:none !important;}
-  #bottom-nav{display:block;top:0;bottom:0;right:auto;left:0;width:calc(var(--nav-h) + env(safe-area-inset-left,0px));height:100dvh;border-top:none;border-right:1px solid rgba(11,166,179,0.2);}
-  #bottom-nav-inner{flex-direction:column;height:100%;width:100%;padding-left:env(safe-area-inset-left,0px);}
-  #app{padding-left:calc(var(--nav-h) + env(safe-area-inset-left,0px));}
+  #bottom-nav{display:block;top:0;bottom:0;right:auto;left:env(safe-area-inset-left,0px);width:var(--nav-h);height:100dvh;border-top:none;border-right:1px solid rgba(11,166,179,0.2);}
+  #bottom-nav-inner{flex-direction:column;height:100%;width:100%;}
+  #app{padding-left:0;}
   #map-wrap{height:100%;}
   .nav-item span:not(.nav-item-icon),.nav-item-add>span{display:none;}
   #btn-locate{bottom:14px;}
