@@ -603,6 +603,10 @@ path.leaflet-cluster-spider-leg{stroke:#fff!important;stroke-width:1.5px!importa
 </style>
 </head>
 <body>
+<!-- TEMP DEBUG bande navbar — à retirer une fois le diagnostic terminé -->
+<div id="debug-overlay" style="position:fixed;top:0;left:0;right:0;z-index:999999;background:rgba(0,0,0,0.85);color:#0f0;font:10px/1.4 monospace;padding:6px 8px;white-space:pre-wrap;pointer-events:none;"></div>
+<div id="debug-probe" style="position:fixed;visibility:hidden;top:env(safe-area-inset-top,0px);right:env(safe-area-inset-right,0px);bottom:env(safe-area-inset-bottom,0px);left:env(safe-area-inset-left,0px);"></div>
+<!-- FIN TEMP DEBUG (haut) -->
 <div id="loading"><img src="ANY.splash.webp" alt="ANY"><div class="spinner"></div></div>
 
 <div id="app">
@@ -8128,6 +8132,37 @@ function setAppHeight() {
 setAppHeight();
 window.addEventListener('resize', setAppHeight);
 window.addEventListener('orientationchange', function() { setTimeout(setAppHeight, 300); });
+
+// TEMP DEBUG bande navbar — à retirer une fois le diagnostic terminé
+function updateDebugOverlay() {
+  var el = document.getElementById('debug-overlay');
+  var probe = document.getElementById('debug-probe');
+  var appEl = document.getElementById('app');
+  var mapWrapEl = document.getElementById('map-wrap');
+  var navEl = document.getElementById('bottom-nav');
+  if (!el || !probe || !appEl || !mapWrapEl || !navEl) return;
+  var cs = getComputedStyle(probe);
+  var app = appEl.getBoundingClientRect();
+  var mapWrap = mapWrapEl.getBoundingClientRect();
+  var nav = navEl.getBoundingClientRect();
+  function r(rect) { return 'x' + Math.round(rect.left) + ' y' + Math.round(rect.top) + ' w' + Math.round(rect.width) + ' h' + Math.round(rect.height); }
+  el.textContent =
+    'inner W/H: ' + window.innerWidth + ' / ' + window.innerHeight +
+    ' | visualVP: ' + (window.visualViewport ? Math.round(window.visualViewport.width) + '/' + Math.round(window.visualViewport.height) : 'n/a') + '\n' +
+    'safe T/R/B/L: ' + cs.top + ' / ' + cs.right + ' / ' + cs.bottom + ' / ' + cs.left +
+    ' | --app-height: ' + getComputedStyle(document.documentElement).getPropertyValue('--app-height') + '\n' +
+    'app: ' + r(app) + '\n' +
+    'mapWrap: ' + r(mapWrap) + '\n' +
+    'nav: ' + r(nav) + '\n' +
+    'display standalone/fullscreen: ' + window.matchMedia('(display-mode: standalone)').matches + ' / ' + window.matchMedia('(display-mode: fullscreen)').matches +
+    ' | navigator.standalone: ' + window.navigator.standalone +
+    ' | orientation: ' + (screen.orientation ? screen.orientation.type : 'n/a');
+}
+setInterval(updateDebugOverlay, 500);
+window.addEventListener('resize', updateDebugOverlay);
+window.addEventListener('orientationchange', function() { setTimeout(updateDebugOverlay, 300); });
+updateDebugOverlay();
+// FIN TEMP DEBUG
 
 if (isIOS && !isStandalone && !localStorage.getItem('install-dismissed')) {
   document.getElementById('install-steps-ios').style.display = 'flex';
