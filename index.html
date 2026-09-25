@@ -8127,7 +8127,7 @@ function setAppHeight() {
 }
 setAppHeight();
 window.addEventListener('resize', setAppHeight);
-window.addEventListener('orientationchange', function() { setTimeout(setAppHeight, 300); });
+window.addEventListener('orientationchange', function() { setTimeout(function() { setAppHeight(); if (map) map.invalidateSize(); }, 300); });
 
 if (isIOS && !isStandalone && !localStorage.getItem('install-dismissed')) {
   document.getElementById('install-steps-ios').style.display = 'flex';
