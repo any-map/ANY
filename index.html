@@ -230,11 +230,11 @@ html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none;font-f
 
 /* BOTTOM NAV */
 #bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:rgba(7,24,32,0.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid rgba(11,166,179,0.2);z-index:1000;overflow:visible;}
-#bottom-nav-inner{display:flex;height:var(--nav-h);align-items:stretch;overflow:visible;}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;border:none;background:none;color:var(--accent);font-family:var(--font-body);font-size:9px;font-weight:500;transition:color 0.15s;padding:4px 2px;white-space:nowrap;overflow:hidden;}
+#bottom-nav-inner{display:flex;height:100%;align-items:stretch;overflow:visible;}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;cursor:pointer;border:none;background:none;color:var(--accent);font-family:var(--font-body);font-size:9px;font-weight:500;transition:color 0.15s;padding:4px 2px 1px;white-space:nowrap;overflow:hidden;}
 .nav-item.active{color:var(--accent);}
 .nav-item-icon{font-size:24px;line-height:1;}
-.nav-item-add{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;background:none;border:none;font-family:var(--font-body);font-size:9px;font-weight:500;overflow:visible;}
+.nav-item-add{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;cursor:pointer;background:none;border:none;font-family:var(--font-body);font-size:9px;font-weight:500;overflow:visible;padding-bottom:1px;}
 .nav-add-btn{width:50px;height:50px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;color:#fff;font-weight:700;margin-top:-20px;box-shadow:0 4px 16px rgba(11,166,179,0.5);border:1.5px solid rgba(255,255,255,0.2);}
 .nav-item-add span{color:var(--accent);font-size:7px;text-align:center;line-height:1.2;}
 
