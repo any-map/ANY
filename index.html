@@ -140,6 +140,8 @@ html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none;font-f
 #btn-locate.live{background:#4285f4 !important;border-color:#4285f4 !important;color:#fff !important;}
 #btn-sat-toggle{position:absolute;top:56px;right:14px;z-index:999;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;box-shadow:0 2px 8px rgba(0,0,0,0.3);}
 #btn-sat-toggle.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+#btn-terrain-toggle{position:absolute;top:96px;right:14px;z-index:999;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;box-shadow:0 2px 8px rgba(0,0,0,0.3);}
+#btn-terrain-toggle.on{background:var(--accent);border-color:var(--accent);color:#fff;}
 #info-adding{display:none;position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:999;background:var(--accent);color:#fff;border-radius:var(--radius-sm);padding:10px 18px;font-size:13px;font-weight:600;font-family:var(--font-head);white-space:nowrap;}
 
 
@@ -536,6 +538,7 @@ html.pwa-standalone #bottom-nav{background:var(--bg);backdrop-filter:none;-webki
   #map-search-bar{display:block;position:fixed;top:0;left:0;right:92px;z-index:1100;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 8px;pointer-events:none;}
   #places-count{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:12px;z-index:1101;}
   #btn-sat-toggle{position:fixed;top:calc(58px + env(safe-area-inset-top,0px));right:14px;z-index:1101;}
+  #btn-terrain-toggle{position:fixed;top:calc(98px + env(safe-area-inset-top,0px));right:14px;z-index:1101;}
 }
 .map-srch-row{display:flex;gap:8px;align-items:center;pointer-events:all;}
 .map-srch-wrap{flex:1;position:relative;}
@@ -680,6 +683,7 @@ path.leaflet-cluster-spider-leg{stroke:#fff!important;stroke-width:1.5px!importa
     <button id="btn-locate" title="Suivre ma position en direct"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="7" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
     <div id="places-count">Lieux : <span id="count-num">0</span></div>
     <button id="btn-sat-toggle" title="Vue satellite" onclick="toggleSatSetting()">&#128752;</button>
+    <button id="btn-terrain-toggle" title="Vue terrain" onclick="toggleTerrain()">&#9968;</button>
     <div id="solo-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:1500;background:var(--surface);border-top:2px solid var(--accent);height:var(--nav-h);align-items:stretch;">
       <button onclick="clearSoloMode()" data-i18n="solo_back_profile" style="flex:1;background:none;border:none;border-right:1px solid var(--border);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font-body);">&#8592; Retour au Profil</button>
       <button onclick="exitSoloToMap()" data-i18n="solo_back_map" style="flex:1;background:none;border:none;color:var(--text2);font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font-body);">&#128506; Retour sur la carte</button>
@@ -1205,7 +1209,7 @@ var VAPID_PUBLIC_KEY = 'BGKoMqe8Jlj8Bqr3u1NR9L8Vb0gDirvGHErIZmjlrG1ewb7gbvFaDKEj
 var db;
 
 var map, cluster;
-var layerStreet, layerSat, layerLabels, isSat = false;
+var layerStreet, layerSat, layerLabels, layerTerrain, isSat = false, isTerrain = false;
 var _autoLocateSkip = false;
 var currentUser = null;
 var currentUsername = '';
@@ -3454,6 +3458,7 @@ async function init() {
   layerStreet = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap', maxZoom: 19 });
   layerSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: '&copy; Esri', maxZoom: 19 });
   layerLabels = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, opacity: 0.9 });
+  layerTerrain = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenTopoMap (CC-BY-SA)', maxZoom: 17 });
   layerStreet.addTo(map);
   cluster = L.markerClusterGroup({
     maxClusterRadius: function(zoom) { return zoom >= 12 ? 24 : zoom >= 9 ? 35 : 60; },
@@ -3539,6 +3544,7 @@ function applySat(on) {
   var tog = document.getElementById('toggle-sat');
   var btn = document.getElementById('btn-sat-toggle');
   if (on) {
+    if (isTerrain) applyTerrain(false);
     if (!map.hasLayer(layerSat)) {
       map.removeLayer(layerStreet);
       layerSat.addTo(map);
@@ -3555,6 +3561,30 @@ function applySat(on) {
     if (tog) tog.classList.remove('on');
     if (btn) btn.classList.remove('on');
   }
+}
+
+// ===== TERRAIN (libre d'accès) =====
+function applyTerrain(on) {
+  isTerrain = on;
+  var btn = document.getElementById('btn-terrain-toggle');
+  if (on) {
+    if (isSat) applySat(false);
+    if (!map.hasLayer(layerTerrain)) {
+      map.removeLayer(layerStreet);
+      layerTerrain.addTo(map);
+    }
+    if (btn) btn.classList.add('on');
+  } else {
+    if (map.hasLayer(layerTerrain)) {
+      map.removeLayer(layerTerrain);
+      layerStreet.addTo(map);
+    }
+    if (btn) btn.classList.remove('on');
+  }
+}
+
+function toggleTerrain() {
+  applyTerrain(!isTerrain);
 }
 
 
