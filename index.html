@@ -603,8 +603,27 @@ path.leaflet-cluster-spider-leg{stroke:#fff!important;stroke-width:1.5px!importa
 </style>
 </head>
 <body>
-<!-- TEMP repère de version — à retirer une fois le diagnostic paysage terminé -->
-<div style="position:fixed;bottom:2px;right:2px;z-index:999999;background:#f00;color:#fff;font:10px monospace;padding:2px 5px;pointer-events:none;">build-landscape-4</div>
+<!-- TEMP repère de mesure paysage — à retirer une fois le diagnostic terminé -->
+<div id="lg-debug" style="position:fixed;bottom:2px;right:2px;left:2px;z-index:999999;background:#f00;color:#fff;font:11px monospace;padding:3px 5px;pointer-events:none;white-space:pre-wrap;">build-landscape-5</div>
+<script>
+function _lgDebug() {
+  var el = document.getElementById('lg-debug');
+  var nav = document.getElementById('bottom-nav');
+  var mw = document.getElementById('map-wrap');
+  var app = document.getElementById('app');
+  if (!el || !nav || !mw || !app) return;
+  var probe = document.createElement('div');
+  probe.style.cssText = 'position:fixed;visibility:hidden;left:env(safe-area-inset-left,0px);';
+  document.body.appendChild(probe);
+  var safeLeft = getComputedStyle(probe).left;
+  probe.remove();
+  function r(el2) { var b = el2.getBoundingClientRect(); return 'x' + Math.round(b.left) + ' w' + Math.round(b.width); }
+  el.textContent = 'safeLeft:' + safeLeft + ' app:' + r(app) + ' mapWrap:' + r(mw) + ' nav:' + r(nav) + ' navCS-width:' + getComputedStyle(nav).width + ' navCS-left:' + getComputedStyle(nav).left;
+}
+setInterval(_lgDebug, 500);
+window.addEventListener('resize', _lgDebug);
+window.addEventListener('orientationchange', function(){ setTimeout(_lgDebug, 400); });
+</script>
 <div id="loading"><img src="ANY.splash.webp" alt="ANY"><div class="spinner"></div></div>
 
 <div id="app">
