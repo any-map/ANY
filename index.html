@@ -102,7 +102,8 @@ html[data-theme="maps"] #places-count{border:none;border-radius:16px;box-shadow:
 html[data-theme="maps"] .btn-p{border-radius:24px;}
 html[data-theme="maps"] .modal{border-radius:20px;box-shadow:0 -1px 10px rgba(60,64,67,0.2);}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none;font-family:var(--font-body);background:var(--bg);color:var(--text);}
+html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none;font-family:var(--font-body);background:linear-gradient(160deg,#1ab8a0 0%,#1a7ac8 100%);color:var(--text);}
+html.app-ready{background:var(--bg);}
 #app{display:flex;width:100vw;height:var(--app-height,100dvh);padding-top:env(safe-area-inset-top,0px);}
 
 /* SIDEBAR */
@@ -3525,12 +3526,16 @@ async function init() {
     }
   }
 
-  var _safeHide = setTimeout(function() { document.getElementById('loading').style.display = 'none'; }, 12000);
+  function hideLoading() {
+    document.getElementById('loading').style.display = 'none';
+    document.documentElement.classList.add('app-ready');
+  }
+  var _safeHide = setTimeout(hideLoading, 12000);
   try { await checkAuth(); } catch(e) { showToast(t('lbl_err_generic') + (e && e.message ? e.message : e), 'error'); }
   try { await loadCats(); } catch(e) {}
   try { await loadCommTypes(); } catch(e) {}
   clearTimeout(_safeHide);
-  document.getElementById('loading').style.display = 'none';
+  hideLoading();
 
   localStorage.removeItem('vlm_countries');
   localStorage.removeItem('vlm_no_filter');
