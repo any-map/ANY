@@ -632,6 +632,38 @@ path.leaflet-cluster-spider-leg{stroke:#fff!important;stroke-width:1.5px!importa
 </head>
 <body>
 <div id="loading"><img src="ANY.splash.webp" alt="ANY"><div class="spinner"></div></div>
+<div id="_dbg" style="position:fixed;top:0;left:0;right:0;z-index:99999;background:rgba(0,0,0,0.85);color:#0f0;font:10px/1.4 monospace;padding:6px;white-space:pre-wrap;pointer-events:none;"></div>
+<script>
+(function(){
+  var el = document.getElementById('_dbg');
+  var probe = document.createElement('div');
+  probe.style.cssText = 'position:fixed;bottom:0;left:0;width:0;height:0;padding-bottom:env(safe-area-inset-bottom,0px);';
+  document.body.appendChild(probe);
+  function measure(){
+    var loading = document.getElementById('loading');
+    var lr = loading ? loading.getBoundingClientRect() : null;
+    var theme = document.documentElement.getAttribute('data-theme') || 'default';
+    var appReady = document.documentElement.classList.contains('app-ready');
+    var bg = getComputedStyle(document.documentElement).backgroundColor;
+    var bodyBg = getComputedStyle(document.body).backgroundColor;
+    var safeBottom = getComputedStyle(probe).paddingBottom;
+    el.textContent =
+      'theme=' + theme + ' appReady=' + appReady + '\n' +
+      'standalone=' + (window.navigator.standalone) + ' display-mode-standalone=' + window.matchMedia('(display-mode: standalone)').matches + '\n' +
+      'innerW/H=' + window.innerWidth + '/' + window.innerHeight + ' visualVP.h=' + (window.visualViewport ? window.visualViewport.height : 'n/a') + '\n' +
+      'safeBottom=' + safeBottom + '\n' +
+      'html.bg=' + bg + ' body.bg=' + bodyBg + '\n' +
+      (lr ? ('loadingRect: top=' + lr.top + ' bottom=' + lr.bottom + ' left=' + lr.left + ' right=' + lr.right) : 'loading:removed');
+  }
+  var n = 0;
+  var iv = setInterval(function(){
+    measure();
+    n++;
+    if (n > 60) { clearInterval(iv); if (el) el.remove(); if (probe) probe.remove(); }
+  }, 500);
+  measure();
+})();
+</script>
 
 <div id="app">
   <div id="sidebar">
