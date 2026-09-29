@@ -197,7 +197,7 @@ html[data-theme="maps"]{background:#e3edf6;}
 
 
 /* BOTTOM NAV */
-#bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:rgba(7,24,32,0.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid rgba(11,166,179,0.2);z-index:1000;overflow:visible;}
+#bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:var(--bg);border-top:1px solid rgba(11,166,179,0.2);z-index:1000;overflow:visible;}
 #bottom-nav-inner{display:flex;height:100%;align-items:stretch;overflow:visible;}
 .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;cursor:pointer;border:none;background:none;color:var(--accent);font-family:var(--font-body);font-size:9px;font-weight:700;transition:color 0.15s;padding:4px 2px 1px;white-space:nowrap;overflow:hidden;}
 .nav-item.active{color:var(--accent);}
@@ -409,8 +409,6 @@ html[data-theme="maps"]{background:#e3edf6;}
   #places-count{top:10px;right:10px;font-size:11px;padding:5px 10px;}
   #toast{bottom:calc(var(--nav-h) + 12px);}
 }
-/* PWA installée — navbar à sa hauteur de base (54px), couleur unie = fond de page, sans flou */
-html.pwa-standalone:not([data-theme="maps"]) #bottom-nav{background:var(--bg);backdrop-filter:none;-webkit-backdrop-filter:none;}
 /* LANDSCAPE MOBILE — nav passe à gauche */
 @media (orientation:landscape) and (max-height:500px) {
   #sidebar{display:none !important;}
