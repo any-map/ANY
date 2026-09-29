@@ -53,39 +53,6 @@
   --font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;
   --radius:16px;--radius-sm:10px;
 }
-/* THEME EXPLORATION — palette jeu d'exploration/aventure, cartes bleu marine + accents émeraude */
-html[data-theme="explorer"] {
-  --bg:#0d1b2a;--surface:#16283a;--surface2:#1e3446;--border:#2f4a5c;
-  --accent:#22a06b;--text:#f2f7f0;--text2:#8ba5b5;--danger:#e8543f;
-}
-/* THEME EXPLORATION — styles de composants façon jeu d'exploration (cartes en relief, pastille active, barres dorées) */
-html[data-theme="explorer"] .dash-tile,
-html[data-theme="explorer"] .prof-stat {
-  background:linear-gradient(145deg, var(--surface2), var(--surface));
-  border:1px solid var(--border);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,0.1), 0 3px 0 rgba(0,0,0,0.35), 0 6px 14px rgba(0,0,0,0.3);
-}
-html[data-theme="explorer"] .nav-item.active {
-  background:var(--accent);color:#fff;border-radius:20px;margin:2px 3px;
-  box-shadow:0 3px 0 rgba(0,0,0,0.3);
-}
-html[data-theme="explorer"] .btn-p,
-html[data-theme="explorer"] .nav-add-btn {
-  border-radius:24px;box-shadow:0 4px 0 rgba(0,0,0,0.3);font-weight:800;
-}
-html[data-theme="explorer"] .nav-add-btn{border-radius:50%;}
-html[data-theme="explorer"] .prof-xp-bar,
-html[data-theme="explorer"] .prof-rank-bar {
-  background:rgba(0,0,0,0.4);
-}
-html[data-theme="explorer"] .prof-xp-fill,
-html[data-theme="explorer"] .prof-rank-fill {
-  background:linear-gradient(90deg,#f5b942,#e89a2c);
-}
-html[data-theme="explorer"] .prof-card,
-html[data-theme="explorer"] .modal {
-  border-radius:20px;
-}
 /* THEME MAPS — palette et composants façon Google Maps (clair, accent bleu, boutons ronds/pilule, ombres douces) */
 html[data-theme="maps"] {
   --bg:#ffffff;--surface:#ffffff;--surface2:#f1f3f4;--border:#dadce0;
@@ -1423,7 +1390,7 @@ fr:{
   profile_settings:'⚙️ Réglages', profile_change_country:'🌍 Changer ou ajouter un pays',
   profile_country_desc:'Sélectionner les pays où chercher des lieux',
   profile_satellite:'🛰 Vue satellite hybride', profile_satellite_desc:'Carte en vue aérienne avec noms de rues',
-  profile_theme:'🗺️ Thème Exploration', profile_theme_desc:'Palette inspirée des cartes d\'aventure et de randonnée',
+  profile_theme:'🎨 Thème', profile_theme_desc:'Choisis l\'apparence de l\'application',
   profile_push:'🔔 Notifications push', profile_push_desc:'Recevez une alerte même quand l\'app est fermée',
   profile_push_active:'Notifications actives sur cet appareil',
   profile_share:'🔗 Partager', profile_signout:'🚪 Se déconnecter', profile_language:'🌐 Langue',
@@ -1722,7 +1689,7 @@ en:{
   profile_settings:'⚙️ Settings', profile_change_country:'🌍 Change or add a country',
   profile_country_desc:'Select countries to search for places',
   profile_satellite:'🛰 Hybrid satellite view', profile_satellite_desc:'Aerial map with street names',
-  profile_theme:'🗺️ Explorer Theme', profile_theme_desc:'Palette inspired by adventure and hiking maps',
+  profile_theme:'🎨 Theme', profile_theme_desc:'Choose the app\'s appearance',
   profile_push:'🔔 Push notifications', profile_push_desc:'Get an alert even when the app is closed',
   profile_push_active:'Notifications active on this device',
   profile_share:'🔗 Share', profile_signout:'🚪 Sign out', profile_language:'🌐 Language',
@@ -2020,7 +1987,7 @@ es:{
   profile_settings:'⚙️ Ajustes', profile_change_country:'🌍 Cambiar o añadir país',
   profile_country_desc:'Seleccionar países para buscar lugares',
   profile_satellite:'🛰 Vista satélite híbrida', profile_satellite_desc:'Mapa aéreo con nombres de calles',
-  profile_theme:'🗺️ Tema Exploración', profile_theme_desc:'Paleta inspirada en mapas de aventura y senderismo',
+  profile_theme:'🎨 Tema', profile_theme_desc:'Elige la apariencia de la aplicación',
   profile_push:'🔔 Notificaciones push', profile_push_desc:'Recibe una alerta aunque la app esté cerrada',
   profile_push_active:'Notificaciones activas en este dispositivo',
   profile_share:'🔗 Compartir', profile_signout:'🚪 Cerrar sesión', profile_language:'🌐 Idioma',
@@ -2315,7 +2282,7 @@ de:{
   profile_settings:'⚙️ Einstellungen', profile_change_country:'🌍 Land ändern oder hinzufügen',
   profile_country_desc:'Länder für die Ortesuche auswählen',
   profile_satellite:'🛰 Hybride Satellitenansicht', profile_satellite_desc:'Luftkarte mit Straßennamen',
-  profile_theme:'🗺️ Entdecker-Design', profile_theme_desc:'Palette inspiriert von Abenteuer- und Wanderkarten',
+  profile_theme:'🎨 Design', profile_theme_desc:'Wähle das Erscheinungsbild der App',
   profile_push:'🔔 Push-Benachrichtigungen', profile_push_desc:'Benachrichtigung auch wenn die App geschlossen ist',
   profile_push_active:'Benachrichtigungen auf diesem Gerät aktiv',
   profile_share:'🔗 Teilen', profile_signout:'🚪 Abmelden', profile_language:'🌐 Sprache',
@@ -2610,7 +2577,7 @@ it:{
   profile_settings:'⚙️ Impostazioni', profile_change_country:'🌍 Cambia o aggiungi paese',
   profile_country_desc:'Seleziona paesi per cercare luoghi',
   profile_satellite:'🛰 Vista satellitare ibrida', profile_satellite_desc:'Mappa aerea con nomi delle strade',
-  profile_theme:'🗺️ Tema Esplorazione', profile_theme_desc:'Palette ispirata alle mappe di avventura ed escursionismo',
+  profile_theme:'🎨 Tema', profile_theme_desc:'Scegli l\'aspetto dell\'app',
   profile_push:'🔔 Notifiche push', profile_push_desc:'Ricevi un avviso anche quando l\'app è chiusa',
   profile_push_active:'Notifiche attive su questo dispositivo',
   profile_share:'🔗 Condividi', profile_signout:'🚪 Esci', profile_language:'🌐 Lingua',
@@ -2905,7 +2872,7 @@ pt:{
   profile_settings:'⚙️ Configurações', profile_change_country:'🌍 Alterar ou adicionar país',
   profile_country_desc:'Selecionar países para pesquisar locais',
   profile_satellite:'🛰 Vista satélite híbrida', profile_satellite_desc:'Mapa aéreo com nomes das ruas',
-  profile_theme:'🗺️ Tema Exploração', profile_theme_desc:'Paleta inspirada em mapas de aventura e caminhadas',
+  profile_theme:'🎨 Tema', profile_theme_desc:'Escolha a aparência da aplicação',
   profile_push:'🔔 Notificações push', profile_push_desc:'Receba um alerta mesmo com a app fechada',
   profile_push_active:'Notificações ativas neste dispositivo',
   profile_share:'🔗 Partilhar', profile_signout:'🚪 Sair', profile_language:'🌐 Idioma',
@@ -3200,7 +3167,7 @@ nl:{
   profile_settings:'⚙️ Instellingen', profile_change_country:'🌍 Land wijzigen of toevoegen',
   profile_country_desc:'Landen selecteren om locaties te zoeken',
   profile_satellite:'🛰 Hybride satellietweergave', profile_satellite_desc:'Luchtkaart met straatnamen',
-  profile_theme:'🗺️ Ontdekkingsthema', profile_theme_desc:'Palet geïnspireerd op avontuur- en wandelkaarten',
+  profile_theme:'🎨 Thema', profile_theme_desc:'Kies het uiterlijk van de app',
   profile_push:'🔔 Pushmeldingen', profile_push_desc:'Ontvang een melding ook als de app gesloten is',
   profile_push_active:'Meldingen actief op dit apparaat',
   profile_share:'🔗 Delen', profile_signout:'🚪 Uitloggen', profile_language:'🌐 Taal',
@@ -4016,7 +3983,6 @@ async function renderProfile() {
     + '<div><div class="setting-label">' + t('profile_theme') + '</div><div class="setting-desc">' + t('profile_theme_desc') + '</div></div>'
     + '<div class="theme-picker" id="theme-picker">'
     + '<button data-theme="default" class="' + (currentTheme === 'default' ? 'active' : '') + '" onclick="applyTheme(\'default\')">Normal</button>'
-    + '<button data-theme="explorer" class="' + (currentTheme === 'explorer' ? 'active' : '') + '" onclick="applyTheme(\'explorer\')">Exploration</button>'
     + '<button data-theme="maps" class="' + (currentTheme === 'maps' ? 'active' : '') + '" onclick="applyTheme(\'maps\')">Maps</button>'
     + '</div>'
     + '</div>'

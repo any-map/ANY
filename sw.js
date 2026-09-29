@@ -1,4 +1,4 @@
-﻿var CACHE = 'any-v18';
+﻿var CACHE = 'any-v19';
 var ASSETS = [
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
