@@ -4048,7 +4048,23 @@ async function renderProfile() {
 
   applySat(isSat);
   initPushToggle();
+  var cached = _loadProfStatsCache(currentUser.id);
+  if (cached) _applyProfileStats(username, cached);
   loadProfileStats(username);
+}
+
+var _PROF_STATS_TTL = 120000;
+function _loadProfStatsCache(uid) {
+  try {
+    var s = localStorage.getItem('profStatsCache');
+    if (!s) return null;
+    var o = JSON.parse(s);
+    if (o.uid !== uid || Date.now() - o.t > _PROF_STATS_TTL) return null;
+    return o.d;
+  } catch(e) { return null; }
+}
+function _saveProfStatsCache(uid, d) {
+  try { localStorage.setItem('profStatsCache', JSON.stringify({ uid: uid, t: Date.now(), d: d })); } catch(e) {}
 }
 
 
@@ -4252,7 +4268,19 @@ async function loadProfileStats(username) {
     var myRank = myIdx + 1;
     var total = lbData.length;
     var placesCount = placeIds.length;
-    var pEl = document.getElementById('prof-places');
+    var stats = { placesCount:placesCount, commentsCount:commentsCount, votesCount:votesCount, validatedCount:validatedCount, merciCount:merciCount, memberNum:memberNum, photosCount:photosCount, myRank:myRank, total:total };
+    _applyProfileStats(username, stats);
+    _saveProfStatsCache(uid, stats);
+  } catch(e) {
+    console.warn('Profile stats error:', e);
+  }
+}
+
+function _applyProfileStats(username, stats) {
+  var placesCount = stats.placesCount, commentsCount = stats.commentsCount, votesCount = stats.votesCount,
+      validatedCount = stats.validatedCount, merciCount = stats.merciCount, memberNum = stats.memberNum,
+      photosCount = stats.photosCount, myRank = stats.myRank, total = stats.total;
+  var pEl = document.getElementById('prof-places');
     var cEl = document.getElementById('prof-comments');
     var vEl = document.getElementById('prof-votes');
     var rankEl = document.getElementById('prof-rank');
@@ -4340,9 +4368,6 @@ async function loadProfileStats(username) {
           + '</div>';
       }).join('');
     }
-  } catch(e) {
-    console.warn('Profile stats error:', e);
-  }
 }
 
 var _pubProfileData = null;
