@@ -5856,7 +5856,7 @@ function makePopup(p) {
     + '</div>'
 
     + '<div class="pv2-votes">'
-    + '<button class="pv2-vote-btn ok" onclick="vote(\'' + safeId + '\',true)"><span>Merci<br><span style=\"font-size:10px;font-weight:400;opacity:0.75;\">(Je valide ce lieu)</span> (' + (p.votes_positifs || 0) + ')</span>&#128077;</button>'
+    + '<button class="pv2-vote-btn ok" onclick="vote(\'' + safeId + '\',true)"><span>Merci<br><span style=\"font-size:10px;font-weight:400;opacity:0.75;\">(Je valide ce lieu)</span> (<span id="merci-count-' + safeId + '">' + (p.votes_positifs || 0) + '</span>)</span>&#128077;</button>'
     + '<button class="pv2-vote-btn closed" onclick="openReport(\'' + safeId + '\',\'' + safeName + '\')">&#128078;<span>Quelque chose<br>ne va pas</span></button>'
     + '</div>'
     + modHtml
@@ -7806,6 +7806,11 @@ async function vote(pid, pos) {
     var thanksPlaceName = (place && place.name) || placeData.name || 'votre lieu';
     insertPlaceNotif(placeData.user_id, 'place_thanks', '🙏 Quelqu\'un a dit merci pour « ' + escHtml(thanksPlaceName) + ' »', pid);
     sendPush([placeData.user_id], '🙏 Merci reçu', 'Quelqu\'un a dit merci pour « ' + thanksPlaceName + ' »', '/');
+  }
+  if (place) {
+    place.votes_positifs = (place.votes_positifs || 0) + 1;
+    var merciCountEl = document.getElementById('merci-count-' + pid);
+    if (merciCountEl) merciCountEl.textContent = place.votes_positifs;
   }
   showToast(t('toast_voted_useful'), 'success');
   scheduleLoad();
