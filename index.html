@@ -8021,7 +8021,7 @@ async function submitPlace() {
 function sharePlace(id, name, lat, lon) {
   var url = window.location.origin + window.location.pathname + '?lat=' + lat + '&lon=' + lon + '&zoom=16';
   if (navigator.share) {
-    navigator.share({ title: name, text: '📍 ' + name + ' — ANY', url: url });
+    navigator.share({ title: name, text: '📍 ' + name + ' — ANY', url: url }).catch(function() {});
   } else {
     navigator.clipboard.writeText(url).then(function() {
       showToast(t('toast_copied'), 'success');
