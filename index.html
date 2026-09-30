@@ -7339,7 +7339,7 @@ async function translateText(textId, spanId, orig) {
     var res = await fetch('https://api.mymemory.translated.net/get?q=' + encodeURIComponent(orig) + '&langpair=autodetect|' + lang);
     var json = await res.json();
     var translated = json.responseData && json.responseData.translatedText;
-    if (translated && translated !== orig) {
+    if (json.responseStatus === 200 && translated && translated !== orig) {
       el.textContent = translated;
       sp.dataset.translated = '1';
       sp.textContent = t('btn_original');
