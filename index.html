@@ -8138,7 +8138,10 @@ function locateMe() {
   map.once('locationerror', function() { showToast(t('toast_location_error'), 'error'); });
 }
 
-function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+function openModal(id) {
+  if (id === 'modal-auth' && !isLogin) switchAuthMode();
+  document.getElementById(id).style.display = 'flex';
+}
 function closeModal(id) {
   document.getElementById(id).style.display = 'none';
   if (id === 'modal-add') { addingMode = false; document.getElementById('info-adding').style.display = 'none'; }
