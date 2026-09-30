@@ -7942,8 +7942,9 @@ function set24h(val) {
 async function submitPlace() {
   var submitBtn = document.querySelector('#modal-add .btn-p');
   if (submitBtn && submitBtn.disabled) return;
+  var submitBtnOrigText = submitBtn ? submitBtn.textContent : '';
   if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = t('btn_publishing'); }
-  var _reEnable = function() { if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = t('btn_publish') || 'Publier le lieu'; } };
+  var _reEnable = function() { if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = submitBtnOrigText; } };
   var name = document.getElementById('add-name').value.trim();
   var mainId = document.getElementById('add-main-cat').value;
   var catId = document.getElementById('add-sub-cat').value;
