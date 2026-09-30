@@ -6606,6 +6606,8 @@ async function toggleFavorite(placeId) {
     showToast(t('toast_fav_added'), 'success');
   }
   checkFavorite(placeId);
+  var fEl = document.getElementById('prof-favs-count');
+  if (fEl) fEl.textContent = Object.keys(userFavs).length;
 }
 
 var _profValidatedOpen = false;
@@ -9984,11 +9986,15 @@ function _fetchRouteWpSugg(idx, q) {
     var dd = document.getElementById('rw-dd-' + idx);
     if (!dd) return;
     if (!data || !data.length) { dd.classList.remove('open'); return; }
+    var seen = {};
     var html = data.map(function(item) {
       var addr = item.address || {};
       var city = addr.city || addr.town || addr.village || addr.municipality || addr.county || item.display_name.split(',')[0];
       var region = [addr.state, addr.country].filter(Boolean).join(', ');
       var lat = parseFloat(item.lat), lon = parseFloat(item.lon);
+      var key = city + '|' + region;
+      if (seen[key]) return '';
+      seen[key] = true;
       return '<div class="route-dd-item" onclick="selectRouteWp(' + idx + ',' + lat + ',' + lon + ',this.dataset.n)" data-n="' + escHtml(city) + '">'
         + '<div class="route-dd-city">' + escHtml(city) + '</div>'
         + (region ? '<div class="route-dd-region">' + escHtml(region) + '</div>' : '')
