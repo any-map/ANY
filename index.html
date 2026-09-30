@@ -7781,42 +7781,31 @@ async function addCmt(pid) {
 
 async function vote(pid, pos) {
   if (!currentUser) { showToast(t('toast_login_vote'), 'error'); return; }
-  var result = await db.from('votes').insert({ place_id: pid, user_id: currentUser.id, vote: pos });
-  if (result.error) {
-    if ((isAdmin || isModerator) && pos) {
+  var place = allPlaces.find(function(p) { return p.id === pid; });
+  var placeData = place || (await db.from('places').select('user_id, name, validation_weight').eq('id', pid).maybeSingle()).data;
+  if (!pos) {
+    var result = await db.from('votes').insert({ place_id: pid, user_id: currentUser.id, vote: pos });
+    if (result.error) { showToast(t('toast_already_voted'), 'error'); return; }
+    showToast(t('toast_voted_useful'), 'success');
+    scheduleLoad();
+    return;
+  }
+  // Les compteurs agrégés (votes_positifs, validation_weight) vivent sur places,
+  // dont l'UPDATE est restreint par RLS au propriétaire/aux mods : on passe par
+  // une RPC SECURITY DEFINER qui recalcule ces compteurs côté serveur.
+  var rpcResult = await db.rpc('cast_place_thanks_vote', { p_place_id: pid });
+  if (rpcResult.error) {
+    if (isAdmin || isModerator) {
       showConfirm('🔓 Valider quand même ?', 'Vous avez déjà voté pour ce lieu. En tant qu\'admin, voulez-vous le valider directement ?', '✅ Oui, valider', '#27ae60', function() { adminForceValidate(pid); });
     } else {
       showToast(t('toast_already_voted'), 'error');
     }
     return;
   }
-  var place = allPlaces.find(function(p) { return p.id === pid; });
-  if (place) {
-    var newCount = (place.votes_positifs || 0) + 1;
-    await db.from('places').update({ votes_positifs: newCount }).eq('id', pid);
-  }
-  if (pos) {
-    var placeData = place || (await db.from('places').select('user_id, validation_weight').eq('id', pid).maybeSingle()).data;
-    if (placeData && placeData.user_id !== currentUser.id && (placeData.validation_weight || 0) < 3) {
-      if (isAdmin || isModerator) {
-        var exMod = await db.from('place_validations').select('id').eq('place_id', pid).eq('user_id', currentUser.id).maybeSingle();
-        if (!exMod.data) await db.from('place_validations').insert({ place_id: pid, user_id: currentUser.id, weight: 2 });
-        await db.from('places').update({ validation_weight: 3 }).eq('id', pid);
-      } else {
-        var existing = await db.from('place_validations').select('id').eq('place_id', pid).eq('user_id', currentUser.id).maybeSingle();
-        if (!existing.data) {
-          var weight = isTrusted ? 2 : 1;
-          await db.from('place_validations').insert({ place_id: pid, user_id: currentUser.id, weight: weight });
-          var voteCount = await getWeightedCount(pid);
-          await db.from('places').update({ validation_weight: voteCount }).eq('id', pid);
-        }
-      }
-    }
-    if (placeData && placeData.user_id && placeData.user_id !== currentUser.id) {
-      var thanksPlaceName = (place && place.name) || 'votre lieu';
-      insertPlaceNotif(placeData.user_id, 'place_thanks', '🙏 Quelqu\'un a dit merci pour « ' + escHtml(thanksPlaceName) + ' »', pid);
-      sendPush([placeData.user_id], '🙏 Merci reçu', 'Quelqu\'un a dit merci pour « ' + thanksPlaceName + ' »', '/');
-    }
+  if (placeData && placeData.user_id && placeData.user_id !== currentUser.id) {
+    var thanksPlaceName = (place && place.name) || placeData.name || 'votre lieu';
+    insertPlaceNotif(placeData.user_id, 'place_thanks', '🙏 Quelqu\'un a dit merci pour « ' + escHtml(thanksPlaceName) + ' »', pid);
+    sendPush([placeData.user_id], '🙏 Merci reçu', 'Quelqu\'un a dit merci pour « ' + thanksPlaceName + ' »', '/');
   }
   showToast(t('toast_voted_useful'), 'success');
   scheduleLoad();
