@@ -46,6 +46,13 @@
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
 <style>
+@font-face{font-family:'ANY Pic Outline';font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/materialsymbolsrounded/v375/syl0-zNym6YjUruM-QrEh7-nyTnjDwKNJ_190FjpZIvDmUSVOK7BDB_Qb9vUSzq3wzLK-P0J-V_Zs-QtQth3-jOcbTCVpeRL2w5rwZu2rIelXxc.woff2) format('woff2');}
+@font-face{font-family:'ANY Pic Fill';font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/materialsymbolsrounded/v375/syl0-zNym6YjUruM-QrEh7-nyTnjDwKNJ_190FjpZIvDmUSVOK7BDJ_vb9vUSzq3wzLK-P0J-V_Zs-QtQth3-jOcbTCVpeRL2w5rwZu2rIelXxc.woff2) format('woff2');}
+.any-pic{position:relative;display:inline-block;width:1em;height:1em;vertical-align:middle;flex-shrink:0;}
+.any-pic .u,.any-pic .o{position:absolute;inset:0;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;word-wrap:normal;direction:ltr;-webkit-font-feature-settings:'liga';font-feature-settings:'liga';-webkit-font-smoothing:antialiased;}
+.any-pic .u{font-family:'ANY Pic Fill';opacity:0.32;}
+.any-pic .o{font-family:'ANY Pic Outline';}
+.any-pic-solid{font-family:'ANY Pic Fill';font-style:normal;display:inline-block;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;word-wrap:normal;direction:ltr;-webkit-font-feature-settings:'liga';font-feature-settings:'liga';-webkit-font-smoothing:antialiased;vertical-align:middle;}
 :root {
   --bg:#071820;--surface:#0d2535;--surface2:#122e40;--border:#1d4a60;
   --accent:#0ba6b3;--text:#e8f5f8;--text2:#6ab5c8;--danger:#f87171;
@@ -461,6 +468,29 @@ html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none;font-f
 .pbe-av-btn.sel{border-color:#fff;}
 .pbe-av-btn:active{transform:scale(0.85);}
 .av-bg-swatch{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;flex-shrink:0;transition:border-color 0.15s,transform 0.12s;}
+#icon-picker{position:fixed;inset:0;z-index:9600;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0.55);}
+#icon-picker.show{display:flex;}
+.ip-panel{max-height:85vh;}
+.ip-field-row{display:flex;align-items:center;gap:8px;}
+.ip-preview{width:40px;height:40px;border-radius:10px;background:rgba(11,166,179,0.12);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;}
+#ip-value{flex:1;min-width:0;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 10px;color:var(--text);font-size:13px;font-family:var(--font-body);outline:none;}
+.ip-convert-btn{flex-shrink:0;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:0 12px;height:39px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);}
+.ip-msg{font-size:11px;margin:6px 0 0;min-height:14px;color:var(--text2);}
+.ip-msg.ok{color:var(--accent);}
+#ip-search{width:100%;box-sizing:border-box;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 10px;color:var(--text);font-size:13px;font-family:var(--font-body);outline:none;}
+.ip-chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;margin-top:8px;}
+.ip-chip{font-size:11px;color:var(--text2);background:var(--surface2);border:1px solid var(--border);border-radius:100px;padding:5px 11px;white-space:nowrap;cursor:pointer;flex-shrink:0;}
+.ip-chip.on{background:var(--accent);color:#fff;border-color:var(--accent);}
+.ip-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px;max-height:240px;overflow-y:auto;padding:2px;}
+.ip-cell{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px 4px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
+.ip-cell .any-pic{font-size:20px;color:var(--text2);}
+.ip-cell span{font-size:8px;color:var(--text2);text-align:center;line-height:1.1;}
+.ip-cell.sel{background:rgba(11,166,179,0.15);border-color:var(--accent);}
+.ip-cell.sel .any-pic,.ip-cell.sel span{color:var(--accent);}
+.ip-noresult{grid-column:1/-1;text-align:center;font-size:12px;color:var(--text2);padding:12px 0;}
+.ip-hint{font-size:11px;color:var(--text2);line-height:1.5;margin-top:12px;}
+.ip-hint a{color:var(--accent);}
+.ip-pick-btn{flex-shrink:0;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:0 10px;cursor:pointer;font-size:16px;display:flex;align-items:center;}
 .av-bg-swatch:hover,.av-bg-swatch.sel{border-color:var(--accent);transform:scale(1.15);}
 .prof-identity{background:var(--surface);padding:46px 20px 16px;border-bottom:1px solid var(--border);}
 .prof-username{font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px;}
@@ -642,7 +672,7 @@ path.leaflet-cluster-spider-leg{stroke:#fff!important;stroke-width:1.5px!importa
       </div>
       <button id="btn-add-desk" data-i18n="btn_add_place">&#65291; Ajouter un lieu</button>
       <button id="btn-route-desk" onclick="openRouteSheet()" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:10px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:var(--font-body);">&#128739; Sur ma route</button>
-      <button onclick="window.open('https://paypal.me/anyprojet','_blank')" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:#e74c3c;border-radius:var(--radius-sm);padding:10px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:var(--font-body);font-weight:600;">&#10084; Soutenir le projet</button>
+      <button onclick="window.open('https://paypal.me/anyprojet','_blank')" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:#e74c3c;border-radius:var(--radius-sm);padding:10px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:var(--font-body);font-weight:600;"><span class="any-pic"><span class="u">favorite</span><span class="o">favorite</span></span> Soutenir le projet</button>
       <div id="auth-zone">
         <span id="auth-info" style="cursor:pointer;" onclick="onAuthInfoClick()" data-i18n="auth_not_connected">Non connect&#233;</span>
         <button id="btn-auth" data-i18n="btn_connect">Connexion</button>
@@ -696,29 +726,29 @@ path.leaflet-cluster-spider-leg{stroke:#fff!important;stroke-width:1.5px!importa
 <div id="bottom-nav">
   <div id="bottom-nav-inner">
     <button class="nav-item active" id="nav-cats" onclick="navTo('cats')">
-      <span class="nav-item-icon">&#128193;</span><span data-i18n="nav_filters">Filtres</span>
+      <span class="nav-item-icon"><span class="any-pic"><span class="u">filter_list</span><span class="o">filter_list</span></span></span><span data-i18n="nav_filters">Filtres</span>
     </button>
     <div class="nav-item-add" onclick="onAddBtn()">
-      <div class="nav-add-btn">&#65291;</div>
+      <div class="nav-add-btn"><span class="any-pic-solid" style="font-size:24px;">add</span></div>
       <span data-i18n="nav_add">Ajouter un lieu</span>
     </div>
     <button class="nav-item" id="nav-route" onclick="navTo('route')">
-      <span class="nav-item-icon">&#128739;</span><span>Sur ma route</span>
+      <span class="nav-item-icon"><span class="any-pic"><span class="u">route</span><span class="o">route</span></span></span><span>Sur ma route</span>
     </button>
     <button class="nav-item" id="nav-favorites" onclick="navTo('favorites')">
-      <span class="nav-item-icon">&#11088;</span><span>Favoris</span>
+      <span class="nav-item-icon"><span class="any-pic"><span class="u">star</span><span class="o">star</span></span></span><span>Favoris</span>
     </button>
     <button class="nav-item" id="nav-community" style="display:none;" onclick="window.open('https://discord.gg/jRbR4K6s','_blank')">
       <span class="nav-item-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#5865F2"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.025.015.048.036.063a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.1.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg></span>
       <span>Discord</span>
     </button>
     <button class="nav-item" id="nav-member-dash" onclick="navTo('member-dash')" style="display:none;position:relative;">
-      <span class="nav-item-icon">&#128202;</span>
+      <span class="nav-item-icon"><span class="any-pic"><span class="u">space_dashboard</span><span class="o">space_dashboard</span></span></span>
       <span id="dash-nav-badge" style="display:none;position:absolute;top:8px;right:calc(50% - 18px);background:#e74c3c;color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 5px;min-width:16px;text-align:center;line-height:16px;">0</span>
       <span>Mon espace</span>
     </button>
     <button class="nav-item" id="nav-profile" onclick="navTo('profile')">
-      <span class="nav-item-icon">&#128100;</span>
+      <span class="nav-item-icon"><span class="any-pic"><span class="u">person</span><span class="o">person</span></span></span>
       <span data-i18n="nav_profile">Profil</span>
     </button>
   </div>
@@ -1220,6 +1250,26 @@ path.leaflet-cluster-spider-leg{stroke:#fff!important;stroke-width:1.5px!importa
   </div>
 </div>
 
+<div id="icon-picker" onclick="if(event.target===this)closeIconPicker()">
+  <div class="av-panel ip-panel">
+    <div class="av-panel-title">Choisir un pictogramme</div>
+    <div class="ip-field-row">
+      <div class="ip-preview" id="ip-preview"></div>
+      <input type="text" id="ip-value" placeholder="nom d'icône ou emoji" oninput="renderIconPickerPreview()">
+      <button class="ip-convert-btn" onclick="iconPickerConvert()" type="button">⇄</button>
+    </div>
+    <div class="ip-msg" id="ip-msg"></div>
+    <input type="text" id="ip-search" placeholder="Rechercher un pictogramme…" oninput="renderIconPickerGrid()" style="margin-top:10px;">
+    <div class="ip-chips" id="ip-chips"></div>
+    <div class="ip-grid" id="ip-grid"></div>
+    <div class="ip-hint">Pas trouvé ? Cherche sur <a href="https://fonts.google.com/icons" target="_blank" rel="noopener">fonts.google.com/icons</a> (filtre « Material Symbols »), copie le nom, colle-le ci-dessus. Un emoji marche aussi.</div>
+    <div style="display:flex;gap:8px;margin-top:14px;">
+      <button onclick="closeIconPicker()" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px;font-size:13px;cursor:pointer;font-family:var(--font-body);">Annuler</button>
+      <button onclick="iconPickerValidate()" style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);">Valider</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -1297,16 +1347,16 @@ var AVATAR_EMOJIS = [
   '🦸','🏋️','🤸','☕','🍕','🌮','🍺','🎪'
 ];
 var BADGES_DEF = [
-  { icon:'🗺️', key:'badge_first_place', check:function(s){ return s.places>=1; } },
-  { icon:'📍', key:'badge_mapper',       check:function(s){ return s.places>=10; } },
-  { icon:'🏗️', key:'badge_builder',      check:function(s){ return s.places>=25; } },
-  { icon:'✅', key:'badge_verifier',     check:function(s){ return s.validated>=5; } },
-  { icon:'🔍', key:'badge_inspector',    check:function(s){ return s.validated>=25; } },
-  { icon:'💬', key:'badge_chatter',      check:function(s){ return s.comments>=10; } },
-  { icon:'🙏', key:'badge_helper',       check:function(s){ return s.merci>=5; } },
-  { icon:'💛', key:'badge_pillar',       check:function(s){ return s.merci>=20; } },
-  { icon:'👍', key:'badge_voter',        check:function(s){ return s.votes>=30; } },
-  { icon:'🏆', key:'badge_champion',     check:function(s){ return s.xpIdx>=4; } }
+  { icon:'map', key:'badge_first_place', check:function(s){ return s.places>=1; } },
+  { icon:'add_location', key:'badge_mapper',       check:function(s){ return s.places>=10; } },
+  { icon:'construction', key:'badge_builder',      check:function(s){ return s.places>=25; } },
+  { icon:'task_alt', key:'badge_verifier',     check:function(s){ return s.validated>=5; } },
+  { icon:'search', key:'badge_inspector',    check:function(s){ return s.validated>=25; } },
+  { icon:'chat_bubble', key:'badge_chatter',      check:function(s){ return s.comments>=10; } },
+  { icon:'volunteer_activism', key:'badge_helper',       check:function(s){ return s.merci>=5; } },
+  { icon:'favorite', key:'badge_pillar',       check:function(s){ return s.merci>=20; } },
+  { icon:'thumb_up', key:'badge_voter',        check:function(s){ return s.votes>=30; } },
+  { icon:'emoji_events', key:'badge_champion',     check:function(s){ return s.xpIdx>=4; } }
 ];
 
 // ===== XP SYSTEM =====
@@ -3465,7 +3515,7 @@ function applyI18n() {
 var mainCats = [], allCats = [], allPlaces = [], catCounts = {};
 var filters = {};
 
-function fluentImg(emoji, size) { return emoji; }
+function fluentImg(value, size) { return iconHtml(value, size); }
 var selectedLatLng = null;
 var add24hValue = null;
 var addingMode = false;
@@ -3935,15 +3985,15 @@ async function renderProfile() {
       })()
     + '<div style="margin:5px 16px 14px;display:flex;gap:8px;">'
     + '<button onclick="closeSheet(\'sheet-profile\');navTo(\'member-dash\');" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:5px 8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;justify-content:center;gap:5px;">📊 Mon espace</button>'
-    + '<button onclick="window.open(\'https://paypal.me/anyprojet\',\'_blank\')" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:#e74c3c;border-radius:var(--radius-sm);padding:5px 8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;justify-content:center;gap:5px;">&#10084; Soutenir</button>'
+    + '<button onclick="window.open(\'https://paypal.me/anyprojet\',\'_blank\')" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:#e74c3c;border-radius:var(--radius-sm);padding:5px 8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;justify-content:center;gap:5px;">' + picHtml('favorite') + ' Soutenir</button>'
     + '</div>'
     + '<div class="prof-stats"><div class="prof-stats-grid">'
-    + '<div class="prof-stat" onclick="toggleProfPlaces()" style="cursor:pointer;" title="Voir mes lieux"><div class="prof-stat-icon pic-green">&#128205;</div><div style="flex:1"><div class="prof-stat-val" id="prof-places">\u2014</div><div class="prof-stat-lbl">' + t('profile_places_added') + '</div></div><span id="prof-places-arrow" style="color:var(--text2);font-size:16px;">\u203a</span></div>'
-    + '<div class="prof-stat" onclick="toggleProfValidated()" style="cursor:pointer;" title="Voir mes confirmations de lieux"><div class="prof-stat-icon pic-teal">&#9989;</div><div style="flex:1"><div class="prof-stat-val" id="prof-validated">\u2014</div><div class="prof-stat-lbl">' + t('profile_validated') + '</div></div><span id="prof-validated-arrow" style="color:var(--text2);font-size:16px;">\u203a</span></div>'
-    + '<div class="prof-stat" onclick="toggleProfComments()" style="cursor:pointer;" title="Voir mes commentaires"><div class="prof-stat-icon pic-blue">&#128172;</div><div style="flex:1"><div class="prof-stat-val" id="prof-comments">\u2014</div><div class="prof-stat-lbl">' + t('profile_comments') + '</div></div><span id="prof-cmts-arrow" style="color:var(--text2);font-size:16px;">\u203a</span></div>'
-    + '<div class="prof-stat" onclick="toggleProfVotes()" style="cursor:pointer;" title="Voir mes votes"><div class="prof-stat-icon pic-yellow">&#128077;</div><div style="flex:1"><div class="prof-stat-val" id="prof-votes">\u2014</div><div class="prof-stat-lbl">' + t('profile_votes') + '</div></div><span id="prof-votes-arrow" style="color:var(--text2);font-size:16px;">\u203a</span></div>'
-    + '<div class="prof-stat" onclick="toggleProfFavs()" style="cursor:pointer;" title="Voir mes favoris"><div class="prof-stat-icon" style="background:rgba(231,76,60,0.12);">&#11088;</div><div style="flex:1"><div class="prof-stat-val" id="prof-favs-count">\u2014</div><div class="prof-stat-lbl">' + t('profile_favorites') + '</div></div><span id="prof-favs-arrow" style="color:var(--text2);font-size:16px;">\u203a</span></div>'
-    + '<div class="prof-stat"><div class="prof-stat-icon" style="background:rgba(147,51,234,0.12);">&#128591;</div><div style="flex:1"><div class="prof-stat-val" id="prof-merci">\u2014</div><div class="prof-stat-lbl">' + t('profile_thanks_received') + '</div></div></div>'
+    + '<div class="prof-stat" onclick="toggleProfPlaces()" style="cursor:pointer;" title="Voir mes lieux"><div class="prof-stat-icon pic-green">' + picHtml('add_location') + '</div><div style="flex:1"><div class="prof-stat-val" id="prof-places">\u2014</div><div class="prof-stat-lbl">' + t('profile_places_added') + '</div></div><span id="prof-places-arrow" style="color:var(--text2);font-size:16px;">\u203a</span></div>'
+    + '<div class="prof-stat" onclick="toggleProfValidated()" style="cursor:pointer;" title="Voir mes confirmations de lieux"><div class="prof-stat-icon pic-teal">' + picHtml('task_alt') + '</div><div style="flex:1"><div class="prof-stat-val" id="prof-validated">\u2014</div><div class="prof-stat-lbl">' + t('profile_validated') + '</div></div><span id="prof-validated-arrow" style="color:var(--text2);font-size:16px;">\u203a</span></div>'
+    + '<div class="prof-stat" onclick="toggleProfComments()" style="cursor:pointer;" title="Voir mes commentaires"><div class="prof-stat-icon pic-blue">' + picHtml('chat_bubble') + '</div><div style="flex:1"><div class="prof-stat-val" id="prof-comments">\u2014</div><div class="prof-stat-lbl">' + t('profile_comments') + '</div></div><span id="prof-cmts-arrow" style="color:var(--text2);font-size:16px;">\u203a</span></div>'
+    + '<div class="prof-stat" onclick="toggleProfVotes()" style="cursor:pointer;" title="Voir mes votes"><div class="prof-stat-icon pic-yellow">' + picHtml('thumb_up') + '</div><div style="flex:1"><div class="prof-stat-val" id="prof-votes">\u2014</div><div class="prof-stat-lbl">' + t('profile_votes') + '</div></div><span id="prof-votes-arrow" style="color:var(--text2);font-size:16px;">\u203a</span></div>'
+    + '<div class="prof-stat" onclick="toggleProfFavs()" style="cursor:pointer;" title="Voir mes favoris"><div class="prof-stat-icon" style="background:rgba(231,76,60,0.12);">' + picHtml('star') + '</div><div style="flex:1"><div class="prof-stat-val" id="prof-favs-count">\u2014</div><div class="prof-stat-lbl">' + t('profile_favorites') + '</div></div><span id="prof-favs-arrow" style="color:var(--text2);font-size:16px;">\u203a</span></div>'
+    + '<div class="prof-stat"><div class="prof-stat-icon" style="background:rgba(147,51,234,0.12);">' + picHtml('volunteer_activism') + '</div><div style="flex:1"><div class="prof-stat-val" id="prof-merci">\u2014</div><div class="prof-stat-lbl">' + t('profile_thanks_received') + '</div></div></div>'
     + '</div></div>'
     + '<div id="prof-places-panel" style="display:none;padding:0 16px 4px;"></div>'
     + '<div id="prof-validated-panel" style="display:none;padding:0 16px 4px;"></div>'
@@ -4134,6 +4184,83 @@ function openAvatarPicker() {
 function closeAvatarPicker() {
   var p = document.getElementById('avatar-picker');
   if (p) p.classList.remove('show');
+}
+
+// ---- Sélecteur de pictogramme (catégories) ----
+var _iconPickerTarget = null;
+var _ipActiveCat = 'tout';
+function openIconPicker(targetInputId) {
+  _iconPickerTarget = targetInputId;
+  var srcEl = document.getElementById(targetInputId);
+  document.getElementById('ip-value').value = srcEl ? (srcEl.value || '') : '';
+  document.getElementById('ip-msg').textContent = '';
+  document.getElementById('ip-search').value = '';
+  _ipActiveCat = 'tout';
+  renderIconPickerChips();
+  renderIconPickerGrid();
+  renderIconPickerPreview();
+  document.getElementById('icon-picker').classList.add('show');
+}
+function closeIconPicker() {
+  var p = document.getElementById('icon-picker');
+  if (p) p.classList.remove('show');
+}
+function iconPickerValidate() {
+  var v = document.getElementById('ip-value').value.trim();
+  if (_iconPickerTarget) {
+    var el = document.getElementById(_iconPickerTarget);
+    if (el) { el.value = v; previewIconInput(_iconPickerTarget, _iconPickerTarget + '-prev'); }
+  }
+  closeIconPicker();
+}
+function renderIconPickerPreview() {
+  var v = document.getElementById('ip-value').value.trim();
+  document.getElementById('ip-preview').innerHTML = v ? iconHtml(v, 20) : picHtml('help', 20);
+  var cells = document.querySelectorAll('#ip-grid .ip-cell');
+  for (var i = 0; i < cells.length; i++) cells[i].classList.toggle('sel', cells[i].dataset.icon === v);
+}
+function renderIconPickerChips() {
+  var chips = document.getElementById('ip-chips');
+  chips.innerHTML = PIC_CATS.map(function(c) {
+    return '<div class="ip-chip' + (c === _ipActiveCat ? ' on' : '') + '" onclick="_ipActiveCat=\'' + c + '\';renderIconPickerChips();renderIconPickerGrid();">' + c + '</div>';
+  }).join('');
+}
+function renderIconPickerGrid() {
+  var q = (document.getElementById('ip-search').value || '').trim().toLowerCase();
+  var list = PIC_ICONS.filter(function(it) {
+    var mc = _ipActiveCat === 'tout' || it[2] === _ipActiveCat;
+    var mq = !q || it[1].toLowerCase().indexOf(q) > -1 || it[0].indexOf(q) > -1;
+    return mc && mq;
+  });
+  var grid = document.getElementById('ip-grid');
+  grid.innerHTML = list.length ? list.map(function(it) {
+    return '<div class="ip-cell" data-icon="' + it[0] + '" onclick="document.getElementById(\'ip-value\').value=\'' + it[0] + '\';renderIconPickerPreview();">' + picHtml(it[0]) + '<span>' + it[1] + '</span></div>';
+  }).join('') : '<div class="ip-noresult">Aucun résultat — essaie la recherche Google ci-dessous.</div>';
+  renderIconPickerPreview();
+}
+function iconPickerConvert() {
+  var inp = document.getElementById('ip-value');
+  var v = inp.value.trim();
+  var msg = document.getElementById('ip-msg');
+  if (isPicName(v)) { msg.className = 'ip-msg'; msg.textContent = 'Déjà un pictogramme.'; return; }
+  var match = PIC_EMOJI_MAP[v];
+  if (match) {
+    inp.value = match;
+    renderIconPickerPreview();
+    msg.className = 'ip-msg ok';
+    msg.textContent = '✓ Converti en pictogramme (' + match + ').';
+  } else {
+    msg.className = 'ip-msg';
+    msg.textContent = v ? 'Pas de pictogramme pour « ' + v + ' » — emoji conservé.' : 'Tape ou colle un emoji, puis réessaie.';
+  }
+}
+// Aperçu live dans les mini-formulaires admin (à côté du champ texte brut)
+function previewIconInput(inputId, previewId) {
+  var inp = document.getElementById(inputId);
+  var prev = document.getElementById(previewId);
+  if (!inp || !prev) return;
+  var v = (inp.value || '').trim();
+  prev.innerHTML = v ? iconHtml(v, 18) : '';
 }
 
 async function selectAvatarBg(g) {
@@ -4341,7 +4468,7 @@ function _applyProfileStats(username, stats) {
       badgeGrid.innerHTML = BADGES_DEF.map(function(b) {
         var on = b.check(badgeStats);
         return '<div class="prof-badge-cell" title="' + t(b.key) + '">'
-          + '<div class="prof-badge-icon ' + (on?'on':'off') + '">' + b.icon + '</div>'
+          + '<div class="prof-badge-icon ' + (on?'on':'off') + '">' + picHtml(b.icon) + '</div>'
           + '<div class="prof-badge-label ' + (on?'on':'off') + '">' + t(b.key) + '</div>'
           + '</div>';
       }).join('');
@@ -4486,11 +4613,11 @@ async function openPublicProfile(username) {
           + '</div>';
       })()
     + '<div class="prof-stats"><div class="prof-stats-grid">'
-    + '<div class="prof-stat" onclick="togglePubPlaces()" style="cursor:pointer;"><div class="prof-stat-icon pic-green">&#128205;</div><div style="flex:1"><div class="prof-stat-val">' + placesCount + '</div><div class="prof-stat-lbl">Lieux ajout&eacute;s</div></div><span id="pub-places-arrow" style="color:var(--text2);font-size:16px;">&#8250;</span></div>'
-    + '<div class="prof-stat" onclick="togglePubValidated()" style="cursor:pointer;"><div class="prof-stat-icon pic-teal">&#9989;</div><div style="flex:1"><div class="prof-stat-val">' + validatedCount + '</div><div class="prof-stat-lbl">' + t('profile_validated') + '</div></div><span id="pub-validated-arrow" style="color:var(--text2);font-size:16px;">&#8250;</span></div>'
-    + '<div class="prof-stat" onclick="togglePubComments()" style="cursor:pointer;"><div class="prof-stat-icon pic-blue">&#128172;</div><div style="flex:1"><div class="prof-stat-val">' + commentsCount + '</div><div class="prof-stat-lbl">' + t('profile_comments') + '</div></div><span id="pub-cmts-arrow" style="color:var(--text2);font-size:16px;">&#8250;</span></div>'
-    + '<div class="prof-stat"><div class="prof-stat-icon pic-yellow">&#128077;</div><div style="flex:1"><div class="prof-stat-val">' + votesCount + '</div><div class="prof-stat-lbl">Remerciements donn&eacute;s</div></div></div>'
-    + '<div class="prof-stat"><div class="prof-stat-icon" style="background:rgba(147,51,234,0.12);">&#128591;</div><div style="flex:1"><div class="prof-stat-val">' + merciCount + '</div><div class="prof-stat-lbl">Merci re&ccedil;us</div></div></div>'
+    + '<div class="prof-stat" onclick="togglePubPlaces()" style="cursor:pointer;"><div class="prof-stat-icon pic-green">' + picHtml('add_location') + '</div><div style="flex:1"><div class="prof-stat-val">' + placesCount + '</div><div class="prof-stat-lbl">Lieux ajout&eacute;s</div></div><span id="pub-places-arrow" style="color:var(--text2);font-size:16px;">&#8250;</span></div>'
+    + '<div class="prof-stat" onclick="togglePubValidated()" style="cursor:pointer;"><div class="prof-stat-icon pic-teal">' + picHtml('task_alt') + '</div><div style="flex:1"><div class="prof-stat-val">' + validatedCount + '</div><div class="prof-stat-lbl">' + t('profile_validated') + '</div></div><span id="pub-validated-arrow" style="color:var(--text2);font-size:16px;">&#8250;</span></div>'
+    + '<div class="prof-stat" onclick="togglePubComments()" style="cursor:pointer;"><div class="prof-stat-icon pic-blue">' + picHtml('chat_bubble') + '</div><div style="flex:1"><div class="prof-stat-val">' + commentsCount + '</div><div class="prof-stat-lbl">' + t('profile_comments') + '</div></div><span id="pub-cmts-arrow" style="color:var(--text2);font-size:16px;">&#8250;</span></div>'
+    + '<div class="prof-stat"><div class="prof-stat-icon pic-yellow">' + picHtml('thumb_up') + '</div><div style="flex:1"><div class="prof-stat-val">' + votesCount + '</div><div class="prof-stat-lbl">Remerciements donn&eacute;s</div></div></div>'
+    + '<div class="prof-stat"><div class="prof-stat-icon" style="background:rgba(147,51,234,0.12);">' + picHtml('volunteer_activism') + '</div><div style="flex:1"><div class="prof-stat-val">' + merciCount + '</div><div class="prof-stat-lbl">Merci re&ccedil;us</div></div></div>'
     + '</div></div>'
     + '<div id="pub-places-panel" style="display:none;padding:0 16px 4px;"></div>'
     + '<div id="pub-validated-panel" style="display:none;padding:0 16px 4px;"></div>'
@@ -4505,7 +4632,7 @@ async function openPublicProfile(username) {
           + BADGES_DEF.map(function(b) {
               var on = b.check(badgeStats);
               return '<div class="prof-badge-cell" title="' + t(b.key) + '">'
-                + '<div class="prof-badge-icon ' + (on?'on':'off') + '">' + b.icon + '</div>'
+                + '<div class="prof-badge-icon ' + (on?'on':'off') + '">' + picHtml(b.icon) + '</div>'
                 + '<div class="prof-badge-label ' + (on?'on':'off') + '">' + t(b.key) + '</div>'
                 + '</div>';
             }).join('')
@@ -4575,7 +4702,7 @@ async function loadPubPlaces() {
   panel.innerHTML = data.map(function(p) {
     var cat = p.categories || {};
     return '<div onclick="goToPubSoloPlace(\'' + p.id + '\',' + p.latitude + ',' + p.longitude + ')" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;">'
-      + '<div style="width:34px;height:34px;border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">' + (cat.icon || '&#128205;') + '</div>'
+      + '<div style="width:34px;height:34px;border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">' + iconHtml(cat.icon) + '</div>'
       + '<div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escHtml(p.name) + '</div>'
       + '<div style="font-size:11px;color:var(--text2);">' + escHtml(cat.name || '') + '</div></div>'
       + '<span style="color:var(--text2);font-size:16px;">&#8250;</span></div>';
@@ -4592,7 +4719,7 @@ async function loadPubValidated() {
   panel.innerHTML = data.map(function(r) {
     var p = r.places; var cat = p.categories || {};
     return '<div onclick="goToPubSoloPlace(\'' + p.id + '\',' + p.latitude + ',' + p.longitude + ')" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;">'
-      + '<div style="width:34px;height:34px;border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">' + (cat.icon || '&#128205;') + '</div>'
+      + '<div style="width:34px;height:34px;border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">' + iconHtml(cat.icon) + '</div>'
       + '<div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escHtml(p.name) + '</div>'
       + '<div style="font-size:11px;color:var(--text2);">' + escHtml(cat.name || '') + '</div></div>'
       + '<span style="color:var(--text2);font-size:16px;">&#8250;</span></div>';
@@ -4894,7 +5021,7 @@ function renderSrchCatList() {
     var isOpen = srchOpenCatId === mc.id;
     return '<div class="srch-cat-row">'
       + '<div class="srch-cat-row-head' + (selCount ? ' has-sel' : '') + (isOpen ? ' open' : '') + '" onclick="toggleSrchCat(\'' + mc.id + '\')">'
-      + '<span class="srch-cat-row-icon">' + mc.icon + '</span>'
+      + '<span class="srch-cat-row-icon">' + iconHtml(mc.icon) + '</span>'
       + '<span class="srch-cat-row-name">' + mc.name + '</span>'
       + (selCount ? '<span class="srch-cat-sel-count">' + selCount + '</span>' : '')
       + '<span class="srch-cat-arrow' + (isOpen ? ' open' : '') + '">&#8250;</span>'
@@ -4903,7 +5030,7 @@ function renderSrchCatList() {
       + subs.map(function(s) {
         var isSel = !!srchSelectedSubCatIds[s.id];
         return '<button class="srch-subpill' + (isSel ? ' sel' : '') + '" onclick="event.stopPropagation();toggleSrchSubcat(\'' + mc.id + '\',\'' + s.id + '\')">'
-          + s.icon + ' ' + s.name + '</button>';
+          + iconHtml(s.icon) + ' ' + s.name + '</button>';
       }).join('')
       + '</div>'
       + '</div>';
@@ -5041,7 +5168,7 @@ function renderSrchResults(places, cities) {
     html += places.map(function(p) {
       var cat = p.categories;
       var color = cat ? (cat.color || '#0ba6b3') : '#0ba6b3';
-      var icon = cat ? cat.icon : '&#128205;';
+      var icon = iconHtml(cat ? cat.icon : null);
       return '<div class="srch-result" onclick="goToPlace(' + p.latitude + ',' + p.longitude + ')">'
         + '<div class="srch-result-icon" style="background:' + hexToRgba(color, 0.15) + ';color:' + color + ';">' + icon + '</div>'
         + '<div style="min-width:0;flex:1;">'
@@ -5059,7 +5186,7 @@ function renderSrchResults(places, cities) {
       var region = addr.state || '';
       var sub = [dept, region].filter(Boolean).join(' · ');
       return '<div class="srch-result" onclick="event.stopPropagation();selectSrchLocation(' + i + ')">'
-        + '<div class="srch-result-icon" style="background:rgba(11,166,179,0.1);color:var(--accent);">&#128205;</div>'
+        + '<div class="srch-result-icon" style="background:rgba(11,166,179,0.1);color:var(--accent);">' + picHtml('location_city') + '</div>'
         + '<div style="min-width:0;flex:1;">'
         + '<div class="srch-result-name">' + escHtml(city) + '</div>'
         + (sub ? '<div class="srch-result-sub">' + escHtml(sub) + '</div>' : '')
@@ -5093,13 +5220,13 @@ function renderMapSrchDropdown(places, cities) {
   var dropdown = document.getElementById('map-srch-dropdown');
   if (!dropdown) return;
   srchNominatimResults = cities;
-  var html = '<div class="map-srch-locate"><button class="map-srch-locate-btn" onclick="toggleLiveTracking()">&#127919; Ma position actuelle</button></div>';
+  var html = '<div class="map-srch-locate"><button class="map-srch-locate-btn" onclick="toggleLiveTracking()">' + picHtml('my_location') + ' Ma position actuelle</button></div>';
   if (places.length) {
     html += '<div class="map-srch-section">Lieux sur la carte</div>';
     html += places.map(function(p) {
       var cat = p.categories;
       return '<div class="map-srch-result" onclick="goToPlaceAndClose(' + p.latitude + ',' + p.longitude + ')">'
-        + '<span style="font-size:20px;">' + (cat ? cat.icon : '&#128205;') + '</span>'
+        + '<span style="font-size:20px;">' + iconHtml(cat ? cat.icon : null) + '</span>'
         + '<div><div style="font-size:13px;font-weight:600;color:var(--text);">' + escHtml(p.name) + '</div>'
         + (cat ? '<div style="font-size:11px;color:var(--text2);">' + escHtml(cat.name) + '</div>' : '')
         + '</div></div>';
@@ -5749,11 +5876,11 @@ function renderMarkers(places) {
   places.forEach(function(p) {
     var cat = p.categories;
     var color = cat ? cat.color : '#0ba6b3';
-    var icon = cat ? cat.icon : '📍';
+    var icon = cat ? cat.icon : null;
     var isHidden = !!p.hidden;
     var isPending = p.status === 'pending';
     var isValidated = (p.validation_weight || 0) >= 3;
-    var iconHtml = isHidden ? '🔒' : isPending ? '⏳' : fluentImg(icon, 22);
+    var markerIconHtml = isHidden ? picHtml('lock', 22) : isPending ? picHtml('hourglass_top', 22) : fluentImg(icon, 22);
     var markerColor = isHidden ? '#555' : isPending ? '#888' : color;
     var extra = isHidden || isPending ? ';opacity:0.6' : (isValidated || userMyValidations[p.id]) ? '' : ';filter:grayscale(1)';
     var markerStyle = 'background:' + markerColor + extra;
@@ -5761,7 +5888,7 @@ function renderMarkers(places) {
     var badgeHtml = (!isValidated && !isPending && !isHidden) ? '<div class="marker-unverified-badge">' + (vw > 0 ? vw + '/3' : 'à valider') + '</div>' : '';
     var mi = L.divIcon({
       html: '<div style="position:relative;">' +
-        '<div class="custom-marker" style="' + markerStyle + '"><div class="custom-marker-inner">' + iconHtml + '</div></div>' +
+        '<div class="custom-marker" style="' + markerStyle + '"><div class="custom-marker-inner">' + markerIconHtml + '</div></div>' +
         badgeHtml +
         '</div>',
       className: '', iconSize: [36,44], iconAnchor: [18,44], popupAnchor: [0,-46]
@@ -5794,9 +5921,9 @@ function makeFuelHtml(fuel) {
       + '</div>';
   }).join('');
   return '<div class="pv2-fuel">'
-    + (fuel.addr ? '<div style="font-size:11px;color:var(--text2);margin-bottom:2px;">📍 ' + escHtml(fuel.addr) + '</div>' : '')
+    + (fuel.addr ? '<div style="font-size:11px;color:var(--text2);margin-bottom:2px;">' + picHtml('place') + ' ' + escHtml(fuel.addr) + '</div>' : '')
     + '<div class="pv2-fuel-grid">' + items + '</div>'
-    + '<div class="pv2-fuel-note">⛽ Prix au moment de l\'import</div>'
+    + '<div class="pv2-fuel-note">' + picHtml('local_gas_station') + ' Prix au moment de l\'import</div>'
     + '</div>';
 }
 
@@ -5804,7 +5931,7 @@ function makePopup(p) {
   window._currentPopupPlace = p;
   var cat = p.categories;
   var color = cat ? cat.color : '#0ba6b3';
-  var icon  = cat ? cat.icon  : '\ud83d\udccd';
+  var icon  = cat ? cat.icon  : null;
   var catName = cat ? cat.name : 'Lieu';
   var el = document.createElement('div');
   var safeId = p.id;
@@ -5840,10 +5967,10 @@ function makePopup(p) {
   }
 
   el.innerHTML =
-    (p.status === 'pending' ? '<div class="pv2-hidden-banner" style="background:rgba(255,165,0,0.15);color:#f59e0b;">\u23f3 En attente de validation \u2014 visible uniquement par toi et les mod\u00e9rateurs</div>' : '')
-    + (p.hidden ? '<div class="pv2-hidden-banner">&#128683; Lieu masqu\u00e9 \u2014 visible uniquement par les mod\u00e9rateurs</div>' : '')
+    (p.status === 'pending' ? '<div class="pv2-hidden-banner" style="background:rgba(255,165,0,0.15);color:#f59e0b;">' + picHtml('hourglass_top') + ' En attente de validation \u2014 visible uniquement par toi et les mod\u00e9rateurs</div>' : '')
+    + (p.hidden ? '<div class="pv2-hidden-banner">' + picHtml('block') + ' Lieu masqu\u00e9 \u2014 visible uniquement par les mod\u00e9rateurs</div>' : '')
     + '<div class="pv2-header" style="background:' + color + '">'
-    + '<div class="pv2-emoji">' + icon + '</div>'
+    + '<div class="pv2-emoji">' + iconHtml(icon, 22) + '</div>'
     + '<div class="pv2-header-info">'
     + '<div class="pv2-hcat">' + escHtml(catName) + '</div>'
     + '<div class="pv2-hname">' + escHtml(p.name) + '</div>'
@@ -5945,7 +6072,7 @@ async function openEditPlace() {
   var currentMainId = p.main_category_id || (subCat ? subCat.main_category_id : '');
   var mainSel = document.getElementById('edit-main-cat');
   mainSel.innerHTML = '<option value="">-- Choisir --</option>' + mainCats.map(function(mc) {
-    return '<option value="' + mc.id + '"' + (mc.id === currentMainId ? ' selected' : '') + '>' + mc.icon + ' ' + mc.name + '</option>';
+    return '<option value="' + mc.id + '"' + (mc.id === currentMainId ? ' selected' : '') + '>' + optIcon(mc.icon) + mc.name + '</option>';
   }).join('');
   loadEditSubCats(p.category_id);
   var catRow = document.getElementById('edit-cat-row');
@@ -5984,7 +6111,7 @@ function loadEditSubCats(selectedCatId) {
   var mid = document.getElementById('edit-main-cat').value;
   var sel = document.getElementById('edit-sub-cat');
   sel.innerHTML = '<option value="">-- Choisir --</option>' + allCats.filter(function(c) { return c.main_category_id === mid; }).map(function(c) {
-    return '<option value="' + c.id + '"' + (c.id === selectedCatId ? ' selected' : '') + '>' + c.icon + ' ' + c.name + '</option>';
+    return '<option value="' + c.id + '"' + (c.id === selectedCatId ? ' selected' : '') + '>' + optIcon(c.icon) + c.name + '</option>';
   }).join('');
 }
 
@@ -6865,12 +6992,12 @@ async function loadAdminStats() {
       + '<div style="font-size:10px;color:var(--text2);margin-top:2px;">' + label + (onclick ? ' ›' : '') + '</div>'
       + '</div>';
   };
-  el.innerHTML = statItem('👥', t('dash_members'), results[0].count, 'toggleMembersList()')
-    + statItem('📍', t('dash_stats'), results[1].count)
-    + statItem('⏳', t('lbl_status_pending'), results[2].count)
-    + statItem('🔒', t('lbl_status_hiddens'), results[3].count)
-    + statItem('💬', t('profile_comments'), results[4].count)
-    + statItem('🚫', t('lbl_banned'), results[5].count);
+  el.innerHTML = statItem(picHtml('group'), t('dash_members'), results[0].count, 'toggleMembersList()')
+    + statItem(picHtml('place'), t('dash_stats'), results[1].count)
+    + statItem(picHtml('hourglass_top'), t('lbl_status_pending'), results[2].count)
+    + statItem(picHtml('lock'), t('lbl_status_hiddens'), results[3].count)
+    + statItem(picHtml('chat_bubble'), t('profile_comments'), results[4].count)
+    + statItem(picHtml('block'), t('lbl_banned'), results[5].count);
   var panel = document.getElementById('admin-members-panel');
   if (!panel) {
     var p = document.createElement('div');
@@ -6906,7 +7033,7 @@ async function loadMembersList() {
   panel.innerHTML = '<div style="font-size:11px;color:var(--text2);margin-bottom:8px;">' + members.length + ' ' + t('lbl_members_count') + '</div>'
     + members.map(function(m, i) {
       var role = rolesMap[m.user_id] || null;
-      var roleLabel = role === 'admin' ? '&#128081;' : role === 'moderator' ? '&#128737;&#65039;' : role === 'trusted' ? '&#11088;' : '';
+      var roleLabel = role === 'admin' ? picHtml('crown') : role === 'moderator' ? picHtml('shield') : role === 'trusted' ? picHtml('star') : '';
       var dateStr = (m.registered_at || m.created_at) ? new Date(m.registered_at || m.created_at).toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' }) : '—';
       var uname = m.username || '(sans pseudo)';
       return '<div onclick="openPublicProfile(\'' + escJsAttr(uname) + '\')" style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer;">'
@@ -6993,7 +7120,7 @@ async function loadUserVotes() {
     var cat = p.categories || {};
     var hasPlace = p.latitude && p.longitude;
     return '<div ' + (hasPlace ? 'onclick="goToSoloPlace(\'' + p.id + '\',' + p.latitude + ',' + p.longitude + ')"' : '') + ' style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);' + (hasPlace ? 'cursor:pointer;' : '') + '">'
-      + '<div style="width:34px;height:34px;border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">' + (cat.icon || '📍') + '</div>'
+      + '<div style="width:34px;height:34px;border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">' + iconHtml(cat.icon) + '</div>'
       + '<div style="flex:1;min-width:0;font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escHtml(p.name || t('lbl_no_name')) + '</div>'
       + '<span style="font-size:18px;">' + (v.vote ? '👍' : '👎') + '</span>'
       + '</div>';
@@ -7024,7 +7151,7 @@ async function loadUserPlaces() {
   panel.innerHTML = data.map(function(p) {
     var cat = p.categories || {};
     return '<div onclick="goToSoloPlace(\'' + p.id + '\',' + p.latitude + ',' + p.longitude + ')" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;">'
-      + '<div style="width:34px;height:34px;border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">' + (cat.icon || '📍') + '</div>'
+      + '<div style="width:34px;height:34px;border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">' + iconHtml(cat.icon) + '</div>'
       + '<div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escHtml(p.name) + '</div>'
       + '<div style="font-size:11px;color:var(--text2);">' + escHtml(cat.name || '') + '</div></div>'
       + '<span style="color:var(--text2);font-size:16px;">›</span>'
@@ -7088,7 +7215,7 @@ async function loadFavoritesInProfile() {
   el.innerHTML = places.map(function(p) {
     var cat = p.categories || {};
     return '<div onclick="goToSoloPlace(\'' + p.id + '\',' + p.latitude + ',' + p.longitude + ')" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;">'
-      + '<div style="width:34px;height:34px;border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">' + (cat.icon || '📍') + '</div>'
+      + '<div style="width:34px;height:34px;border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">' + iconHtml(cat.icon) + '</div>'
       + '<div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escHtml(p.name) + '</div>'
       + '<div style="font-size:11px;color:var(--text2);">' + escHtml(cat.name || '') + '</div></div>'
       + '<button onclick="event.stopPropagation();toggleFavorite(\'' + p.id + '\');this.closest(\'div[style]\').remove();loadFavoritesInProfile();" style="background:none;border:none;color:#e74c3c;font-size:18px;cursor:pointer;padding:4px;">&#9733;</button>'
@@ -7143,7 +7270,7 @@ async function renderFavoritesSheet() {
   html += places.length ? places.map(function(p) {
     var cat = p.categories || {};
     return '<div onclick="goToFavorite(' + p.latitude + ',' + p.longitude + ');closeFavoritesSheet();" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;">'
-      + '<div style="width:34px;height:34px;border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">' + (cat.icon || '📍') + '</div>'
+      + '<div style="width:34px;height:34px;border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">' + iconHtml(cat.icon) + '</div>'
       + '<div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escHtml(p.name) + '</div>'
       + '<div style="font-size:11px;color:var(--text2);">' + escHtml(cat.name || '') + '</div></div>'
       + '<button onclick="event.stopPropagation();toggleFavorite(\'' + p.id + '\');renderFavoritesSheet();" style="background:none;border:none;color:#e74c3c;font-size:18px;cursor:pointer;padding:4px;">&#9733;</button>'
@@ -7348,6 +7475,130 @@ function escJsAttr(str) {
   return escHtml(String(str == null ? '' : str).replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
 }
 
+// Pictogrammes (remplacement des emoji d'interface) — voir PIC_ICONS / PIC_EMOJI_MAP plus bas.
+// picHtml(name,size) : rend TOUJOURS un pictogramme (utilisé pour la nav/tuiles codées en dur, name garanti valide).
+// iconHtml(value,size) : rend un pictogramme SI value est un nom d'icône valide, sinon affiche value tel quel (emoji de secours) —
+// utilisé pour tout ce qui vient de la base (icônes de catégorie), pour ne jamais casser une valeur existante.
+function isPicName(v) {
+  return typeof v === 'string' && /^[a-z][a-z0-9_]{1,40}$/.test(v);
+}
+function picHtml(name, size) {
+  var s = size ? ' style="font-size:' + size + 'px"' : '';
+  return '<span class="any-pic"' + s + '><span class="u">' + name + '</span><span class="o">' + name + '</span></span>';
+}
+function iconHtml(value, size) {
+  if (!value) return picHtml('place', size);
+  if (isPicName(value)) return picHtml(value, size);
+  var s = size ? ' style="font-size:' + size + 'px"' : '';
+  return '<span' + s + '>' + escHtml(value) + '</span>';
+}
+// Pour un <option>/textContent (pas de HTML possible) : préfixe avec l'emoji si c'en est un, sinon n'affiche rien
+// (un nom de pictogramme du genre "shower" ne doit jamais s'afficher tel quel comme texte brut).
+function optIcon(value) {
+  return (value && !isPicName(value)) ? (value + ' ') : '';
+}
+// Convertit un emoji en nom de pictogramme équivalent si on en connaît un (sinon retourne l'emoji inchangé).
+function emojiToPic(value) {
+  var v = (value || '').trim();
+  if (!v || isPicName(v)) return v;
+  return PIC_EMOJI_MAP[v] || v;
+}
+
+// Bibliothèque de pictogrammes proposée dans le sélecteur de catégorie (nom Material Symbols, libellé, groupe).
+var PIC_ICONS = [
+  // Sanitaire
+  ['wc','Toilettes','sanitaire'],['shower','Douche','sanitaire'],['water_drop','Eau potable','sanitaire'],
+  ['local_drink','Eau / fontaine','sanitaire'],['family_restroom','Sanitaires familiaux','sanitaire'],
+  ['baby_changing_station','Table à langer','sanitaire'],['wash','Point d\'eau / lavage','sanitaire'],
+  ['local_laundry_service','Laverie','sanitaire'],['laundry','Linge / pressing','sanitaire'],
+  // Route
+  ['local_gas_station','Essence','route'],['charging_station','Borne de recharge','route'],
+  ['ev_charger','Recharge électrique','route'],['local_parking','Parking','route'],['parking_meter','Parking payant','route'],
+  ['directions_car','Voiture','route'],['local_car_wash','Station de lavage','route'],['car_repair','Garage auto','route'],
+  ['tire_repair','Réparation pneus','route'],['car_rental','Location de véhicule','route'],
+  ['airport_shuttle','Van / camping-car','route'],['moped','Scooter','route'],['bedtime','Parking de nuit','route'],
+  ['route','Itinéraire','route'],['alt_route','Itinéraire alternatif','route'],['signpost','Panneau / signalétique','route'],
+  ['navigation','Navigation','route'],['my_location','Ma position','route'],['map','Carte','route'],['explore','Explorer','route'],
+  ['streetview','Vue de rue','route'],['directions_bike','Vélo','route'],['pedal_bike','Vélo classique','route'],
+  ['electric_bike','Vélo électrique','route'],['electric_scooter','Trottinette électrique','route'],['motorcycle','Moto','route'],
+  ['directions_bus','Bus','route'],['train','Train','route'],['tram','Tramway','route'],['cable_car','Téléphérique','route'],
+  ['directions_boat','Bateau','route'],['sailing','Voile','route'],['anchor','Port / mouillage','route'],
+  // Énergie
+  ['bolt','Électricité','énergie'],['electric_bolt','Courant électrique','énergie'],['offline_bolt','Batterie / autonomie','énergie'],
+  ['propane_tank','Bouteille de gaz','énergie'],['propane','Gaz','énergie'],['gas_meter','Compteur de gaz','énergie'],
+  ['electric_meter','Compteur électrique','énergie'],['electrical_services','Services électriques','énergie'],
+  ['battery_charging_full','Batterie en charge','énergie'],['local_fire_department','Gaz / feu','énergie'],
+  ['fire_extinguisher','Extincteur','énergie'],['fire_hydrant','Borne à incendie','énergie'],['wifi','Wifi','énergie'],
+  ['network_wifi','Réseau wifi','énergie'],
+  // Commerce
+  ['local_cafe','Café','commerce'],['coffee','Coffee shop','commerce'],['local_dining','Restauration','commerce'],
+  ['restaurant','Restaurant','commerce'],['restaurant_menu','Menu / carte','commerce'],['bakery_dining','Boulangerie','commerce'],
+  ['breakfast_dining','Petit-déjeuner','commerce'],['brunch_dining','Brunch','commerce'],['dinner_dining','Dîner','commerce'],
+  ['takeout_dining','À emporter','commerce'],['fastfood','Fast-food','commerce'],['local_grocery_store','Épicerie','commerce'],
+  ['local_convenience_store','Supérette 24/7','commerce'],['storefront','Commerce / boutique','commerce'],['shop','Magasin','commerce'],
+  ['shopping_cart','Supermarché','commerce'],['local_pharmacy','Pharmacie','commerce'],['local_hospital','Hôpital','commerce'],
+  ['medical_services','Soins médicaux','commerce'],['local_atm','Distributeur / ATM','commerce'],['food_bank','Aide alimentaire','commerce'],
+  ['local_pizza','Pizza','commerce'],['agriculture','Produits fermiers','commerce'],['set_meal','Fruits de mer','commerce'],
+  ['local_florist','Fleuriste','commerce'],['egg_alt','Œufs','commerce'],['ac_unit','Glaçons / froid','commerce'],
+  ['smoking_rooms','Cigarettes','commerce'],
+  // Nature & loisirs
+  ['park','Parc / nature','nature'],['forest','Forêt','nature'],['nature','Nature','nature'],['terrain','Relief / montagne','nature'],
+  ['landscape','Paysage','nature'],['hiking','Randonnée','nature'],['camping','Camping','nature'],['cabin','Cabane / refuge','nature'],
+  ['beach_access','Plage','nature'],['pool','Piscine','nature'],['spa','Spa / bien-être','nature'],['golf_course','Golf','nature'],
+  ['playground','Aire de jeux','nature'],['outdoor_grill','Barbecue / pique-nique','nature'],['kitesurfing','Kitesurf','nature'],
+  ['surfing','Surf','nature'],['snowboarding','Snowboard','nature'],['downhill_skiing','Ski','nature'],
+  ['fitness_center','Salle de sport','nature'],['sports','Sport','nature'],['stadium','Stade','nature'],['eco','Écologie','nature'],
+  ['grass','Espace vert','nature'],['phishing','Pêche','nature'],['kayaking','Kayak / canoë','nature'],
+  // Logement
+  ['hotel','Hôtel','logement'],['local_hotel','Hébergement','logement'],['bed','Lit / chambre','logement'],
+  ['king_bed','Grand lit','logement'],['single_bed','Lit simple','logement'],['houseboat','Péniche','logement'],
+  ['cottage','Gîte','logement'],['house','Maison','logement'],['home','Accueil / logement','logement'],
+  ['garage_home','Garage','logement'],['warehouse','Entrepôt / hangar','logement'],
+  // Services
+  ['shield','Sécurité / admin','services'],['recycling','Recyclage','services'],['local_library','Bibliothèque','services'],
+  ['school','École','services'],['museum','Musée','services'],['church','Église','services'],
+  ['temple_buddhist','Temple bouddhiste','services'],['temple_hindu','Temple hindou','services'],
+  ['luggage','Bagages / consigne','services'],['backpack','Sac à dos','services'],['key','Clé / accès','services'],
+  ['lock','Verrouillé','services'],['handyman','Bricolage / réparation','services'],['build','Outils','services'],
+  ['plumbing','Plomberie','services'],['construction','Travaux','services'],['local_printshop','Imprimerie','services'],
+  ['location_city','Ville / service urbain','services'],['concierge','Accueil / concierge','services'],
+  ['auto_stories','Livres','services'],['photo_camera','Photomaton','services'],['delete','Vidange / déchets','services'],
+  // Animaux
+  ['pets','Animaux','animaux'],['pet_supplies','Fournitures animaux','animaux'],
+  // Autre
+  ['accessible','Accessibilité PMR','autre'],['wheelchair_pickup','Prise en charge PMR','autre'],['elderly','Senior','autre'],
+  ['child_care','Petite enfance','autre'],['group','Groupe / communauté','autre'],['person','Personne','autre'],
+  ['place','Lieu','autre'],['location_on','Position','autre'],['add_location','Ajouter un lieu','autre'],
+  ['flag','Repère','autre'],['umbrella','Abri / parapluie','autre']
+];
+var PIC_CATS = ['tout','sanitaire','route','énergie','commerce','nature','logement','services','animaux','autre'];
+
+// Emoji -> pictogramme équivalent (seulement quand un vrai dessin correspondant existe dans Material Symbols).
+var PIC_EMOJI_MAP = {
+  '☀️':'sunny','🌤️':'partly_cloudy_day','⛅':'partly_cloudy_day','🌥️':'cloud','☁️':'cloud','🌦️':'rainy','🌧️':'rainy',
+  '⛈️':'thunderstorm','🌩️':'thunderstorm','🌨️':'snowing','❄️':'ac_unit','🌬️':'air','💨':'air','🌪️':'tornado',
+  '🌫️':'foggy','🌊':'waves','🌙':'bedtime','🌡️':'thermostat',
+  '⏰':'alarm','⏱️':'timer','⌛':'hourglass_empty','⏳':'hourglass_top','📅':'calendar_month','📆':'calendar_today',
+  '🕐':'schedule','🕰️':'history',
+  '💰':'savings','💵':'attach_money','💳':'credit_card','🏦':'account_balance','👛':'wallet','💸':'payments',
+  '📱':'smartphone','💻':'laptop','🖥️':'desktop_windows','📺':'tv','📷':'camera_alt','🎥':'videocam','🎧':'headphones',
+  '📧':'mail','✉️':'mail','📞':'call','☎️':'phone','🔋':'battery_full','🔌':'cable','⌨️':'keyboard','📻':'radio',
+  '🔑':'key','🔒':'lock','💡':'lightbulb','🕯️':'candle',
+  '🛏️':'bed','🛋️':'weekend','🪑':'chair','🛁':'bathtub','🧼':'soap','🍽️':'table_restaurant',
+  '⛪':'church','🕌':'mosque','🕍':'synagogue','🏰':'castle','🏢':'business','🏭':'factory','🏟️':'stadium','🏠':'home','🏡':'cottage',
+  '🎂':'cake','🍦':'icecream','🍷':'wine_bar',
+  '🎁':'card_giftcard','✂️':'content_cut','⚖️':'balance',
+  '🦋':'flutter_dash','🐰':'cruelty_free','🐇':'cruelty_free',
+  '📍':'place','☕':'local_cafe','⚡':'bolt','⛺':'camping','⛽':'local_gas_station','🌿':'eco','🏕️':'camping',
+  '🏥':'local_pharmacy','🐾':'pets','📶':'wifi','🔧':'build','🔵':'propane_tank','🥖':'bakery_dining',
+  '🥛':'local_drink','🥤':'local_drink','🧺':'outdoor_grill','🩹':'medical_services','🫧':'local_laundry_service',
+  '🚗':'directions_car','🚰':'water_drop','🚲':'directions_bike','🚻':'wc','🚽':'wc','🚿':'shower','🛒':'shopping_cart',
+  '🅿️':'local_parking','🌮':'fastfood','🏙️':'location_city','🚐':'airport_shuttle','🛎️':'concierge','🍕':'local_pizza',
+  '🎣':'phishing','🐓':'agriculture','🐟':'set_meal','💐':'local_florist','📚':'auto_stories','📸':'photo_camera',
+  '🗑️':'delete','🥚':'egg_alt','🦪':'set_meal','🧊':'ac_unit','🚤':'kayaking','🚬':'smoking_rooms','🛵':'moped','🛶':'kayaking'
+  // Volontairement absents (aucun équivalent) : 🍯 miel, 💌 préservatifs, 🧀 fromage, 🧴 hygiène féminine, 🚭 cigarette électronique
+};
+
 async function translateText(textId, spanId, orig) {
   var el = document.getElementById(textId);
   var sp = document.getElementById(spanId);
@@ -7517,13 +7768,13 @@ async function loadPendingPlaces() {
   var res = await db.from('places').select('id,name,user_name,user_id,latitude,longitude,created_at,main_categories(name,icon),categories(name,icon)').eq('status', 'pending').order('created_at', { ascending: false });
   var data = res.data || [];
   if (badge) badge.textContent = data.length;
-  if (!data.length) { el.innerHTML = '<div style="color:var(--text2);text-align:center;padding:12px 0;">✓ ' + t('dash_no_pending') + '</div>'; return; }
+  if (!data.length) { el.innerHTML = '<div style="color:var(--text2);text-align:center;padding:12px 0;">' + picHtml('task_alt') + ' ' + t('dash_no_pending') + '</div>'; return; }
   el.innerHTML = data.map(function(p) {
-    var icon = (p.categories && p.categories.icon) || (p.main_categories && p.main_categories.icon) || '&#128205;';
+    var icon = iconHtml((p.categories && p.categories.icon) || (p.main_categories && p.main_categories.icon));
     var catName = (p.categories && p.categories.name) || (p.main_categories && p.main_categories.name) || 'Autre';
     var date = p.created_at ? new Date(p.created_at).toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'2-digit' }) : '';
     var isImport = !p.user_id;
-    var sourceBadge = isImport ? '<span style="font-size:10px;font-weight:700;background:rgba(52,152,219,0.15);color:#3498db;border:1px solid rgba(52,152,219,0.3);border-radius:4px;padding:1px 6px;margin-left:6px;">&#128200; ' + escHtml(p.user_name || 'Import') + '</span>' : '';
+    var sourceBadge = isImport ? '<span style="font-size:10px;font-weight:700;background:rgba(52,152,219,0.15);color:#3498db;border:1px solid rgba(52,152,219,0.3);border-radius:4px;padding:1px 6px;margin-left:6px;">' + picHtml('download') + ' ' + escHtml(p.user_name || 'Import') + '</span>' : '';
     var borderColor = isImport ? 'rgba(52,152,219,0.25)' : 'rgba(11,166,179,0.25)';
     var bgColor = isImport ? 'rgba(52,152,219,0.04)' : 'rgba(11,166,179,0.04)';
     return '<div id="pending-item-' + p.id + '" style="border:1px solid ' + borderColor + ';border-radius:8px;padding:10px;margin-bottom:8px;background:' + bgColor + ';">'
@@ -7906,7 +8157,7 @@ function populateForm() {
   sel.innerHTML = '<option value="">'+t('form_choose')+'</option>';
   mainCats.forEach(function(mc) {
     var o = document.createElement('option');
-    o.value = mc.id; o.textContent = mc.icon + ' ' + mc.name;
+    o.value = mc.id; o.textContent = optIcon(mc.icon) + mc.name;
     sel.appendChild(o);
   });
 }
@@ -7917,7 +8168,7 @@ function loadSubCats() {
   sel.innerHTML = '<option value="">'+t('form_choose')+'</option>';
   allCats.filter(function(c) { return c.main_category_id === mid; }).forEach(function(c) {
     var o = document.createElement('option');
-    o.value = c.id; o.textContent = c.icon + ' ' + c.name;
+    o.value = c.id; o.textContent = optIcon(c.icon) + c.name;
     sel.appendChild(o);
   });
   var pg = document.getElementById('add-photo-group');
@@ -8510,29 +8761,29 @@ async function loadDashboardTiles(gridId) {
 
   var html = '';
   if (isAdmin || isModerator) {
-    html += tile('&#128101;', t('dash_registered_members'), totalMembers, 'showDashMembers()')
-      + tile('&#127381;', t('dash_new_members'), newMembers, 'showDashNewMembers()', 0, 'week', t('lbl_this_week'))
-      + tile('&#128205;', t('dash_validated_total'), totalPlaces, 'showDashValidatedPlaces()')
-      + tile('&#10024;', t('dash_new_places'), newPlaces, 'showDashNewPlaces()', 0, 'week', t('lbl_this_week'));
-    html += tile('&#9888;&#65039;', t('dash_reported_places'), reportedPlaces, 'showDashReportedPlaces()', reportedPlaces, reportedPlaces > 0 ? 'urgent' : '')
-      + tile('&#128172;', t('dash_reported_comments'), reportedCmts, 'showDashReportedComments()', reportedCmts, reportedCmts > 0 ? 'urgent' : '');
-    html += tile('&#127942;', 'Classement XP', '', 'showDashLeaderboard()', 0, '')
-      + tile('&#9203;', t('dash_pending'), pendingCount, 'showDashPending()', pendingCount, pendingCount > 0 ? 'urgent' : '')
-      + tile('&#128202;', t('dash_global_stats'), '', 'showDashStats()', 0, '');
+    html += tile(picHtml('group'), t('dash_registered_members'), totalMembers, 'showDashMembers()')
+      + tile(picHtml('person_add'), t('dash_new_members'), newMembers, 'showDashNewMembers()', 0, 'week', t('lbl_this_week'))
+      + tile(picHtml('task_alt'), t('dash_validated_total'), totalPlaces, 'showDashValidatedPlaces()')
+      + tile(picHtml('add_location'), t('dash_new_places'), newPlaces, 'showDashNewPlaces()', 0, 'week', t('lbl_this_week'));
+    html += tile(picHtml('flag'), t('dash_reported_places'), reportedPlaces, 'showDashReportedPlaces()', reportedPlaces, reportedPlaces > 0 ? 'urgent' : '')
+      + tile(picHtml('chat_bubble'), t('dash_reported_comments'), reportedCmts, 'showDashReportedComments()', reportedCmts, reportedCmts > 0 ? 'urgent' : '');
+    html += tile(picHtml('emoji_events'), 'Classement XP', '', 'showDashLeaderboard()', 0, '')
+      + tile(picHtml('hourglass_top'), t('dash_pending'), pendingCount, 'showDashPending()', pendingCount, pendingCount > 0 ? 'urgent' : '')
+      + tile(picHtml('bar_chart'), t('dash_global_stats'), '', 'showDashStats()', 0, '');
   }
   // Ligne admin : équipe + sanctions
   if (isAdmin) {
-    html += tile('&#128737;&#65039;', t('dash_team'), '', 'showDashTeam()', 0, 'admin-only')
-      + tile('&#128296;', t('dash_bans'), '', 'showDashBan()', 0, 'admin-only')
-      + tile('&#128221;', t('dash_history_mod'), '', 'showDashReportHistory()', 0, 'admin-only')
-      + tile('&#128193;', t('dash_categories'), '', 'showDashCategories()', 0, 'admin-only')
-      + tile('&#128172;', t('dash_comm_types'), '', 'showDashCommTypes()', 0, 'admin-only');
+    html += tile(picHtml('shield'), t('dash_team'), '', 'showDashTeam()', 0, 'admin-only')
+      + tile(picHtml('gavel'), t('dash_bans'), '', 'showDashBan()', 0, 'admin-only')
+      + tile(picHtml('history'), t('dash_history_mod'), '', 'showDashReportHistory()', 0, 'admin-only')
+      + tile(picHtml('folder'), t('dash_categories'), '', 'showDashCategories()', 0, 'admin-only')
+      + tile(picHtml('forum'), t('dash_comm_types'), '', 'showDashCommTypes()', 0, 'admin-only');
   }
   grid.innerHTML = html;
 }
 
 function showDashPending() {
-  showDashDetail('⏳ ' + t('dash_pending'), function() {
+  showDashDetail(picHtml('hourglass_top') + ' ' + t('dash_pending'), function() {
     var c = document.getElementById('dash-detail-content');
     c.innerHTML = '<div id="pending-places-list"><div style="color:var(--text2);">' + t('dash_loading') + '</div></div>';
     loadPendingPlaces();
@@ -8557,7 +8808,7 @@ function showDashReportedComments() {
 
 function showDashReportHistory() {
   if (!isAdmin) return;
-  showDashDetail('📋 ' + t('dash_history_mod'), function() {
+  showDashDetail(picHtml('history') + ' ' + t('dash_history_mod'), function() {
     var c = document.getElementById('dash-detail-content');
     c.innerHTML = '<div id="report-history-list"><div style="color:var(--text2);">' + t('dash_loading') + '</div></div>';
     loadReportHistory();
@@ -8613,7 +8864,7 @@ async function openHistoryPlace(placeId) {
 }
 
 function showDashNewMembers() {
-  showDashDetail('&#127381; ' + t('dash_new_members') + ' — ' + t('lbl_this_week'), function() {
+  showDashDetail(picHtml('person_add') + ' ' + t('dash_new_members') + ' — ' + t('lbl_this_week'), function() {
     var c = document.getElementById('dash-detail-content');
     c.innerHTML = '<div id="dash-new-members-list"><div style="color:var(--text2);font-size:13px;">' + t('lbl_loading') + '</div></div>';
     (async function() {
@@ -8639,7 +8890,7 @@ function showDashNewMembers() {
 }
 
 function showDashLeaderboard() {
-  showDashDetail('🏆 Classement XP — Cette semaine', function() {
+  showDashDetail(picHtml('emoji_events') + ' Classement XP — Cette semaine', function() {
     var c = document.getElementById('dash-detail-content');
     c.innerHTML = '<div id="dash-leaderboard"><div style="color:var(--text2);font-size:13px;text-align:center;padding:24px 0;">' + t('lbl_loading') + '</div></div>';
     loadDashLeaderboard();
@@ -8700,7 +8951,7 @@ async function loadDashLeaderboard() {
 }
 
 function showDashNewPlaces() {
-  showDashDetail('&#10024; ' + t('dash_new_places') + ' — ' + t('lbl_this_week'), function() {
+  showDashDetail(picHtml('add_location') + ' ' + t('dash_new_places') + ' — ' + t('lbl_this_week'), function() {
     var c = document.getElementById('dash-detail-content');
     c.innerHTML = '<div id="dash-new-places-list"><div style="color:var(--text2);font-size:13px;">' + t('lbl_loading') + '</div></div>';
     (async function() {
@@ -8712,7 +8963,7 @@ function showDashNewPlaces() {
       if (!places.length) { el.innerHTML = '<div style="color:var(--text2);font-size:13px;text-align:center;padding:16px 0;">' + t('lbl_no_new_place_week') + '</div>'; return; }
       el.innerHTML = '<div style="font-size:11px;color:var(--text2);margin-bottom:10px;">' + places.length + ' ' + t('dash_new_places').toLowerCase() + ' — ' + t('lbl_this_week') + '</div>'
         + places.map(function(p) {
-          var icon = (p.categories && p.categories.icon) || '📍';
+          var icon = iconHtml((p.categories && p.categories.icon));
           var statusColor = p.status === 'active' ? '#27ae60' : p.status === 'pending' ? '#f39c12' : '#e74c3c';
           var statusLabel = p.status === 'active' ? t('lbl_status_active') : p.status === 'pending' ? t('lbl_status_pending') : t('lbl_status_hidden');
           var date = p.created_at ? new Date(p.created_at).toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }) : '';
@@ -8731,7 +8982,7 @@ function showDashNewPlaces() {
 }
 
 function showDashReports() {
-  showDashDetail('⚠️ ' + t('dash_reports'), function() {
+  showDashDetail(picHtml('flag') + ' ' + t('dash_reports'), function() {
     var c = document.getElementById('dash-detail-content');
     c.innerHTML = '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;">' + t('dash_reported_places') + '</div>'
       + '<div id="reported-places-list"><div style="color:var(--text2);">' + t('dash_loading') + '</div></div>'
@@ -8743,7 +8994,7 @@ function showDashReports() {
 }
 
 function showDashMembers() {
-  showDashDetail('👥 ' + t('dash_registered_members'), function() {
+  showDashDetail(picHtml('group') + ' ' + t('dash_registered_members'), function() {
     var c = document.getElementById('dash-detail-content');
     c.innerHTML = '<div id="dash-members-list"><div style="color:var(--text2);">' + t('dash_loading') + '</div></div>';
     loadDashMembersList();
@@ -8765,7 +9016,7 @@ async function loadDashMembersList() {
   el.innerHTML = '<div style="font-size:11px;color:var(--text2);margin-bottom:10px;">' + members.length + ' ' + t('dash_registered_members').toLowerCase() + '</div>'
     + members.map(function(m, i) {
       var role = rolesMap[m.user_id] || null;
-      var roleLabel = role === 'admin' ? '&#128081;' : role === 'moderator' ? '&#128737;&#65039;' : role === 'trusted' ? '&#11088;' : '';
+      var roleLabel = role === 'admin' ? picHtml('crown') : role === 'moderator' ? picHtml('shield') : role === 'trusted' ? picHtml('star') : '';
       var date = m.registered_at ? new Date(m.registered_at).toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'2-digit' }) : '';
       var lastSeen = m.last_seen_at ? new Date(m.last_seen_at) : null;
       var isOnline = lastSeen && (Date.now() - lastSeen.getTime()) < 5 * 60 * 1000;
@@ -8783,7 +9034,7 @@ async function loadDashMembersList() {
 }
 
 function showDashValidatedPlaces() {
-  showDashDetail('📍 ' + t('dash_validated_total'), function() {
+  showDashDetail(picHtml('task_alt') + ' ' + t('dash_validated_total'), function() {
     var el = document.getElementById('dash-detail-content');
     el.innerHTML = '<div id="validated-places-list"><div style="color:var(--text2);font-size:13px;">' + t('dash_loading') + '</div></div>';
     (async function() {
@@ -8794,7 +9045,7 @@ function showDashValidatedPlaces() {
       if (!places.length) { listEl.innerHTML = '<div style="color:var(--text2);font-size:13px;text-align:center;padding:16px 0;">' + t('lbl_no_active_place') + '</div>'; return; }
       listEl.innerHTML = '<div style="font-size:11px;color:var(--text2);margin-bottom:10px;">' + places.length + ' ' + t('dash_validated_total_label') + '</div>'
         + places.map(function(p) {
-          var icon = (p.categories && p.categories.icon) || '\uD83D\uDCCD';
+          var icon = iconHtml((p.categories && p.categories.icon));
           var catName = (p.categories && p.categories.name) || '';
           var date = p.created_at ? new Date(p.created_at).toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'2-digit' }) : '';
           return '<div onclick="viewFromDashboard(\'' + p.id + '\',' + p.latitude + ',' + p.longitude + ',\'← Retour aux lieux validés\')" style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer;">'
@@ -8811,7 +9062,7 @@ function showDashValidatedPlaces() {
 }
 
 function showDashStats() {
-  showDashDetail('📊 ' + t('dash_global_stats'), async function() {
+  showDashDetail(picHtml('bar_chart') + ' ' + t('dash_global_stats'), async function() {
     var results = await Promise.all([
       db.from('profiles').select('id', { count: 'exact', head: true }).not('username', 'is', null),
       db.from('places').select('id', { count: 'exact', head: true }).eq('status', 'active'),
@@ -8830,18 +9081,18 @@ function showDashStats() {
         + '</div>';
     }
     c.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">'
-      + sitem('&#128101;', t('dash_members'), results[0].count)
-      + sitem('&#128205;', t('dash_stats'), results[1].count)
-      + sitem('&#9203;', t('lbl_status_pending'), results[2].count)
-      + sitem('&#128274;', t('lbl_status_hiddens'), results[3].count)
-      + sitem('&#128172;', t('profile_comments'), results[4].count)
-      + sitem('&#128683;', t('lbl_banned'), results[5].count)
+      + sitem(picHtml('group'), t('dash_members'), results[0].count)
+      + sitem(picHtml('place'), t('dash_stats'), results[1].count)
+      + sitem(picHtml('hourglass_top'), t('lbl_status_pending'), results[2].count)
+      + sitem(picHtml('lock'), t('lbl_status_hiddens'), results[3].count)
+      + sitem(picHtml('chat_bubble'), t('profile_comments'), results[4].count)
+      + sitem(picHtml('block'), t('lbl_banned'), results[5].count)
       + '</div>';
   });
 }
 
 function showDashTeam() {
-  showDashDetail('&#128737;&#65039; ' + t('dash_team'), function() {
+  showDashDetail(picHtml('shield') + ' ' + t('dash_team'), function() {
     var c = document.getElementById('dash-detail-content');
     c.innerHTML = '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;">&#128737;&#65039; ' + t('dash_moderators') + '</div>'
       + '<div id="validators-list" style="margin-bottom:10px;font-size:13px;color:var(--text2);">' + t('lbl_loading') + '</div>'
@@ -8865,7 +9116,7 @@ function showDashTeam() {
 }
 
 function showDashBan() {
-  showDashDetail('&#128296; ' + t('dash_bans'), function() {
+  showDashDetail(picHtml('gavel') + ' ' + t('dash_bans'), function() {
     var c = document.getElementById('dash-detail-content');
     c.innerHTML = '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;">&#128683; ' + t('dash_banned_members') + '</div>'
       + '<div id="banned-list" style="margin-bottom:12px;font-size:13px;color:var(--text2);">' + t('lbl_loading') + '</div>'
@@ -8927,7 +9178,7 @@ function adminToggleReorder(id) {
 
 function showDashCategories() {
   if (!isAdmin) return;
-  showDashDetail('&#128193; Gestion des catégories', function() {
+  showDashDetail(picHtml('folder') + ' Gestion des catégories', function() {
     renderDashCategoriesContent();
   });
 }
@@ -8991,7 +9242,7 @@ async function adminDeleteCat(catId, poiCount) {
 
 function showDashCommTypes() {
   if (!isAdmin) return;
-  showDashDetail('&#128172; Types communauté', function() {
+  showDashDetail(picHtml('forum') + ' Types communauté', function() {
     renderDashCommTypesContent();
   });
 }
@@ -9195,9 +9446,9 @@ function renderDashCategoriesContent() {
       // Header — appui long pour réordonner
       + '<div onmousedown="adminStartLongPress(\'' + mcLpId + '\')" onmouseup="adminCancelLongPress()" onmouseleave="adminCancelLongPress()" ontouchstart="adminStartLongPress(\'' + mcLpId + '\')" ontouchend="adminCancelLongPress()" ontouchmove="adminCancelLongPress()" oncontextmenu="return false" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;user-select:none;-webkit-user-select:none;">'
       + '<button ' + stopProp + ' id="fold-mc-' + mc.id + '" onclick="adminToggleCatFold(\'' + mc.id + '\')" style="background:none;border:none;color:var(--text2);font-size:12px;cursor:pointer;padding:2px 4px;line-height:1;">' + (_catFoldState[mc.id] ? '▶' : '▼') + '</button>'
-      + '<span style="font-size:18px;">' + mc.icon + '</span>'
+      + '<span style="font-size:18px;">' + iconHtml(mc.icon) + '</span>'
       + '<span style="font-size:14px;font-weight:700;flex:1;color:var(--text);">' + mc.name + adminRoleTag(mc.min_role) + '</span>'
-      + '<button ' + stopProp + ' onclick="adminShowEditMainCatForm(\'' + mc.id + '\')" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;cursor:pointer;font-family:var(--font-body);">&#9998;</button>'
+      + '<button ' + stopProp + ' onclick="adminShowEditMainCatForm(\'' + mc.id + '\')" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;cursor:pointer;font-family:var(--font-body);">' + picHtml('edit') + '</button>'
       + '<button ' + stopProp + ' onclick="adminShowCreateSubCatForm(\'' + mc.id + '\')" style="background:rgba(11,166,179,0.12);color:var(--accent);border:1px solid rgba(11,166,179,0.3);border-radius:6px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);white-space:nowrap;">+ Sous-cat</button>'
       + '</div>'
       // Barre de réordonnement (cachée, révélée sur appui long)
@@ -9205,7 +9456,7 @@ function renderDashCategoriesContent() {
       + '<span style="font-size:11px;color:var(--text2);flex:1;">Déplacer :</span>'
       + (isFirst ? '' : '<button ' + lpBtn + ' onclick="adminMoveCatOrder(\'' + mc.id + '\',-1)">&#8593; Monter</button>')
       + (isLast  ? '' : '<button ' + lpBtn + ' onclick="adminMoveCatOrder(\'' + mc.id + '\',1)">&#8595; Descendre</button>')
-      + '<button ' + lpBtn + ' onclick="adminConfirmDeleteMainCat(\'' + mc.id + '\',' + allSubsRaw.length + ',\'' + escJsAttr(mc.name) + '\')" style="background:rgba(231,76,60,0.12);color:#e74c3c;border-color:rgba(231,76,60,0.3);">🗑 Supprimer</button>'
+      + '<button ' + lpBtn + ' onclick="adminConfirmDeleteMainCat(\'' + mc.id + '\',' + allSubsRaw.length + ',\'' + escJsAttr(mc.name) + '\')" style="background:rgba(231,76,60,0.12);color:#e74c3c;border-color:rgba(231,76,60,0.3);">' + picHtml('delete') + ' Supprimer</button>'
       + '</div>'
       + '<div id="admin-edit-maincat-' + mc.id + '"></div>'
       + '<div id="admin-subcat-form-' + mc.id + '"></div>';
@@ -9219,14 +9470,14 @@ function renderDashCategoriesContent() {
         var scLpId = 'sc-' + s.id;
         var opts = '<option value="">Déplacer vers...</option>';
         mainCats.forEach(function(m) {
-          if (m.id !== mc.id) opts += '<option value="' + m.id + '">' + m.icon + ' ' + m.name + '</option>';
+          if (m.id !== mc.id) opts += '<option value="' + m.id + '">' + optIcon(m.icon) + m.name + '</option>';
         });
         html += '<div style="border-top:1px solid var(--border);padding:5px 0;">'
           + '<div onmousedown="adminStartLongPress(\'' + scLpId + '\')" onmouseup="adminCancelLongPress()" onmouseleave="adminCancelLongPress()" ontouchstart="adminStartLongPress(\'' + scLpId + '\')" ontouchend="adminCancelLongPress()" ontouchmove="adminCancelLongPress()" oncontextmenu="return false" style="display:flex;align-items:center;gap:8px;user-select:none;-webkit-user-select:none;">'
-          + '<span style="font-size:14px;">' + s.icon + '</span>'
+          + '<span style="font-size:14px;">' + iconHtml(s.icon) + '</span>'
           + '<span style="font-size:12px;flex:1;color:var(--text2);">' + s.name + adminRoleTag(s.min_role) + '</span>'
-          + '<span style="font-size:10px;color:' + (s.allow_photos ? '#27ae60' : 'var(--text2)') + ';opacity:0.7;margin-right:2px;">' + (s.allow_photos ? '📷' : '') + '</span>'
-          + '<button ' + stopProp + ' onclick="adminShowEditSubCatForm(\'' + s.id + '\',\'' + mc.id + '\')" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:3px 7px;font-size:11px;cursor:pointer;font-family:var(--font-body);">&#9998;</button>'
+          + '<span style="font-size:10px;color:' + (s.allow_photos ? '#27ae60' : 'var(--text2)') + ';opacity:0.7;margin-right:2px;">' + (s.allow_photos ? picHtml('photo_camera') : '') + '</span>'
+          + '<button ' + stopProp + ' onclick="adminShowEditSubCatForm(\'' + s.id + '\',\'' + mc.id + '\')" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:3px 7px;font-size:11px;cursor:pointer;font-family:var(--font-body);">' + picHtml('edit') + '</button>'
           + '<select ' + stopProp + ' onchange="adminMoveSubCat(\'' + s.id + '\',this.value,this)" '
           + 'style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:3px 6px;font-size:11px;font-family:var(--font-body);max-width:130px;">'
           + opts + '</select>'
@@ -9256,7 +9507,11 @@ function adminShowCreateMainCatForm() {
   z.innerHTML = '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:12px;">'
     + '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;">Nouvelle grande catégorie</div>'
     + '<input id="acm-name" type="text" placeholder="Nom *" style="width:100%;box-sizing:border-box;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;margin-bottom:8px;font-family:var(--font-body);outline:none;">'
-    + '<input id="acm-icon" type="text" placeholder="Icône (emoji) *" style="width:100%;box-sizing:border-box;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;margin-bottom:8px;font-family:var(--font-body);outline:none;">'
+    + '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">'
+    + '<span id="acm-icon-prev" style="width:30px;height:30px;flex-shrink:0;display:flex;align-items:center;justify-content:center;"></span>'
+    + '<input id="acm-icon" type="text" placeholder="Pictogramme ou emoji *" oninput="previewIconInput(\'acm-icon\',\'acm-icon-prev\')" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;font-family:var(--font-body);outline:none;">'
+    + '<button type="button" class="ip-pick-btn" onclick="openIconPicker(\'acm-icon\')">🖼️</button>'
+    + '</div>'
     + adminRoleSelectHTML('acm-role', 'public')
     + '<div style="display:flex;gap:8px;">'
     + '<button onclick="document.getElementById(\'admin-cat-form-zone\').innerHTML=\'\';" style="flex:1;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px;font-size:13px;cursor:pointer;font-family:var(--font-body);">Annuler</button>'
@@ -9286,7 +9541,11 @@ function adminShowEditMainCatForm(mcId) {
   var z = document.getElementById('admin-edit-maincat-' + mcId);
   z.innerHTML = '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;margin:6px 0;">'
     + '<input id="acme-name-' + mcId + '" type="text" value="' + mc.name.replace(/"/g, '&quot;') + '" style="width:100%;box-sizing:border-box;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;margin-bottom:8px;font-family:var(--font-body);outline:none;">'
-    + '<input id="acme-icon-' + mcId + '" type="text" value="' + mc.icon + '" style="width:100%;box-sizing:border-box;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;margin-bottom:8px;font-family:var(--font-body);outline:none;">'
+    + '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">'
+    + '<span id="acme-icon-prev-' + mcId + '" style="width:30px;height:30px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">' + iconHtml(mc.icon, 18) + '</span>'
+    + '<input id="acme-icon-' + mcId + '" type="text" value="' + escHtml(mc.icon) + '" oninput="previewIconInput(\'acme-icon-' + mcId + '\',\'acme-icon-prev-' + mcId + '\')" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;font-family:var(--font-body);outline:none;">'
+    + '<button type="button" class="ip-pick-btn" onclick="openIconPicker(\'acme-icon-' + mcId + '\')">🖼️</button>'
+    + '</div>'
     + adminRoleSelectHTML('acme-role-' + mcId, mc.min_role)
     + '<div style="display:flex;gap:8px;">'
     + '<button onclick="document.getElementById(\'admin-edit-maincat-' + mcId + '\').innerHTML=\'\';" style="flex:1;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px;font-size:12px;cursor:pointer;font-family:var(--font-body);">Annuler</button>'
@@ -9314,7 +9573,9 @@ function adminShowCreateSubCatForm(mainCatId) {
   z.innerHTML = '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:6px;">'
     + '<input id="acs-name-' + mainCatId + '" type="text" placeholder="Nom *" style="width:100%;box-sizing:border-box;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;margin-bottom:6px;font-family:var(--font-body);outline:none;">'
     + '<div style="display:flex;gap:8px;margin-bottom:6px;">'
-    + '<input id="acs-icon-' + mainCatId + '" type="text" placeholder="Icône (emoji) *" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;font-family:var(--font-body);outline:none;">'
+    + '<span id="acs-icon-prev-' + mainCatId + '" style="width:30px;height:30px;flex-shrink:0;display:flex;align-items:center;justify-content:center;"></span>'
+    + '<input id="acs-icon-' + mainCatId + '" type="text" placeholder="Pictogramme ou emoji *" oninput="previewIconInput(\'acs-icon-' + mainCatId + '\',\'acs-icon-prev-' + mainCatId + '\')" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;font-family:var(--font-body);outline:none;">'
+    + '<button type="button" class="ip-pick-btn" onclick="openIconPicker(\'acs-icon-' + mainCatId + '\')">🖼️</button>'
     + '<input id="acs-color-' + mainCatId + '" type="color" value="#0ba6b3" title="Couleur marqueur" style="width:40px;height:35px;border:1px solid var(--border);border-radius:8px;cursor:pointer;padding:2px;background:var(--surface);">'
     + '</div>'
     + adminRoleSelectHTML('acs-role-' + mainCatId, 'public')
@@ -9347,7 +9608,9 @@ function adminShowEditSubCatForm(subId, mainCatId) {
   z.innerHTML = '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;margin-top:4px;">'
     + '<input id="acse-name-' + subId + '" type="text" value="' + s.name.replace(/"/g, '&quot;') + '" style="width:100%;box-sizing:border-box;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;margin-bottom:6px;font-family:var(--font-body);outline:none;">'
     + '<div style="display:flex;gap:8px;margin-bottom:6px;">'
-    + '<input id="acse-icon-' + subId + '" type="text" value="' + s.icon + '" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;font-family:var(--font-body);outline:none;">'
+    + '<span id="acse-icon-prev-' + subId + '" style="width:30px;height:30px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">' + iconHtml(s.icon, 18) + '</span>'
+    + '<input id="acse-icon-' + subId + '" type="text" value="' + escHtml(s.icon) + '" oninput="previewIconInput(\'acse-icon-' + subId + '\',\'acse-icon-prev-' + subId + '\')" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;font-family:var(--font-body);outline:none;">'
+    + '<button type="button" class="ip-pick-btn" onclick="openIconPicker(\'acse-icon-' + subId + '\')">🖼️</button>'
     + '<input id="acse-color-' + subId + '" type="color" value="' + (s.color || '#0ba6b3') + '" title="Couleur marqueur" style="width:40px;height:35px;border:1px solid var(--border);border-radius:8px;cursor:pointer;padding:2px;background:var(--surface);">'
     + '</div>'
     + adminRoleSelectHTML('acse-role-' + subId, s.min_role)
@@ -9418,7 +9681,7 @@ async function adminMoveSubCat(subCatId, newMainCatId, selectEl) {
   if (!sub || !dest) return;
   var res = await db.from('categories').update({ main_category_id: newMainCatId }).eq('id', subCatId);
   if (res.error) { showToast(t('lbl_err_generic') + res.error.message, 'error'); if (selectEl) selectEl.value = ''; return; }
-  showToast(sub.icon + ' ' + sub.name + ' déplacée vers ' + dest.icon + ' ' + dest.name);
+  showToast(iconHtml(sub.icon) + ' ' + sub.name + ' déplacée vers ' + iconHtml(dest.icon) + ' ' + dest.name);
   await loadCats();
   renderDashCategoriesContent();
 }
@@ -9509,37 +9772,37 @@ async function openMemberDash() {
   }
 
   var html = '<div style="display:flex;gap:8px;margin-bottom:14px;">'
-    + '<button onclick="closeSheet(\'sheet-member-dash\');navTo(\'profile\');" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;justify-content:center;gap:5px;">👤 Mon profil</button>'
-    + '<button onclick="window.open(\'https://paypal.me/anyprojet\',\'_blank\')" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:#e74c3c;border-radius:var(--radius-sm);padding:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;justify-content:center;gap:5px;">&#10084; Soutenir</button>'
+    + '<button onclick="closeSheet(\'sheet-member-dash\');navTo(\'profile\');" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;justify-content:center;gap:5px;">' + picHtml('person') + ' Mon profil</button>'
+    + '<button onclick="window.open(\'https://paypal.me/anyprojet\',\'_blank\')" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:#e74c3c;border-radius:var(--radius-sm);padding:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;justify-content:center;gap:5px;">' + picHtml('favorite') + ' Soutenir</button>'
     + '</div>';
   html += '<div onclick="showMemberDashDetail(\'notifications\')" style="margin-bottom:14px;background:'+(_unreadNotifCount>0?'rgba(11,166,179,0.12)':'var(--surface2)')+';border:1px solid '+(_unreadNotifCount>0?'var(--accent)':'var(--border)')+';border-radius:10px;padding:11px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;">'
-    +'<span style="font-size:13px;font-weight:700;color:var(--text);">🔔 Notifications'+(_unreadNotifCount>0?' <span style="background:#e74c3c;color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;margin-left:6px;">'+(_unreadNotifCount>99?'99+':_unreadNotifCount)+'</span>':'')+'</span>'
+    +'<span style="font-size:13px;font-weight:700;color:var(--text);">' + picHtml('notifications') + ' Notifications'+(_unreadNotifCount>0?' <span style="background:#e74c3c;color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;margin-left:6px;">'+(_unreadNotifCount>99?'99+':_unreadNotifCount)+'</span>':'')+'</span>'
     +'<span style="color:var(--accent);font-size:18px;">›</span></div>';
   var pendingMineCount = places.length - validatedCount;
   var favsCount = Object.keys(userFavs).length;
 
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">'
-    +mTile('📍', places.length, 'Lieux ajoutés', "showMemberDashDetail('places')")
-    +mTile('✅', validatedCount, 'Lieux validés', "showMemberDashDetail('validated')")
-    +mTile('⏳', pendingMineCount, 'En attente', "showMemberDashDetail('pending')")
-    +mTile('🙏', merciCount, 'Merci reçus', "showMemberDashDetail('merci')")
+    +mTile(picHtml('add_location'), places.length, 'Lieux ajoutés', "showMemberDashDetail('places')")
+    +mTile(picHtml('task_alt'), validatedCount, 'Lieux validés', "showMemberDashDetail('validated')")
+    +mTile(picHtml('hourglass_top'), pendingMineCount, 'En attente', "showMemberDashDetail('pending')")
+    +mTile(picHtml('volunteer_activism'), merciCount, 'Merci reçus', "showMemberDashDetail('merci')")
     +'</div>';
 
   html += '<div onclick="closeSheet(\'sheet-member-dash\');navTo(\'favorites\');" style="margin-top:10px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;">'
-    +'<span style="font-size:13px;font-weight:600;color:var(--text);">⭐ Mes favoris ('+favsCount+')</span>'
+    +'<span style="font-size:13px;font-weight:600;color:var(--text);">' + picHtml('star') + ' Mes favoris ('+favsCount+')</span>'
     +'<span style="color:var(--accent);font-size:18px;">›</span></div>';
 
-  html += '<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin:20px 0 8px;">✅ Mes validations ('+valCount+')</div>';
+  html += '<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin:20px 0 8px;">' + picHtml('task_alt') + ' Mes validations ('+valCount+')</div>';
   html += '<div onclick="showMemberDashDetail(\'validations\')" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;">'
     +'<span style="font-size:13px;font-weight:600;color:var(--text);">'+valCount+' lieu'+(valCount>1?'x':'')+' validé'+(valCount>1?'s':'')+'</span>'
     +'<span style="color:var(--accent);font-size:18px;">›</span></div>';
 
   if (isAdmin||isModerator) {
-    html += '<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin:24px 0 10px;">🛡️ Administration</div>';
+    html += '<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin:24px 0 10px;">' + picHtml('shield') + ' Administration</div>';
   }
   html += '<div id="member-dash-stats-grid" class="dash-grid"><div style="color:var(--text2);font-size:12px;text-align:center;padding:8px 0;">' + t('lbl_loading') + '</div></div>';
   html += '<div style="text-align:center;margin-top:20px;padding-bottom:4px;">'
-    +'<button onclick="reopenTuto()" style="background:none;border:none;color:var(--text2);font-size:12px;cursor:pointer;text-decoration:underline;font-family:var(--font-body);">📖 Revoir le tutoriel</button>'
+    +'<button onclick="reopenTuto()" style="background:none;border:none;color:var(--text2);font-size:12px;cursor:pointer;text-decoration:underline;font-family:var(--font-body);">' + picHtml('menu_book') + ' Revoir le tutoriel</button>'
     +'</div>';
   el.innerHTML = html;
 
@@ -9583,20 +9846,20 @@ async function openMemberDash() {
   }
 
   var tileRegistry = {
-    members:      { adminOnly:false, html:function(){ return dTile('&#128101;', t('dash_registered_members'), totalMembers, 'showDashMembers()', 0, '', '', 'members'); } },
-    validated:    { adminOnly:false, html:function(){ return dTile('&#128205;', t('dash_validated_total'), totalPlaces, 'showDashValidatedPlaces()', 0, '', '', 'validated'); } },
-    newMembers:   { adminOnly:false, html:function(){ return dTile('&#127381;', t('dash_new_members'), newMembers, 'showDashNewMembers()', 0, 'week', t('lbl_this_week'), 'newMembers'); } },
-    newPlaces:    { adminOnly:false, html:function(){ return dTile('&#10024;', t('dash_new_places'), newPlaces, 'showDashNewPlaces()', 0, 'week', t('lbl_this_week'), 'newPlaces'); } },
-    reported:     { adminOnly:false, html:function(){ return dTile('&#9888;&#65039;', t('dash_reported_places'), reportedPlaces, 'showDashReportedPlaces()', reportedPlaces, reportedPlaces>0?'urgent':'', '', 'reported'); } },
-    reportedCmts: { adminOnly:false, html:function(){ return dTile('&#128172;', t('dash_reported_comments'), reportedCmts, 'showDashReportedComments()', reportedCmts, reportedCmts>0?'urgent':'', '', 'reportedCmts'); } },
-    leaderboard:  { adminOnly:false, html:function(){ return dTile('&#127942;', 'Classement XP', '', 'showDashLeaderboard()', 0, '', '', 'leaderboard'); } },
-    pending:      { adminOnly:false, html:function(){ return dTile('&#9203;', t('dash_pending'), pendingCount, 'showDashPending()', pendingCount, pendingCount>0?'urgent':'', '', 'pending'); } },
-    globalStats:  { adminOnly:false, html:function(){ return dTile('&#128202;', t('dash_global_stats'), '', 'showDashStats()', 0, '', '', 'globalStats'); } },
-    team:         { adminOnly:true,  html:function(){ return dTile('&#128737;&#65039;', t('dash_team'), '', 'showDashTeam()', 0, 'admin-only', '', 'team'); } },
-    bans:         { adminOnly:true,  html:function(){ return dTile('&#128296;', t('dash_bans'), '', 'showDashBan()', 0, 'admin-only', '', 'bans'); } },
-    history:      { adminOnly:true,  html:function(){ return dTile('&#128221;', t('dash_history_mod'), '', 'showDashReportHistory()', 0, 'admin-only', '', 'history'); } },
-    categories:   { adminOnly:true,  html:function(){ return dTile('&#128193;', t('dash_categories'), '', 'showDashCategories()', 0, 'admin-only', '', 'categories'); } },
-    commTypes:    { adminOnly:true,  html:function(){ return dTile('&#128172;', t('dash_comm_types'), '', 'showDashCommTypes()', 0, 'admin-only', '', 'commTypes'); } }
+    members:      { adminOnly:false, html:function(){ return dTile(picHtml('group'), t('dash_registered_members'), totalMembers, 'showDashMembers()', 0, '', '', 'members'); } },
+    validated:    { adminOnly:false, html:function(){ return dTile(picHtml('task_alt'), t('dash_validated_total'), totalPlaces, 'showDashValidatedPlaces()', 0, '', '', 'validated'); } },
+    newMembers:   { adminOnly:false, html:function(){ return dTile(picHtml('person_add'), t('dash_new_members'), newMembers, 'showDashNewMembers()', 0, 'week', t('lbl_this_week'), 'newMembers'); } },
+    newPlaces:    { adminOnly:false, html:function(){ return dTile(picHtml('add_location'), t('dash_new_places'), newPlaces, 'showDashNewPlaces()', 0, 'week', t('lbl_this_week'), 'newPlaces'); } },
+    reported:     { adminOnly:false, html:function(){ return dTile(picHtml('flag'), t('dash_reported_places'), reportedPlaces, 'showDashReportedPlaces()', reportedPlaces, reportedPlaces>0?'urgent':'', '', 'reported'); } },
+    reportedCmts: { adminOnly:false, html:function(){ return dTile(picHtml('chat_bubble'), t('dash_reported_comments'), reportedCmts, 'showDashReportedComments()', reportedCmts, reportedCmts>0?'urgent':'', '', 'reportedCmts'); } },
+    leaderboard:  { adminOnly:false, html:function(){ return dTile(picHtml('emoji_events'), 'Classement XP', '', 'showDashLeaderboard()', 0, '', '', 'leaderboard'); } },
+    pending:      { adminOnly:false, html:function(){ return dTile(picHtml('hourglass_top'), t('dash_pending'), pendingCount, 'showDashPending()', pendingCount, pendingCount>0?'urgent':'', '', 'pending'); } },
+    globalStats:  { adminOnly:false, html:function(){ return dTile(picHtml('bar_chart'), t('dash_global_stats'), '', 'showDashStats()', 0, '', '', 'globalStats'); } },
+    team:         { adminOnly:true,  html:function(){ return dTile(picHtml('shield'), t('dash_team'), '', 'showDashTeam()', 0, 'admin-only', '', 'team'); } },
+    bans:         { adminOnly:true,  html:function(){ return dTile(picHtml('gavel'), t('dash_bans'), '', 'showDashBan()', 0, 'admin-only', '', 'bans'); } },
+    history:      { adminOnly:true,  html:function(){ return dTile(picHtml('history'), t('dash_history_mod'), '', 'showDashReportHistory()', 0, 'admin-only', '', 'history'); } },
+    categories:   { adminOnly:true,  html:function(){ return dTile(picHtml('folder'), t('dash_categories'), '', 'showDashCategories()', 0, 'admin-only', '', 'categories'); } },
+    commTypes:    { adminOnly:true,  html:function(){ return dTile(picHtml('forum'), t('dash_comm_types'), '', 'showDashCommTypes()', 0, 'admin-only', '', 'commTypes'); } }
   };
   var defaultOrder = ['members','validated','newMembers','newPlaces','reported','reportedCmts','leaderboard','pending','globalStats','team','bans','history','categories','commTypes'];
   var order = (tileOrder || defaultOrder).slice();
@@ -9699,7 +9962,7 @@ async function showMemberDashDetail(type) {
   if (main) main.style.display='none';
   if (detail) { detail.style.display='flex'; detail.style.flexDirection='column'; }
   var d = _memberDashData;
-  var titles = {places:'📍 Mes lieux', validated:'✅ Lieux validés', pending:'⏳ En attente de validation', merci:'🙏 Merci reçus', validations:'✅ Mes validations', ratings:'⭐ Notes reçues', notifications:'🔔 Notifications'};
+  var titles = {places:picHtml('add_location')+' Mes lieux', validated:picHtml('task_alt')+' Lieux validés', pending:picHtml('hourglass_top')+' En attente de validation', merci:picHtml('volunteer_activism')+' Merci reçus', validations:picHtml('task_alt')+' Mes validations', ratings:picHtml('star')+' Notes reçues', notifications:picHtml('notifications')+' Notifications'};
   if (titleEl) titleEl.textContent = titles[type] || '';
   if (type === 'ratings') {
     content.innerHTML = '<div style="color:var(--text2);font-size:13px;padding:20px 0;text-align:center;">' + t('lbl_loading') + '</div>';
@@ -10407,79 +10670,79 @@ function getTutoSlides() {
   return [
     {
       bg: 'linear-gradient(135deg,#0ba6b3 0%,#0d7a87 100%)',
-      illus: '🗺️',
+      illus: 'map',
       sub: 'Find Anything · Anywhere · Anytime',
       title: t('tuto_s1_title'),
       desc: t('tuto_s1_desc'),
       points: [
-        { icon: '🍕', text: t('tuto_s1_p1') },
-        { icon: '🌍', text: t('tuto_s1_p2') },
-        { icon: '🌐', text: t('tuto_s1_p3') }
+        { icon: 'local_pizza', text: t('tuto_s1_p1') },
+        { icon: 'public', text: t('tuto_s1_p2') },
+        { icon: 'language', text: t('tuto_s1_p3') }
       ]
     },
     {
       bg: 'linear-gradient(135deg,#6366f1 0%,#4f46e5 100%)',
-      illus: '📍',
+      illus: 'place',
       sub: '<span style="font-size:10px;opacity:0.65;letter-spacing:1px;">'+t('tuto_s2_sub')+'</span>',
       title: t('tuto_s2_title'),
       desc: t('tuto_s2_desc'),
       points: [
-        { icon: '☰', text: t('tuto_s2_p1') },
-        { icon: '👆', text: t('tuto_s2_p2') },
-        { icon: '📡', text: t('tuto_s2_p3') },
-        { icon: '🛰️', text: t('tuto_s2_p4') }
+        { icon: 'menu', text: t('tuto_s2_p1') },
+        { icon: 'touch_app', text: t('tuto_s2_p2') },
+        { icon: 'cell_tower', text: t('tuto_s2_p3') },
+        { icon: 'satellite_alt', text: t('tuto_s2_p4') }
       ]
     },
     {
       bg: 'linear-gradient(135deg,#10b981 0%,#059669 100%)',
-      illus: '➕',
+      illus: 'add_location',
       sub: t('tuto_s3_sub'),
       title: t('tuto_s3_title'),
       desc: t('tuto_s3_desc'),
       points: [
-        { icon: '🖱️', text: t('tuto_s3_p1') },
-        { icon: '📍', text: t('tuto_s3_p2') },
-        { icon: '📝', text: t('tuto_s3_p3') },
-        { icon: '🚀', text: t('tuto_s3_p4') }
+        { icon: 'mouse', text: t('tuto_s3_p1') },
+        { icon: 'place', text: t('tuto_s3_p2') },
+        { icon: 'edit_note', text: t('tuto_s3_p3') },
+        { icon: 'rocket_launch', text: t('tuto_s3_p4') }
       ]
     },
     {
       bg: 'linear-gradient(135deg,#f59e0b 0%,#d97706 100%)',
-      illus: '✅',
+      illus: 'task_alt',
       sub: t('tuto_s4_sub'),
       title: t('tuto_s4_title'),
       desc: t('tuto_s4_desc'),
       points: [
-        { icon: '🔘', text: t('tuto_s4_p1') },
-        { icon: '🗳️', text: t('tuto_s4_p2') },
-        { icon: '🎨', text: t('tuto_s4_p3') },
-        { icon: '🛡️', text: t('tuto_s4_p4') }
+        { icon: 'radio_button_checked', text: t('tuto_s4_p1') },
+        { icon: 'how_to_vote', text: t('tuto_s4_p2') },
+        { icon: 'palette', text: t('tuto_s4_p3') },
+        { icon: 'shield', text: t('tuto_s4_p4') }
       ]
     },
     {
       bg: 'linear-gradient(135deg,#8b5cf6 0%,#7c3aed 100%)',
-      illus: '🛣️',
+      illus: 'route',
       sub: t('tuto_s5_sub'),
       title: t('tuto_s5_title'),
       desc: t('tuto_s5_desc'),
       points: [
-        { icon: '🗺️', text: t('tuto_s5_p1') },
-        { icon: '📍', text: t('tuto_s5_p2') },
-        { icon: '🛣️', text: t('tuto_s5_p3') },
-        { icon: '🔒', text: t('tuto_s5_p4') }
+        { icon: 'map', text: t('tuto_s5_p1') },
+        { icon: 'place', text: t('tuto_s5_p2') },
+        { icon: 'route', text: t('tuto_s5_p3') },
+        { icon: 'lock', text: t('tuto_s5_p4') }
       ]
     },
     {
       bg: 'linear-gradient(135deg,#e74c3c 0%,#c0392b 100%)',
-      illus: '👤',
+      illus: 'person',
       sub: t('tuto_s6_sub'),
       title: t('tuto_s6_title'),
       desc: t('tuto_s6_desc'),
       points: [
-        { icon: '📍', text: t('tuto_s6_p1') },
-        { icon: '⭐', text: t('tuto_s6_p2') },
-        { icon: '🙏', text: t('tuto_s6_p3') },
-        { icon: '♥', text: t('tuto_s6_p4') }
+        { icon: 'add_location', text: t('tuto_s6_p1') },
+        { icon: 'star', text: t('tuto_s6_p2') },
+        { icon: 'volunteer_activism', text: t('tuto_s6_p3') },
+        { icon: 'favorite', text: t('tuto_s6_p4') }
       ]
     }
   ];
@@ -10504,12 +10767,12 @@ function _renderTutoSlide() {
   var total = slides.length;
   var illus = document.getElementById('tuto-illus');
   illus.style.background = s.bg;
-  illus.innerHTML = '<span style="filter:drop-shadow(0 4px 16px rgba(0,0,0,0.25));font-size:84px;line-height:1;">'+s.illus+'</span>'
+  illus.innerHTML = '<span style="filter:drop-shadow(0 4px 16px rgba(0,0,0,0.25));color:#fff;">'+picHtml(s.illus,84)+'</span>'
     +'<div id="tuto-illus-sub" style="position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:11px;color:rgba(255,255,255,0.75);font-weight:700;letter-spacing:0.6px;text-transform:uppercase;">'+s.sub+'</div>';
   document.getElementById('tuto-title').textContent = s.title;
   document.getElementById('tuto-desc').innerHTML = s.desc;
   document.getElementById('tuto-points').innerHTML = (s.points||[]).map(function(p) {
-    return '<div class="tuto-point"><span class="tuto-point-icon">'+p.icon+'</span><span>'+p.text+'</span></div>';
+    return '<div class="tuto-point"><span class="tuto-point-icon">'+picHtml(p.icon)+'</span><span>'+p.text+'</span></div>';
   }).join('');
   document.getElementById('tuto-dots').innerHTML = slides.map(function(_,i) {
     return '<div class="tuto-dot'+(i===_tutoSlide?' active':'')+'"></div>';
