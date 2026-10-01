@@ -9177,7 +9177,7 @@ function adminToggleReorder(id) {
 }
 
 function showDashCategories() {
-  if (!isAdmin) return;
+  if (!isAdmin && !isModerator) return;
   showDashDetail(picHtml('folder') + ' Gestion des catégories', function() {
     renderDashCategoriesContent();
   });
@@ -9456,7 +9456,7 @@ function renderDashCategoriesContent() {
       + '<span style="font-size:11px;color:var(--text2);flex:1;">Déplacer :</span>'
       + (isFirst ? '' : '<button ' + lpBtn + ' onclick="adminMoveCatOrder(\'' + mc.id + '\',-1)">&#8593; Monter</button>')
       + (isLast  ? '' : '<button ' + lpBtn + ' onclick="adminMoveCatOrder(\'' + mc.id + '\',1)">&#8595; Descendre</button>')
-      + '<button ' + lpBtn + ' onclick="adminConfirmDeleteMainCat(\'' + mc.id + '\',' + allSubsRaw.length + ',\'' + escJsAttr(mc.name) + '\')" style="background:rgba(231,76,60,0.12);color:#e74c3c;border-color:rgba(231,76,60,0.3);">' + picHtml('delete') + ' Supprimer</button>'
+      + (isAdmin ? '<button ' + lpBtn + ' onclick="adminConfirmDeleteMainCat(\'' + mc.id + '\',' + allSubsRaw.length + ',\'' + escJsAttr(mc.name) + '\')" style="background:rgba(231,76,60,0.12);color:#e74c3c;border-color:rgba(231,76,60,0.3);">' + picHtml('delete') + ' Supprimer</button>' : '')
       + '</div>'
       + '<div id="admin-edit-maincat-' + mc.id + '"></div>'
       + '<div id="admin-subcat-form-' + mc.id + '"></div>';
@@ -9487,8 +9487,8 @@ function renderDashCategoriesContent() {
           + (isFirstS ? '' : '<button ' + lpBtn + ' onclick="adminMoveSubCatOrder(\'' + s.id + '\',-1,\'' + mc.id + '\')">&#8593;</button>')
           + (isLastS  ? '' : '<button ' + lpBtn + ' onclick="adminMoveSubCatOrder(\'' + s.id + '\',1,\'' + mc.id + '\')">&#8595;</button>')
           + '<span style="flex:1;"></span>'
-          + '<button ' + lpBtn + ' onclick="adminToggleCatPhotos(\'' + s.id + '\',' + (!!s.allow_photos) + ')" style="background:' + (s.allow_photos ? 'rgba(39,174,96,0.15)' : 'var(--surface2)') + ';border-color:' + (s.allow_photos ? '#27ae60' : 'var(--border)') + ';color:' + (s.allow_photos ? '#27ae60' : 'var(--text2)') + ';">' + (s.allow_photos ? '📷 Photos ON' : '📷 Photos OFF') + '</button>'
-          + '<button ' + lpBtn + ' onclick="adminConfirmDeleteSubCat(\'' + s.id + '\',\'' + escJsAttr(s.name) + '\')" style="background:rgba(231,76,60,0.12);color:#e74c3c;border-color:rgba(231,76,60,0.3);">🗑 Supprimer</button>'
+          + '<button ' + lpBtn + ' onclick="adminToggleCatPhotos(\'' + s.id + '\',' + (!!s.allow_photos) + ')" style="background:' + (s.allow_photos ? 'rgba(39,174,96,0.15)' : 'var(--surface2)') + ';border-color:' + (s.allow_photos ? '#27ae60' : 'var(--border)') + ';color:' + (s.allow_photos ? '#27ae60' : 'var(--text2)') + ';">' + picHtml('photo_camera') + ' Photos ' + (s.allow_photos ? 'ON' : 'OFF') + '</button>'
+          + (isAdmin ? '<button ' + lpBtn + ' onclick="adminConfirmDeleteSubCat(\'' + s.id + '\',\'' + escJsAttr(s.name) + '\')" style="background:rgba(231,76,60,0.12);color:#e74c3c;border-color:rgba(231,76,60,0.3);">' + picHtml('delete') + ' Supprimer</button>' : '')
           + '</div>'
           + '<div id="admin-edit-subcat-' + s.id + '"></div>'
           + '</div>';
@@ -9521,7 +9521,7 @@ function adminShowCreateMainCatForm() {
 }
 
 async function adminCreateMainCat() {
-  if (!isAdmin) return;
+  if (!isAdmin && !isModerator) return;
   var name  = (document.getElementById('acm-name').value || '').trim();
   var icon  = (document.getElementById('acm-icon').value || '').trim();
   var role  = document.getElementById('acm-role').value || 'public';
@@ -9555,7 +9555,7 @@ function adminShowEditMainCatForm(mcId) {
 }
 
 async function adminSaveEditMainCat(mcId) {
-  if (!isAdmin) return;
+  if (!isAdmin && !isModerator) return;
   var name = (document.getElementById('acme-name-' + mcId).value || '').trim();
   var icon = (document.getElementById('acme-icon-' + mcId).value || '').trim();
   var role = document.getElementById('acme-role-' + mcId).value || 'public';
@@ -9587,7 +9587,7 @@ function adminShowCreateSubCatForm(mainCatId) {
 }
 
 async function adminCreateSubCat(mainCatId) {
-  if (!isAdmin) return;
+  if (!isAdmin && !isModerator) return;
   var name  = (document.getElementById('acs-name-' + mainCatId).value || '').trim();
   var icon  = (document.getElementById('acs-icon-' + mainCatId).value || '').trim();
   var color = document.getElementById('acs-color-' + mainCatId).value || '#0ba6b3';
@@ -9622,7 +9622,7 @@ function adminShowEditSubCatForm(subId, mainCatId) {
 }
 
 async function adminSaveEditSubCat(subId) {
-  if (!isAdmin) return;
+  if (!isAdmin && !isModerator) return;
   var name  = (document.getElementById('acse-name-' + subId).value || '').trim();
   var icon  = (document.getElementById('acse-icon-' + subId).value || '').trim();
   var color = document.getElementById('acse-color-' + subId).value || '#0ba6b3';
@@ -9637,7 +9637,7 @@ async function adminSaveEditSubCat(subId) {
 
 // ---- Réordonner grandes catégories ----
 async function adminMoveCatOrder(mcId, dir) {
-  if (!isAdmin) return;
+  if (!isAdmin && !isModerator) return;
   var idx = mainCats.findIndex(function(m) { return m.id === mcId; });
   var swapIdx = idx + dir;
   if (idx < 0 || swapIdx < 0 || swapIdx >= mainCats.length) return;
@@ -9656,7 +9656,7 @@ async function adminMoveCatOrder(mcId, dir) {
 
 // ---- Réordonner sous-catégories ----
 async function adminMoveSubCatOrder(subId, dir, mainCatId) {
-  if (!isAdmin) return;
+  if (!isAdmin && !isModerator) return;
   var siblings = allCats.filter(function(c) { return c.main_category_id === mainCatId; });
   var idx = siblings.findIndex(function(s) { return s.id === subId; });
   var swapIdx = idx + dir;
@@ -9675,7 +9675,7 @@ async function adminMoveSubCatOrder(subId, dir, mainCatId) {
 
 // ---- Déplacer sous-catégorie ----
 async function adminMoveSubCat(subCatId, newMainCatId, selectEl) {
-  if (!isAdmin || !newMainCatId) return;
+  if ((!isAdmin && !isModerator) || !newMainCatId) return;
   var sub  = allCats.find(function(c) { return c.id === subCatId; });
   var dest = mainCats.find(function(m) { return m.id === newMainCatId; });
   if (!sub || !dest) return;
@@ -9858,7 +9858,7 @@ async function openMemberDash() {
     team:         { adminOnly:true,  html:function(){ return dTile(picHtml('shield'), t('dash_team'), '', 'showDashTeam()', 0, 'admin-only', '', 'team'); } },
     bans:         { adminOnly:true,  html:function(){ return dTile(picHtml('gavel'), t('dash_bans'), '', 'showDashBan()', 0, 'admin-only', '', 'bans'); } },
     history:      { adminOnly:true,  html:function(){ return dTile(picHtml('history'), t('dash_history_mod'), '', 'showDashReportHistory()', 0, 'admin-only', '', 'history'); } },
-    categories:   { adminOnly:true,  html:function(){ return dTile(picHtml('folder'), t('dash_categories'), '', 'showDashCategories()', 0, 'admin-only', '', 'categories'); } },
+    categories:   { adminOnly:false, html:function(){ return dTile(picHtml('folder'), t('dash_categories'), '', 'showDashCategories()', 0, 'admin-only', '', 'categories'); } },
     commTypes:    { adminOnly:true,  html:function(){ return dTile(picHtml('forum'), t('dash_comm_types'), '', 'showDashCommTypes()', 0, 'admin-only', '', 'commTypes'); } }
   };
   var defaultOrder = ['members','validated','newMembers','newPlaces','reported','reportedCmts','leaderboard','pending','globalStats','team','bans','history','categories','commTypes'];
