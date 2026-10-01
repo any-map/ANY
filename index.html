@@ -649,7 +649,7 @@ path.leaflet-cluster-spider-leg{stroke:#fff!important;stroke-width:1.5px!importa
       <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text2);margin-bottom:8px;" data-i18n="sidebar_location">&#128205; Localisation</p>
       <div style="position:relative;display:flex;align-items:center;">
         <span style="position:absolute;left:10px;font-size:14px;pointer-events:none;">&#128205;</span>
-        <input type="text" id="loc-input-desk" data-i18n-ph="loc_ph" placeholder="Ville, département..." oninput="onLocationInputDesk(this.value)" autocomplete="off"
+        <input type="text" id="srch-free-1" data-i18n-ph="loc_ph" placeholder="Ville, département..." oninput="onLocationInputDesk(this.value)" autocomplete="nope" autocorrect="off" spellcheck="false"
           style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:9px 10px 9px 32px;color:var(--text);font-size:13px;outline:none;font-family:var(--font-body);box-sizing:border-box;transition:border-color 0.2s;">
         <button id="loc-clear-desk" onclick="clearLocationDesk()" style="display:none;position:absolute;right:8px;background:none;border:none;color:var(--text2);font-size:16px;cursor:pointer;padding:0;">&#10005;</button>
       </div>
@@ -5337,7 +5337,7 @@ function selectLocationIdxDesk(idx) {
   var dept = addr.county || addr.state_district || '';
   var region = addr.state || '';
   var sub = [dept, region].filter(Boolean).join(' · ');
-  document.getElementById('loc-input-desk').value = city + (sub ? ', ' + sub : '');
+  document.getElementById('srch-free-1').value = city + (sub ? ', ' + sub : '');
   document.getElementById('loc-clear-desk').style.display = 'block';
   dd.style.display = 'none';
   document.getElementById('loc-chip-desk-text').textContent = city;
@@ -5348,7 +5348,7 @@ function selectLocationIdxDesk(idx) {
 
 function clearLocationDesk() {
   selectedLocationDesk = null;
-  document.getElementById('loc-input-desk').value = '';
+  document.getElementById('srch-free-1').value = '';
   document.getElementById('loc-clear-desk').style.display = 'none';
   document.getElementById('loc-dropdown-desk').style.display = 'none';
   document.getElementById('loc-chip-desk').style.display = 'none';
@@ -5359,7 +5359,7 @@ function locateMeLocationDesk() {
   map.locate({ setView: false });
   map.once('locationfound', function(e) {
     selectedLocationDesk = { lat: e.latlng.lat, lon: e.latlng.lng };
-    document.getElementById('loc-input-desk').value = t('lbl_my_position');
+    document.getElementById('srch-free-1').value = t('lbl_my_position');
     document.getElementById('loc-clear-desk').style.display = 'block';
     document.getElementById('loc-chip-desk-text').textContent = t('lbl_my_position');
     document.getElementById('loc-chip-desk').style.display = 'block';
