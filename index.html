@@ -5626,12 +5626,23 @@ async function loadCats() {
   mainCats = (resM.data || []).filter(function(mc) { return catVisibleForRole(mc.min_role); });
   allCats  = (resS.data || []).filter(function(c)  { return catVisibleForRole(c.min_role); });
   mainCats.forEach(function(mc) {
-    var isDefault = mc.name === 'Libre service 24/7';
-    filters[mc.id] = { on: isDefault, subs: {} };
+    filters[mc.id] = { on: true, subs: {} };
     allCats.filter(function(c) { return c.main_category_id === mc.id; }).forEach(function(c) {
-      filters[mc.id].subs[c.id] = isDefault;
+      filters[mc.id].subs[c.id] = true;
     });
   });
+  try {
+    var savedFilters = JSON.parse(localStorage.getItem('vlm_cat_filters') || 'null');
+    if (savedFilters) {
+      Object.keys(savedFilters).forEach(function(mid) {
+        if (!filters[mid]) return;
+        if (typeof savedFilters[mid].on === 'boolean') filters[mid].on = savedFilters[mid].on;
+        Object.keys(savedFilters[mid].subs || {}).forEach(function(sid) {
+          if (sid in filters[mid].subs) filters[mid].subs[sid] = savedFilters[mid].subs[sid];
+        });
+      });
+    }
+  } catch(e) {}
   catCounts = {};
   try {
     await Promise.all(allCats.map(function(s) {
@@ -8155,7 +8166,12 @@ async function submitClosedHS() {
 }
 
 function applyFilters() {
+  saveFilters();
   scheduleLoad();
+}
+
+function saveFilters() {
+  try { localStorage.setItem('vlm_cat_filters', JSON.stringify(filters)); } catch(e) {}
 }
 
 function toggleAllFilters(on) {
