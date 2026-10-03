@@ -123,6 +123,9 @@ html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none;font-f
 #places-count{position:absolute;top:14px;right:14px;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 12px;font-size:12px;color:var(--text2);}
 #places-count span{color:var(--accent);font-weight:600;}
 #btn-locate{position:fixed;bottom:90px;right:14px;z-index:1200;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px;box-shadow:0 2px 8px rgba(0,0,0,0.3);}
+#cluster-legend{position:fixed;bottom:90px;left:14px;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;flex-direction:column;gap:4px;}
+#cluster-legend .cl-row{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text2);white-space:nowrap;}
+#cluster-legend .cl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .my-loc-wrap{width:40px;height:40px;position:relative;transform-origin:center center;}
 .my-loc-cone{position:absolute;left:50%;bottom:50%;transform:translateX(-50%);width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:22px solid rgba(66,133,244,0.5);border-radius:2px;opacity:0;transition:opacity 0.25s;}
 .my-loc-dot{position:absolute;width:16px;height:16px;background:#4285f4;border:2.5px solid #fff;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);box-shadow:0 2px 8px rgba(0,0,0,0.4);}
@@ -412,6 +415,7 @@ html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none;font-f
   #bottom-nav{display:block;}
   #map-wrap{height:100%;}
   #btn-locate{bottom:calc(var(--nav-h) + 14px);}
+  #cluster-legend{bottom:calc(var(--nav-h) + 14px);}
   #places-count{top:10px;right:10px;font-size:11px;padding:5px 10px;}
   #toast{bottom:calc(var(--nav-h) + 12px);}
 }
@@ -424,6 +428,7 @@ html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none;font-f
   #map-wrap{height:100%;}
   .nav-item span:not(.nav-item-icon),.nav-item-add>span{display:none;}
   #btn-locate{bottom:14px;}
+  #cluster-legend{bottom:14px;left:calc(var(--nav-h) + 14px);}
   #toast{bottom:12px;}
 }
 /* ── PROFILE CARD ── */
@@ -703,6 +708,12 @@ path.leaflet-cluster-spider-leg{stroke:#fff!important;stroke-width:1.5px!importa
     </div>
     <button id="btn-locate" title="Suivre ma position en direct"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="7" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
     <div id="places-count">Lieux : <span id="count-num">0</span></div>
+    <div id="cluster-legend">
+      <div class="cl-row"><span class="cl-dot" style="background:#199e70;"></span>Libre service 24/7</div>
+      <div class="cl-row"><span class="cl-dot" style="background:#3987e5;"></span>Van Life &amp; Camping-car</div>
+      <div class="cl-row"><span class="cl-dot" style="background:#d95926;"></span>Service Urbains</div>
+      <div class="cl-row"><span class="cl-dot" style="background:#64798a;"></span>Autre</div>
+    </div>
     <button id="btn-map-style" title="Type de carte" onclick="toggleMapStyleMenu()">&#128506;</button>
     <div id="map-style-menu">
       <button data-mode="street" onclick="selectMapMode('street')">&#128506; Rue</button>
@@ -3516,6 +3527,12 @@ var mainCats = [], allCats = [], allPlaces = [], catCounts = {};
 var filters = {};
 
 function fluentImg(value, size) { return iconHtml(value, size); }
+var MAIN_CAT_CLUSTER_COLORS = {
+  'Libre service 24/7': 'rgba(25,158,112,0.9)',
+  'Van Life & Camping-car': 'rgba(57,135,229,0.9)',
+  'Service Urbains': 'rgba(217,89,38,0.9)',
+  'Autre': 'rgba(100,121,138,0.9)'
+};
 var selectedLatLng = null;
 var add24hValue = null;
 var addingMode = false;
@@ -3552,8 +3569,16 @@ async function init() {
     iconCreateFunction: function(c) {
       var n = c.getChildCount();
       var size = n < 10 ? 34 : n < 50 ? 40 : 46;
+      var counts = {};
+      c.getAllChildMarkers().forEach(function(mk) {
+        var name = mk._mainCatName || 'Autre';
+        counts[name] = (counts[name] || 0) + 1;
+      });
+      var dominant = 'Autre', max = -1;
+      Object.keys(counts).forEach(function(k) { if (counts[k] > max) { max = counts[k]; dominant = k; } });
+      var bg = MAIN_CAT_CLUSTER_COLORS[dominant] || MAIN_CAT_CLUSTER_COLORS['Autre'];
       return L.divIcon({
-        html: '<div style="width:' + size + 'px;height:' + size + 'px;background:rgba(13,21,48,0.88);backdrop-filter:blur(6px);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:' + (n < 10 ? 13 : 11) + 'px;font-weight:800;color:#f0f2f8;box-shadow:0 2px 12px rgba(0,0,0,0.45);border:2px solid rgba(255,255,255,0.18);">' + n + '</div>',
+        html: '<div style="width:' + size + 'px;height:' + size + 'px;background:' + bg + ';backdrop-filter:blur(6px);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:' + (n < 10 ? 13 : 11) + 'px;font-weight:800;color:#f0f2f8;box-shadow:0 2px 12px rgba(0,0,0,0.45);border:2px solid rgba(255,255,255,0.18);">' + n + '</div>',
         className: '', iconSize: [size, size], iconAnchor: [size/2, size/2]
       });
     }
@@ -5894,6 +5919,7 @@ function renderMarkers(places) {
       className: '', iconSize: [36,44], iconAnchor: [18,44], popupAnchor: [0,-46]
     });
     var mk = L.marker([p.latitude, p.longitude], { icon: mi });
+    mk._mainCatName = p.main_categories ? p.main_categories.name : 'Autre';
     mk.on('click', function(e) { L.DomEvent.stopPropagation(e); openPlaceDetail(p, mk); });
     markers.push(mk);
   });
