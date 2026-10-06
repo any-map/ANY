@@ -123,9 +123,11 @@ html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none;font-f
 #places-count{position:absolute;top:14px;right:14px;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 12px;font-size:12px;color:var(--text2);}
 #places-count span{color:var(--accent);font-weight:600;}
 #btn-locate{position:fixed;bottom:90px;right:14px;z-index:1200;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px;box-shadow:0 2px 8px rgba(0,0,0,0.3);}
-#cluster-legend{position:fixed;bottom:90px;left:14px;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;flex-direction:column;gap:4px;}
+#cluster-legend{position:fixed;bottom:90px;left:14px;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;flex-direction:column;gap:4px;cursor:pointer;}
 #cluster-legend .cl-row{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text2);white-space:nowrap;}
 #cluster-legend .cl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+#cluster-legend.cl-collapsed{flex-direction:row;gap:5px;padding:6px 8px;}
+#cluster-legend.cl-collapsed .cl-label{display:none;}
 .my-loc-wrap{width:40px;height:40px;position:relative;transform-origin:center center;}
 .my-loc-cone{position:absolute;left:50%;bottom:50%;transform:translateX(-50%);width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:22px solid rgba(66,133,244,0.5);border-radius:2px;opacity:0;transition:opacity 0.25s;}
 .my-loc-dot{position:absolute;width:16px;height:16px;background:#4285f4;border:2.5px solid #fff;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);box-shadow:0 2px 8px rgba(0,0,0,0.4);}
@@ -708,11 +710,11 @@ path.leaflet-cluster-spider-leg{stroke:#fff!important;stroke-width:1.5px!importa
     </div>
     <button id="btn-locate" title="Suivre ma position en direct"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="7" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
     <div id="places-count">Lieux : <span id="count-num">0</span></div>
-    <div id="cluster-legend">
-      <div class="cl-row"><span class="cl-dot" style="background:#199e70;"></span>Libre service 24/7</div>
-      <div class="cl-row"><span class="cl-dot" style="background:#3987e5;"></span>Van Life &amp; Camping-car</div>
-      <div class="cl-row"><span class="cl-dot" style="background:#d95926;"></span>Service Urbains</div>
-      <div class="cl-row"><span class="cl-dot" style="background:#64798a;"></span>Autre</div>
+    <div id="cluster-legend" class="cl-collapsed" onclick="toggleClusterLegend()">
+      <div class="cl-row"><span class="cl-dot" style="background:#199e70;"></span><span class="cl-label">Libre service 24/7</span></div>
+      <div class="cl-row"><span class="cl-dot" style="background:#3987e5;"></span><span class="cl-label">Van Life &amp; Camping-car</span></div>
+      <div class="cl-row"><span class="cl-dot" style="background:#d95926;"></span><span class="cl-label">Service Urbains</span></div>
+      <div class="cl-row"><span class="cl-dot" style="background:#64798a;"></span><span class="cl-label">Autre</span></div>
     </div>
     <button id="btn-map-style" title="Type de carte" onclick="toggleMapStyleMenu()">&#128506;</button>
     <div id="map-style-menu">
@@ -3694,6 +3696,11 @@ function applyTerrain(on) {
 }
 
 // ===== SÉLECTEUR UNIFIÉ DE TYPE DE CARTE =====
+function toggleClusterLegend() {
+  var el = document.getElementById('cluster-legend');
+  if (el) el.classList.toggle('cl-collapsed');
+}
+
 function toggleMapStyleMenu() {
   var menu = document.getElementById('map-style-menu');
   if (menu) menu.classList.toggle('open');
