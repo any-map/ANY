@@ -111,7 +111,6 @@ input[type=text] { max-width: 100%; }
         <select id="type-select">
           <optgroup label="── Sanitaires">
             <option value="wc">🚻 Toilettes publiques</option>
-            <option value="shower">🚿 Douches publiques</option>
             <option value="eau">💧 Bornes eau potable</option>
             <option value="dump">🗑️ Stations vidange eaux grises/noires</option>
           </optgroup>
@@ -126,6 +125,7 @@ input[type=text] { max-width: 100%; }
             <option value="rest_area">🛣️ Aire de repos (autoroute)</option>
             <option value="dump_service">🚿 Aire de service camping-car (eau + vidange)</option>
             <option value="dump">🗑️ Station de vidange seule</option>
+            <option value="shower">🚿 Douches publiques</option>
           </optgroup>
           <optgroup label="── Pique-nique">
             <option value="picnic">🪑 Aires de pique-nique</option>
@@ -461,12 +461,12 @@ input[type=text] { max-width: 100%; }
       <label><input type="checkbox" class="q-type" value="dump_service"> 🚿 Aire de service camping-car</label>
       <label><input type="checkbox" class="q-type" value="dump"> 🗑️ Station de vidange</label>
       <label><input type="checkbox" class="q-type" value="picnic"> 🪑 Aires de pique-nique</label>
+      <label><input type="checkbox" class="q-type" value="shower"> 🚿 Douches publiques</label>
     </div>
     <div class="queue-group">
       <div class="queue-group-title">🏙️ Services & Commerces</div>
       <label><input type="checkbox" class="q-type" value="parking_public"> 🅿️ Parking public (gratuit, >20 places)</label>
       <label><input type="checkbox" class="q-type" value="wc"> 🚻 Toilettes publiques</label>
-      <label><input type="checkbox" class="q-type" value="shower"> 🚿 Douches publiques</label>
       <label><input type="checkbox" class="q-type" value="eau"> 💧 Bornes eau potable</label>
       <label><input type="checkbox" class="q-type" value="laundry"> 👕 Lavomatiques</label>
       <label><input type="checkbox" class="q-type" value="electric"> ⚡ Bornes recharge électrique</label>
@@ -641,7 +641,7 @@ var CAT_NAMES = {
 // Icône + couleur + main_category par défaut pour chaque type
 var CAT_META = {
   wc:            { icon:'🚻', color:'#3498db', main:'Équipements & Services' },
-  shower:        { icon:'🚿', color:'#2980b9', main:'Équipements & Services' },
+  shower:        { icon:'🚿', color:'#2980b9', main:'Van Life & Camping-car' },
   eau:           { icon:'💧', color:'#1a6fa8', main:'Équipements & Services' },
   dump:          { icon:'🗑️', color:'#117A65', main:'Van Life & Camping-car' },
   dump_service:  { icon:'🚿', color:'#148F77', main:'Van Life & Camping-car' },
