@@ -6007,6 +6007,12 @@ function makePopup(p) {
     if (isAdmin) {
       modBtns += '<button class="pv2-mod-btn pv2-mod-delete" onclick="deletePlace(\'' + safeId + '\',\'' + safeName + '\')">&#128465;&#65039; Supprimer</button>';
     }
+    var feeCatFree = allCats.find(function(c) { return c.name === 'Parking gratuit'; });
+    var feeCatPaid = allCats.find(function(c) { return c.name === 'Parking payant'; });
+    if (feeCatFree && feeCatPaid && (p.category_id === feeCatFree.id || p.category_id === feeCatPaid.id)) {
+      var otherFeeCat = p.category_id === feeCatFree.id ? feeCatPaid : feeCatFree;
+      modBtns += '<button class="pv2-mod-btn" onclick="togglePlaceFeeCategory(\'' + safeId + '\')">&#128260; Basculer vers ' + escHtml(otherFeeCat.name) + '</button>';
+    }
     modHtml = '<div class="pv2-mod-actions">' + modBtns + '</div>';
   }
 
@@ -6575,6 +6581,21 @@ async function showPlace(pid) {
   var res = await db.from('places').update({ hidden: false, hidden_by: null, hidden_at: null }).eq('id', pid);
   if (res.error) { showToast(t('lbl_err_generic') + res.error.message, 'error'); return; }
   showToast(t('toast_place_shown'), 'success');
+  map.closePopup();
+  scheduleLoad();
+}
+
+async function togglePlaceFeeCategory(pid) {
+  if (!currentUser || (!isModerator && !isAdmin)) return;
+  var p = allPlaces.find(function(pl) { return pl.id === pid; }) || window._currentPopupPlace;
+  if (!p) return;
+  var freeCat = allCats.find(function(c) { return c.name === 'Parking gratuit'; });
+  var paidCat = allCats.find(function(c) { return c.name === 'Parking payant'; });
+  if (!freeCat || !paidCat) return;
+  var target = p.category_id === freeCat.id ? paidCat : freeCat;
+  var res = await db.from('places').update({ category_id: target.id, main_category_id: target.main_category_id }).eq('id', pid);
+  if (res.error) { showToast(t('lbl_err_generic') + res.error.message, 'error'); return; }
+  showToast('Déplacé vers ' + target.name, 'success');
   map.closePopup();
   scheduleLoad();
 }
