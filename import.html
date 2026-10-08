@@ -119,7 +119,8 @@ input[type=text] { max-width: 100%; }
             <option value="camping">🅿️ Aire de camping-car officielle</option>
             <option value="camping_trad">⛺ Camping traditionnel</option>
             <option value="camping_nature">🌿 Aire naturelle / petit camping</option>
-            <option value="wild">🏕️ Bivouac / Spot sauvage</option>
+            <option value="wild">🥾 Bivouac (accès à pied)</option>
+            <option value="wild_vehicle">🏕️ Spot sauvage (accessible véhicule)</option>
             <option value="parking_motorhome">🚐 Parking autorisé camping-car</option>
             <option value="parking_night">🌙 Parking autorisé la nuit</option>
             <option value="rest_area">🛣️ Aire de repos (autoroute)</option>
@@ -451,7 +452,8 @@ input[type=text] { max-width: 100%; }
       <label><input type="checkbox" class="q-type" value="camping"> 🅿️ Aire de camping-car officielle</label>
       <label><input type="checkbox" class="q-type" value="camping_trad"> ⛺ Camping traditionnel</label>
       <label><input type="checkbox" class="q-type" value="camping_nature"> 🌿 Aire naturelle / petit camping</label>
-      <label><input type="checkbox" class="q-type" value="wild"> 🏕️ Bivouac / Spot sauvage</label>
+      <label><input type="checkbox" class="q-type" value="wild"> 🥾 Bivouac (accès à pied)</label>
+      <label><input type="checkbox" class="q-type" value="wild_vehicle"> 🏕️ Spot sauvage (accessible véhicule)</label>
       <label><input type="checkbox" class="q-type" value="parking_motorhome"> 🚐 Parking autorisé camping-car</label>
       <label><input type="checkbox" class="q-type" value="parking_night"> 🌙 Parking autorisé la nuit</label>
       <label><input type="checkbox" class="q-type" value="rest_area"> 🛣️ Aire de repos (autoroute)</label>
@@ -607,7 +609,8 @@ var CAT_NAMES = {
   dump:'Station de vidange', dump_service:'Aire de service camping-car',
   camping:'Aire de camping-car officielle', camping_trad:'Camping traditionnel',
   camping_nature:'Aire naturelle / petit camping',
-  wild:'Bivouac / Spot sauvage', picnic:'Aire de pique-nique',
+  wild:'Bivouac (accès à pied)', wild_vehicle:'Spot sauvage (accessible véhicule)',
+  picnic:'Aire de pique-nique',
   parking_motorhome:'Parking autorisé camping-car',
   parking_night:'Parking autorisé la nuit',
   rest_area:'Aire de repos (autoroute)',
@@ -643,7 +646,8 @@ var CAT_META = {
   camping:       { icon:'🅿️', color:'#27AE60', main:'Van Life & Camping-car' },
   camping_trad:  { icon:'⛺', color:'#2ecc71', main:'Van Life & Camping-car' },
   camping_nature:{ icon:'🌿', color:'#1a8a45', main:'Van Life & Camping-car' },
-  wild:          { icon:'🏕️', color:'#1e8449', main:'Van Life & Camping-car' },
+  wild:          { icon:'🥾', color:'#1e8449', main:'Van Life & Camping-car' },
+  wild_vehicle:  { icon:'🏕️', color:'#1e8449', main:'Van Life & Camping-car' },
   picnic:        { icon:'🪑', color:'#f39c12', main:'Nature & Outdoor' },
   parking_motorhome:{ icon:'🚐', color:'#2980b9', main:'Van Life & Camping-car' },
   parking_night: { icon:'🌙', color:'#1a252f', main:'Van Life & Camping-car' },
@@ -900,9 +904,11 @@ function buildQuery(type, b) {
     +ec;
   if (type==='wild')       return t
     +'node["tourism"="camp_site"]["backcountry"="yes"]('+b+');\n'
-    +'node["tourism"="camp_site"]["camp_site"="basic"]["informal"="yes"]('+b+');\n'
     +'node["tourism"="wilderness_hut"]('+b+');\n'
     +'node["tourism"="camp_site"]["tents"="yes"]["caravans"!="yes"]["motorhome"!="yes"]["informal"="yes"]('+b+');'
+    +ec;
+  if (type==='wild_vehicle') return t
+    +'node["tourism"="camp_site"]["camp_site"="basic"]["informal"="yes"]('+b+');'
     +ec;
   if (type==='parking_motorhome') return t
     +'node["amenity"="parking"]["motorhome"="yes"]('+b+');\n'
