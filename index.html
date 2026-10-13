@@ -986,7 +986,10 @@ path.leaflet-cluster-spider-leg{stroke:#fff!important;stroke-width:1.5px!importa
     <div class="info-box">Position : <span id="coord-display" data-i18n="form_click_map">Clique sur la carte !</span></div>
     <div class="form-group"><label data-i18n="form_name">Nom du lieu *</label><input type="text" id="add-name" data-i18n-ph="ph_place_name" placeholder="Ex: Distributeur de pain de la mairie"></div>
     <div class="form-group"><label data-i18n="form_main_cat">Grande cat&#233;gorie *</label><select id="add-main-cat" onchange="loadSubCats()"><option value="" data-i18n="form_choose">-- Choisir --</option></select></div>
-    <div class="form-group"><label data-i18n="form_sub_cat">Sous-cat&#233;gorie *</label><select id="add-sub-cat" onchange="updatePhotoGroupFromSubCat()"><option value="" data-i18n="form_choose_cat_first">-- Choisir la cat&#233;gorie d'abord --</option></select></div>
+    <div class="form-group"><label data-i18n="form_sub_cat">Sous-cat&#233;gorie *</label><select id="add-sub-cat" onchange="updatePhotoGroupFromSubCat();updateComboGroupFromSubCat()"><option value="" data-i18n="form_choose_cat_first">-- Choisir la cat&#233;gorie d'abord --</option></select></div>
+    <div class="form-group" id="add-combo-group" style="display:none">
+      <button type="button" id="add-combo-btn" onclick="toggleComboFlag()" style="width:100%;padding:10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);color:var(--text2);cursor:pointer;font-family:var(--font-body);font-size:13px;font-weight:600;transition:all 0.15s;"></button>
+    </div>
     <div class="form-group"><label data-i18n="form_desc">Description</label><textarea id="add-desc" data-i18n-ph="ph_description" placeholder="Infos utiles : horaires, &#233;tat, prix..."></textarea></div>
     <div class="form-group">
       <label data-i18n="form_available_24h">Disponible 24h/24 ? *</label>
@@ -3537,6 +3540,12 @@ var MAIN_CAT_CLUSTER_COLORS = {
 };
 var selectedLatLng = null;
 var add24hValue = null;
+var addComboFlag = false;
+// Catégories liées "combo" : un lieu de l'une peut aussi contenir l'autre (ex. distributeur boisson+snack)
+var COMBO_CATEGORY_PAIRS = {
+  'Distributeur de boissons fraîche': { pairName: 'Distributeur de snacks', label: 'des snacks' },
+  'Distributeur de snacks': { pairName: 'Distributeur de boissons fraîche', label: 'des boissons fraîches' }
+};
 var addingMode = false;
 var isLogin = true;
 var loadTimer = null;
@@ -5450,6 +5459,8 @@ function onMapClick(e) {
   var mainSel = document.getElementById('add-main-cat'); if (mainSel) mainSel.value = '';
   var subSel = document.getElementById('add-sub-cat'); if (subSel) subSel.innerHTML = '<option value="">' + t('form_choose_cat_first') + '</option>';
   var pg = document.getElementById('add-photo-group'); if (pg) pg.style.display = 'none';
+  var cg = document.getElementById('add-combo-group'); if (cg) cg.style.display = 'none';
+  addComboFlag = false;
   openModal('modal-add');
 }
 
@@ -5992,6 +6003,19 @@ function makePopup(p) {
     return '<span class="star" onclick="ratePlace(\'' + safeId + '\',' + n + ')" onmouseover="hoverStars(\'' + safeId + '\',' + n + ')" onmouseout="resetStars(\'' + safeId + '\')">&#9733;</span>';
   }).join('');
 
+  // Lien "combo" (ex. distributeur boisson+snack) : badge info pour tous, bouton pour le propri\u00e9taire/mod/admin
+  var comboHtml = '';
+  var comboInfo = cat ? COMBO_CATEGORY_PAIRS[cat.name] : null;
+  if (comboInfo) {
+    var hasCombo = !!p.secondary_category_id;
+    var canToggleCombo = currentUser && (currentUser.id === p.user_id || isAdmin || isModerator);
+    if (canToggleCombo) {
+      comboHtml = '<button class="pv2-nav-btn" style="width:100%;' + (hasCombo ? 'background:rgba(39,174,96,0.15);color:#27ae60;border-color:#27ae60;' : '') + '" onclick="toggleComboCategory(\'' + safeId + '\')">' + (hasCombo ? '\u2705' : '\u2795') + ' Il y a aussi ' + comboInfo.label + '</button>';
+    } else if (hasCombo) {
+      comboHtml = '<span class="pv2-badge" style="background:rgba(39,174,96,0.12);color:#27ae60;border:1px solid rgba(39,174,96,0.25);">\u2705 Il y a aussi ' + comboInfo.label + '</span>';
+    }
+  }
+
   // Mod actions HTML (mod\u00e9rateurs et admins uniquement)
   var modHtml = '';
   if (isModerator || isAdmin) {
@@ -6040,6 +6064,7 @@ function makePopup(p) {
         return '<span class="pv2-badge pv2-badge-user" style="cursor:pointer;" onclick="openPublicProfile(this.dataset.u)" data-u="' + escHtml(p.user_name || '') + '">Ajouté par ' + escHtml(p.user_name || t('lbl_anonymous')) + '</span>';
       })()
     + '</div>'
+    + (comboHtml ? '<div style="padding:4px 0 0;">' + comboHtml + '</div>' : '')
     + (fuel ? makeFuelHtml(fuel) : (p.description ? '<div class="pv2-desc">' + escHtml(p.description) + '</div>' : ''))
     + '<div id="report-info-' + safeId + '" style="display:none;font-size:11px;color:var(--danger);padding:4px 0 0;"></div>'
     + '</div>'
@@ -6596,6 +6621,24 @@ async function togglePlaceFeeCategory(pid) {
   var res = await db.from('places').update({ category_id: target.id, main_category_id: target.main_category_id }).eq('id', pid);
   if (res.error) { showToast(t('lbl_err_generic') + res.error.message, 'error'); return; }
   showToast('Déplacé vers ' + target.name, 'success');
+  map.closePopup();
+  scheduleLoad();
+}
+
+async function toggleComboCategory(pid) {
+  var p = allPlaces.find(function(pl) { return pl.id === pid; }) || window._currentPopupPlace;
+  if (!p) return;
+  if (!currentUser || (currentUser.id !== p.user_id && !isAdmin && !isModerator)) return;
+  var cat = allCats.find(function(c) { return c.id === p.category_id; });
+  var combo = cat ? COMBO_CATEGORY_PAIRS[cat.name] : null;
+  if (!combo) return;
+  var pairCat = allCats.find(function(c) { return c.name === combo.pairName; });
+  if (!pairCat) return;
+  var newVal = p.secondary_category_id ? null : pairCat.id;
+  var res = await db.from('places').update({ secondary_category_id: newVal }).eq('id', pid);
+  if (res.error) { showToast(t('lbl_err_generic') + res.error.message, 'error'); return; }
+  p.secondary_category_id = newVal;
+  showToast(newVal ? 'Marqué : il y a aussi ' + combo.label : 'Retiré', 'success');
   map.closePopup();
   scheduleLoad();
 }
@@ -8251,6 +8294,31 @@ function updatePhotoGroupFromSubCat() {
   if (pg) pg.style.display = catId && catAllowsPhotos(catId) ? '' : 'none';
 }
 
+function updateComboGroupFromSubCat() {
+  var cg = document.getElementById('add-combo-group');
+  if (!cg) return;
+  var catId = document.getElementById('add-sub-cat').value;
+  var cat = allCats.find(function(c) { return c.id === catId; });
+  var combo = cat ? COMBO_CATEGORY_PAIRS[cat.name] : null;
+  if (combo) { cg.style.display = ''; setComboFlag(false); }
+  else { cg.style.display = 'none'; addComboFlag = false; }
+}
+
+function setComboFlag(val) {
+  addComboFlag = val;
+  var btn = document.getElementById('add-combo-btn');
+  if (!btn) return;
+  var catId = document.getElementById('add-sub-cat').value;
+  var cat = allCats.find(function(c) { return c.id === catId; });
+  var combo = cat ? COMBO_CATEGORY_PAIRS[cat.name] : null;
+  btn.textContent = (val ? '✅ ' : '➕ ') + 'Il y a aussi ' + (combo ? combo.label : '') + ' à l\'intérieur';
+  btn.style.background = val ? 'rgba(39,174,96,0.2)' : 'var(--surface2)';
+  btn.style.borderColor = val ? '#27ae60' : 'var(--border)';
+  btn.style.color = val ? '#27ae60' : 'var(--text2)';
+}
+
+function toggleComboFlag() { setComboFlag(!addComboFlag); }
+
 function onAddBtn() {
   if (addingMode) {
     addingMode = false;
@@ -8313,10 +8381,17 @@ async function submitPlace() {
   if (!selectedLatLng) { showToast(t('toast_err_click_map'), 'error'); _reEnable(); return; }
   if (add24hValue === null) { showToast(t('toast_err_24h'), 'error'); _reEnable(); return; }
   var placeStatus = 'active';
+  var secondaryCatId = null;
+  if (addComboFlag) {
+    var selCat = allCats.find(function(c) { return c.id === catId; });
+    var combo = selCat ? COMBO_CATEGORY_PAIRS[selCat.name] : null;
+    var pairCat = combo ? allCats.find(function(c) { return c.name === combo.pairName; }) : null;
+    if (pairCat) secondaryCatId = pairCat.id;
+  }
   var result = await db.from('places').insert({
     name: name, description: desc,
     latitude: selectedLatLng.lat, longitude: selectedLatLng.lng,
-    main_category_id: mainId, category_id: catId,
+    main_category_id: mainId, category_id: catId, secondary_category_id: secondaryCatId,
     user_id: currentUser.id, user_name: currentUsername || currentUser.email.split('@')[0],
     disponible_24h: is24h, approved: true, status: placeStatus,
     validation_weight: (isAdmin || isModerator) ? 3 : 0
