@@ -4736,8 +4736,8 @@ async function loadPubPlaces() {
   if (!panel || !_pubProfileData) return;
   panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;">' + t('lbl_loading') + '</div>';
   var res = _pubProfileData.userId
-    ? await db.from('places').select('id,name,latitude,longitude,categories(icon,name)').eq('user_id', _pubProfileData.userId).order('created_at', { ascending: false }).limit(50)
-    : await db.from('places').select('id,name,latitude,longitude,categories(icon,name)').eq('user_name', _pubProfileData.username).order('created_at', { ascending: false }).limit(50);
+    ? await db.from('places').select('id,name,latitude,longitude,categories!places_category_id_fkey(icon,name)').eq('user_id', _pubProfileData.userId).order('created_at', { ascending: false }).limit(50)
+    : await db.from('places').select('id,name,latitude,longitude,categories!places_category_id_fkey(icon,name)').eq('user_name', _pubProfileData.username).order('created_at', { ascending: false }).limit(50);
   var data = res.data || [];
   if (!data.length) { panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;text-align:center;">' + t('lbl_no_place_added') + '</div>'; return; }
   panel.innerHTML = data.map(function(p) {
@@ -4754,7 +4754,7 @@ async function loadPubValidated() {
   var panel = document.getElementById('pub-validated-panel');
   if (!panel || !_pubProfileData || !_pubProfileData.userId) { if (panel) panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;text-align:center;">' + t('lbl_not_available') + '</div>'; return; }
   panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;">' + t('lbl_loading') + '</div>';
-  var res = await db.from('place_validations').select('places(id,name,latitude,longitude,categories(icon,name))').eq('user_id', _pubProfileData.userId).order('created_at', { ascending: false }).limit(50);
+  var res = await db.from('place_validations').select('places(id,name,latitude,longitude,categories!places_category_id_fkey(icon,name))').eq('user_id', _pubProfileData.userId).order('created_at', { ascending: false }).limit(50);
   var data = (res.data || []).filter(function(r) { return r.places; });
   if (!data.length) { panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;text-align:center;">' + t('profile_validated') + '</div>'; return; }
   panel.innerHTML = data.map(function(r) {
@@ -5845,7 +5845,7 @@ async function goToSoloPlace(placeId, lat, lng) {
   var banner = document.getElementById('solo-banner');
   if (banner) banner.style.display = 'flex';
   map.flyTo([lat, lng], 16, { duration: 0.8 });
-  var res = await db.from('places').select('*, categories(name,icon,color), main_categories(name,icon)').eq('id', placeId).maybeSingle();
+  var res = await db.from('places').select('*, categories!places_category_id_fkey(name,icon,color), main_categories(name,icon)').eq('id', placeId).maybeSingle();
   if (res.data) { allPlaces = [res.data]; renderMarkers([res.data]); }
 }
 
@@ -5862,7 +5862,7 @@ async function goToPubSoloPlace(placeId, lat, lng) {
     if (btn) btn.textContent = t('solo_back_profile');
   }
   map.flyTo([lat, lng], 16, { duration: 0.8 });
-  var res = await db.from('places').select('*, categories(name,icon,color), main_categories(name,icon)').eq('id', placeId).maybeSingle();
+  var res = await db.from('places').select('*, categories!places_category_id_fkey(name,icon,color), main_categories(name,icon)').eq('id', placeId).maybeSingle();
   if (res.data) { allPlaces = [res.data]; renderMarkers([res.data]); }
 }
 
@@ -6010,9 +6010,9 @@ function makePopup(p) {
     var hasCombo = !!p.secondary_category_id;
     var canToggleCombo = currentUser && (currentUser.id === p.user_id || isAdmin || isModerator);
     if (canToggleCombo) {
-      comboHtml = '<button class="pv2-nav-btn" style="width:100%;' + (hasCombo ? 'background:rgba(39,174,96,0.15);color:#27ae60;border-color:#27ae60;' : '') + '" onclick="toggleComboCategory(\'' + safeId + '\')">' + (hasCombo ? '\u2705' : '\u2795') + ' Il y a aussi ' + comboInfo.label + '</button>';
+      comboHtml = '<button class="pv2-nav-btn" style="width:100%;' + (hasCombo ? 'background:rgba(39,174,96,0.15);color:#27ae60;border-color:#27ae60;' : '') + '" onclick="toggleComboCategory(\'' + safeId + '\')">' + (hasCombo ? '\u2705' : '\u2795') + ' Il y a aussi ' + comboInfo.label + ' \u00e0 l\'int\u00e9rieur</button>';
     } else if (hasCombo) {
-      comboHtml = '<span class="pv2-badge" style="background:rgba(39,174,96,0.12);color:#27ae60;border:1px solid rgba(39,174,96,0.25);">\u2705 Il y a aussi ' + comboInfo.label + '</span>';
+      comboHtml = '<span class="pv2-badge" style="background:rgba(39,174,96,0.12);color:#27ae60;border:1px solid rgba(39,174,96,0.25);">\u2705 Il y a aussi ' + comboInfo.label + ' \u00e0 l\'int\u00e9rieur</span>';
     }
   }
 
@@ -6895,7 +6895,7 @@ async function loadUserValidated() {
   var panel = document.getElementById('prof-validated-panel');
   if (!panel || !currentUser) return;
   panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;">' + t('lbl_loading') + '</div>';
-  var res = await db.from('place_validations').select('created_at,places(id,name,latitude,longitude,categories(icon,name))').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(50);
+  var res = await db.from('place_validations').select('created_at,places(id,name,latitude,longitude,categories!places_category_id_fkey(icon,name))').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(50);
   var data = (res.data || []).filter(function(r) { return r.places; });
   if (!data.length) { panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;text-align:center;">' + t('profile_validated') + '</div>'; return; }
   panel.innerHTML = data.map(function(r) {
@@ -7217,7 +7217,7 @@ async function loadUserVotes() {
   var panel = document.getElementById('prof-votes-panel');
   if (!panel || !currentUser) return;
   panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;">' + t('lbl_loading') + '</div>';
-  var res = await db.from('votes').select('vote,places(id,name,latitude,longitude,categories(icon))').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(50);
+  var res = await db.from('votes').select('vote,places(id,name,latitude,longitude,categories!places_category_id_fkey(icon))').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(50);
   var data = res.data || [];
   if (!data.length) {
     panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;text-align:center;">' + t('lbl_no_vote') + '</div>';
@@ -7250,7 +7250,7 @@ async function loadUserPlaces() {
   var panel = document.getElementById('prof-places-panel');
   if (!panel || !currentUser) return;
   panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;">' + t('lbl_loading') + '</div>';
-  var res = await db.from('places').select('id,name,latitude,longitude,categories(icon,name)').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(50);
+  var res = await db.from('places').select('id,name,latitude,longitude,categories!places_category_id_fkey(icon,name)').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(50);
   var data = res.data || [];
   if (!data.length) {
     panel.innerHTML = '<div style="padding:8px 0;color:var(--text2);font-size:13px;text-align:center;">' + t('lbl_no_place_added') + '</div>';
@@ -7318,7 +7318,7 @@ async function loadFavoritesInProfile() {
   el.innerHTML = '<div style="padding:12px 0;color:var(--text2);font-size:13px;">' + t('lbl_loading') + '</div>';
   var ids = Object.keys(userFavs);
   if (!ids.length) { el.innerHTML = '<div style="padding:12px 0;color:var(--text2);font-size:13px;text-align:center;">' + t('lbl_no_fav') + '</div>'; return; }
-  var res = await db.from('places').select('id,name,latitude,longitude,categories(icon,name,color)').in('id', ids);
+  var res = await db.from('places').select('id,name,latitude,longitude,categories!places_category_id_fkey(icon,name,color)').in('id', ids);
   var places = res.data || [];
   el.innerHTML = places.map(function(p) {
     var cat = p.categories || {};
@@ -7359,7 +7359,7 @@ async function renderFavoritesSheet() {
   body.innerHTML = '<div style="color:var(--text2);font-size:13px;padding:20px 0;text-align:center;">' + t('lbl_loading') + '</div>';
   var ids = Object.keys(userFavs);
   var [placesRes, presetsRes] = await Promise.all([
-    ids.length ? db.from('places').select('id,name,latitude,longitude,categories(icon,name,color)').in('id', ids) : Promise.resolve({ data: [] }),
+    ids.length ? db.from('places').select('id,name,latitude,longitude,categories!places_category_id_fkey(icon,name,color)').in('id', ids) : Promise.resolve({ data: [] }),
     db.from('favorite_filters').select('id,name,filters').eq('user_id', currentUser.id).order('created_at')
   ]);
   favFilterPresets = presetsRes.data || [];
@@ -7873,7 +7873,7 @@ async function loadPendingPlaces() {
   var badge = document.getElementById('pending-count-badge');
   if (!el) return;
   el.innerHTML = '<div style="color:var(--text2);">' + t('lbl_loading') + '</div>';
-  var res = await db.from('places').select('id,name,user_name,user_id,latitude,longitude,created_at,main_categories(name,icon),categories(name,icon)').eq('status', 'pending').order('created_at', { ascending: false });
+  var res = await db.from('places').select('id,name,user_name,user_id,latitude,longitude,created_at,main_categories(name,icon),categories!places_category_id_fkey(name,icon)').eq('status', 'pending').order('created_at', { ascending: false });
   var data = res.data || [];
   if (badge) badge.textContent = data.length;
   if (!data.length) { el.innerHTML = '<div style="color:var(--text2);text-align:center;padding:12px 0;">' + picHtml('task_alt') + ' ' + t('dash_no_pending') + '</div>'; return; }
@@ -7924,7 +7924,7 @@ function viewPendingPlace(pid, lat, lng) {
     if (btnLeft) btnLeft.textContent = t('solo_back_pending');
   }
   map.flyTo([lat, lng], 16, { duration: 0.8 });
-  db.from('places').select('*, categories(name,icon,color), main_categories(name,icon)').eq('id', pid).maybeSingle().then(function(res) {
+  db.from('places').select('*, categories!places_category_id_fkey(name,icon,color), main_categories(name,icon)').eq('id', pid).maybeSingle().then(function(res) {
     if (res.data) { allPlaces = [res.data]; renderMarkers([res.data]); openPlaceSheet(res.data); }
   });
 }
@@ -8011,7 +8011,7 @@ function viewFromDashboard(pid, lat, lng, backLabel) {
     if (btnLeft) btnLeft.textContent = (backLabel || t('solo_back_dashboard'));
   }
   map.flyTo([lat, lng], 16, { duration: 0.8 });
-  db.from('places').select('*, categories(name,icon,color), main_categories(name,icon)').eq('id', pid).maybeSingle().then(function(res) {
+  db.from('places').select('*, categories!places_category_id_fkey(name,icon,color), main_categories(name,icon)').eq('id', pid).maybeSingle().then(function(res) {
     if (res.data) { allPlaces = [res.data]; renderMarkers([res.data]); openPlaceSheet(res.data); }
     else showToast(t('toast_place_not_found'), 'error');
   });
@@ -8030,7 +8030,7 @@ function viewReportedPlace(pid, lat, lng) {
     if (btnLeft) btnLeft.textContent = t('solo_back_reports');
   }
   map.flyTo([lat, lng], 16, { duration: 0.8 });
-  db.from('places').select('*, categories(name,icon,color), main_categories(name,icon)').eq('id', pid).maybeSingle().then(function(res) {
+  db.from('places').select('*, categories!places_category_id_fkey(name,icon,color), main_categories(name,icon)').eq('id', pid).maybeSingle().then(function(res) {
     if (res.data) { allPlaces = [res.data]; renderMarkers([res.data]); openPlaceSheet(res.data); }
   });
 }
@@ -8991,7 +8991,7 @@ async function loadReportHistory() {
 }
 
 async function openHistoryPlace(placeId) {
-  var res = await db.from('places').select('*, categories(name,icon,color), main_categories(name,icon)').eq('id', placeId).maybeSingle();
+  var res = await db.from('places').select('*, categories!places_category_id_fkey(name,icon,color), main_categories(name,icon)').eq('id', placeId).maybeSingle();
   if (!res.data) { showToast(t('toast_place_not_found'), 'error'); return; }
   closeSheet('sheet-dashboard');
   soloPlaceId = placeId;
@@ -9105,7 +9105,7 @@ function showDashNewPlaces() {
       var el = document.getElementById('dash-new-places-list');
       if (!el) return;
       var weekStart = getWeekStartISO();
-      var res = await db.from('places').select('id,name,user_name,status,created_at,latitude,longitude,categories(icon,name)').gte('created_at', weekStart).order('created_at', { ascending: false });
+      var res = await db.from('places').select('id,name,user_name,status,created_at,latitude,longitude,categories!places_category_id_fkey(icon,name)').gte('created_at', weekStart).order('created_at', { ascending: false });
       var places = res.data || [];
       if (!places.length) { el.innerHTML = '<div style="color:var(--text2);font-size:13px;text-align:center;padding:16px 0;">' + t('lbl_no_new_place_week') + '</div>'; return; }
       el.innerHTML = '<div style="font-size:11px;color:var(--text2);margin-bottom:10px;">' + places.length + ' ' + t('dash_new_places').toLowerCase() + ' — ' + t('lbl_this_week') + '</div>'
@@ -9187,7 +9187,7 @@ function showDashValidatedPlaces() {
     (async function() {
       var listEl = document.getElementById('validated-places-list');
       if (!listEl) return;
-      var res = await db.from('places').select('id,name,user_name,created_at,latitude,longitude,categories(icon,name)').eq('status', 'active').order('created_at', { ascending: false }).limit(60);
+      var res = await db.from('places').select('id,name,user_name,created_at,latitude,longitude,categories!places_category_id_fkey(icon,name)').eq('status', 'active').order('created_at', { ascending: false }).limit(60);
       var places = res.data || [];
       if (!places.length) { listEl.innerHTML = '<div style="color:var(--text2);font-size:13px;text-align:center;padding:16px 0;">' + t('lbl_no_active_place') + '</div>'; return; }
       listEl.innerHTML = '<div style="font-size:11px;color:var(--text2);margin-bottom:10px;">' + places.length + ' ' + t('dash_validated_total_label') + '</div>'

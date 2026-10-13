@@ -177,7 +177,7 @@ async function loadReports() {
 }
 
 async function loadPlaces() {
-  var res = await db.from('places').select('id, name, category_id, user_name, created_at, approved, latitude, longitude, categories(name,icon)').order('created_at', { ascending: false }).limit(200);
+  var res = await db.from('places').select('id, name, category_id, user_name, created_at, approved, latitude, longitude, categories!places_category_id_fkey(name,icon)').order('created_at', { ascending: false }).limit(200);
   allPlaces = res.data || [];
   renderPlaces(allPlaces);
 }
